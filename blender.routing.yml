@@ -1,0 +1,47 @@
+blender.content:
+  path: '/journals'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::content'
+    _title: 'Journal Blender'
+  requirements:
+    _permission: 'access content'
+
+entity.blender_journal.canonical:
+  path: '/journals/journal/{blender_journal}'
+  defaults:
+    _entity_view: 'blender_journal'
+    _title: 'Journal Information'
+  requirements:
+    _entity_access: 'blender_journal.view'
+
+entity.blender_journal.collection:
+  path: '/journals/list'
+  defaults:
+    _entity_list: 'blender_journal'
+    _title: 'Journal List'
+  requirements:
+    _permission: 'view blender'
+
+entity.blender_journal.journal_add:
+  path: '/journals/add_journal'
+  defaults:
+    _entity_form: blender_journal.add
+    _title: 'Add Journal'
+  requirements:
+    _entity_create_access: 'blender_journal'
+
+entity.blender_journal.edit_form:
+  path: 'journals/edit_journal/{blender_journal}'
+  defaults:
+    _entity_form: blender_journal.edit
+    _title: 'Edit Journal'
+  requirements:
+    _entity_access: 'blender_journal.edit'
+
+entity.blender_article.canonical:
+  path: 'journals/article/{blender_article}'
+  defaults:
+    _entity_view: 'blender_article'
+    _title: 'Article Details'
+  requirements:
+    _permission: 'view blender'

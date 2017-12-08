@@ -1,0 +1,9 @@
+blender.journal_add:
+  # Which route will be called by the link
+  route_name: entity.blender_journal.journal_add
+  title: 'Add Journal'
+
+  # Where will the link appear, defined by route name.
+  appears_on:
+    - entity.blender_journal.collection
+    - entity.blender_journal.canonical

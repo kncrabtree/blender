@@ -1,0 +1,5 @@
+entity.blender_journal.collection:
+  title: 'View All Journals'
+  route_name: entity.blender_journal.collection
+  description: 'List information about all journals in the system.'
+  weight: 10

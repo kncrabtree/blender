@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function blender_theme($existing, $type, $theme, $path) {
+  $variables = array(
+    'blender' => array(
+      'variables' => array(
+        'articles' => NULL,
+      ),
+      'template' => 'blender',
+    ),
+  );
+  return $variables;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function blender_cron() {
+  \Drupal::logger('blender')->notice("Blender Cron Triggered.");
+
+  $storage = \Drupal::entityManager()->getStorage('blender_journal');
+
+  $jids = \Drupal::entityQuery('blender_journal')
+    ->condition('active', TRUE, '==')
+    ->execute();
+
+  $journals = $storage->loadMultiple($jids);
+
+  foreach( $journals as $j ) {
+     \Drupal::logger('blender')->notice($j->get('abbr')->value);
+  }
+}

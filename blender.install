@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Journals module.
+ */
+
+use Drupal\user\RoleInterface;
+
+/**
+ * Implements hook_install().
+ */
+// function blender_install() {
+//   user_role_change_permissions(RoleInterface::ANONYMOUS_ID, array(
+//     'view journal articles' => TRUE,
+//     'vote' => TRUE,
+//     'administer journals' => TRUE,
+//   ));
+// }

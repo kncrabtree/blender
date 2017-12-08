@@ -1,0 +1,9 @@
+blender_journal.view:
+  route_name: entity.blender_journal.canonical
+  base_route: entity.blender_journal.canonical
+  title: View
+
+blender_journal.page_edit:
+  route_name: entity.blender_journal.edit_form
+  base_route: entity.blender_journal.canonical
+  title: Edit

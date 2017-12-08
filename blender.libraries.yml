@@ -1,0 +1,6 @@
+blender:
+  css:
+    layout:
+      css/blender-layout.css: {}
+    theme:
+      css/blender-theme.css: {}
