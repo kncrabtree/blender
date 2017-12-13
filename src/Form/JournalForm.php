@@ -34,9 +34,11 @@ class JournalForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $status = parent::save($form, $form_state);
 
     $entity = $this->entity;
+
+    $status = parent::save($form, $form_state);
+
     if ($status == SAVED_UPDATED) {
       drupal_set_message($this->t('The journal %feed has been updated.', ['%feed' => $entity->toLink()->toString()]));
     } else {

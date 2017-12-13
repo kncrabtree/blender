@@ -17,9 +17,9 @@ use Drupal\Core\Datetime\DrupalDateTime;
  * @ContentEntityType(
  *   id = "blender_article",
  *   label = @Translation("Journal Article"),
- *   base_table = "journal_articles",
+ *   base_table = "blender_articles",
  *   admin_permission = "administer journals",
- *   fieldable = FALSE,
+ *   fieldable = false,
  *   handlers = {
  *     "view_builder" = "Drupal\blender\Entity\Controller\JournalArticleViewBuilder",
  *   },
@@ -32,11 +32,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *     "journal_id" = "journal_id",
  *     "authors" = "authors",
  *     "title" = "title",
- *     "abstract" = "abstract",
- *     "volume" = "volume",
- *     "pages" = "pages",
  *     "doi" = "doi",
- *     "url" = "url",
  *     "date_added" = "date_added"
  *   },
  *   links = {
@@ -53,78 +49,78 @@ class JournalArticle extends ContentEntityBase implements ContentEntityInterface
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
       ->setDescription(t('The ID of the article.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(true);
 
     // Standard field, unique outside of the scope of the current project.
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the article.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(true);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
       ->setDescription(t('The ID of the user assigned to this article.'))
       ->setSetting('target_type', 'user')
-      ->setReadOnly(TRUE);
+      ->setReadOnly(true);
 
     $fields['inbox'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('In Inbox?'))
       ->setDescription(t("Is the article in the user's inbox?"))
-      ->setRequired(TRUE)
-      ->setSetting('default_value', TRUE);
+      ->setRequired(true)
+      ->setSetting('default_value', true);
 
     $fields['new'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('New?'))
       ->setDescription(t("Has the user seen the article?"))
-      ->setRequired(TRUE)
-      ->setSetting('default_value', TRUE);
+      ->setRequired(true)
+      ->setSetting('default_value', true);
 
     $fields['journal_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Journal ID'))
       ->setDescription(t('The ID of the journal for this article.'))
       ->setSetting('target_type', 'blender_journal')
-      ->setReadOnly(TRUE);
+      ->setReadOnly(true);
 
     $fields['authors'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Authors'))
       ->setDescription(t('The authors of the article.'))
-      ->setRequired(TRUE);
+      ->setRequired(true);
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The title of the article.'))
-      ->setRequired(TRUE);
+      ->setRequired(true);
 
     $fields['abstract'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Abstract'))
       ->setDescription(t('The abstract of the article.'))
-      ->setRequired(FALSE);
+      ->setRequired(false);
 
     $fields['volume'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Volume'))
       ->setDescription(t('The volume of the article\'s journal.'))
-      ->setRequired(FALSE);
+      ->setRequired(false);
 
     $fields['pages'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Pages'))
       ->setDescription(t('The pages or number of the article in its journal.'))
-      ->setRequired(FALSE);
+      ->setRequired(false);
+
+    $fields['year'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Year'))
+      ->setDescription(t('The year of publication.'))
+      ->setRequired(false);
 
     $fields['doi'] = BaseFieldDefinition::create('string')
       ->setLabel(t('DOI'))
       ->setDescription(t('The digital object identifier of the article.'))
-      ->setRequired(FALSE);
-
-    $fields['url'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('URL'))
-      ->setDescription(t("The URL for the article."))
-      ->setRequired(TRUE)
+      ->setRequired(true)
       ->addConstraint('UniqueField');
 
     $fields['date_added'] = BaseFieldDefinition::create('created')
       ->setLabel("Date added")
       ->setDescription("When the article was added to the system.")
-      ->setRequired(TRUE);
+      ->setRequired(true);
 
     return $fields;
   }

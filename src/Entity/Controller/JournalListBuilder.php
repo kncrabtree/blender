@@ -43,11 +43,13 @@ class JournalListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['id'] = $this->t('Journal ID');
+    $header['uuid'] = $this->t('Journal UUID');
     $header['title'] = $this->t('Title');
     $header['abbr'] = $this->t('Abbreviation');
-    $header['url'] = $this->t('URL');
+    $header['issn'] = $this->t('ISSN');
     $header['active'] = $this->t('Active?');
     $header['last_update'] = $this->t('Last Update');
+    $header['last_num_articles'] = $this->t('Recent Articles');
     return $header + parent::buildHeader();
   }
 
@@ -57,11 +59,13 @@ class JournalListBuilder extends EntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\blender\Entity\Journal */
     $row['id'] = $entity->id();
+    $row['uuid'] = $entity->uuid();
     $row['title'] = $entity->title->value;
     $row['abbr'] = $entity->abbr->value;
-    $row['url'] = $entity->url->value;
+    $row['issn'] = $entity->issn->value;
     $row['active'] = $entity->active->value;
     $row['last_update'] = DrupalDateTime::createFromTimestamp($entity->last_update->value)->format('m/d/Y g:ia');
+    $row['last_num_articles'] = $entity->last_num_articles->value;
 
     return $row + parent::buildRow($entity);
   }

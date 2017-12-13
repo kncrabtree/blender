@@ -15,7 +15,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  * @ContentEntityType(
  *   id = "blender_journal",
  *   label = @Translation("Journal"),
- *   base_table = "journals",
+ *   base_table = "blender_journals",
  *   admin_permission = "administer journals",
  *   fieldable = FALSE,
  *   handlers = {
@@ -33,10 +33,11 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *     "uuid" = "uuid",
  *     "title" = "title",
  *     "abbr" = "abbr",
- *     "url" = "url",
- *     "parser" = "parser",
+ *     "issn" = "issn",
  *     "active" = "active",
- *     "last_update" = "last_update"
+ *     "last_update" = "last_update",
+ *     "queued_time" = "queued_time",
+ *     "last_num_articles" = "last_num_articles",
  *   },
  *   links = {
  *     "canonical" = "/journals/journal/{blender_journal}",
@@ -114,11 +115,12 @@ class Journal extends ContentEntityBase implements ContentEntityInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['url'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('URL'))
-      ->setDescription(t("The URL for the journal's RSS feed."))
+    $fields['issn'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('ISSN'))
+      ->setDescription(t("The journal's ISSN for CrossRef lookup."))
       ->setRequired(TRUE)
       ->addConstraint('UniqueField')
+      ->addConstraint('active_issn')
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 50,
@@ -136,26 +138,6 @@ class Journal extends ContentEntityBase implements ContentEntityInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['parser'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Parser'))
-      ->setDescription(t('The name of the parser function for this journal.'))
-      ->setRequired(TRUE)
-       ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 50,
-        'text_processing' => 0,
-      ))
-      ->setDisplayOptions('view', array(
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -6,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'string_textfield',
-        'weight' => -6,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['active'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active?'))
@@ -174,11 +156,22 @@ class Journal extends ContentEntityBase implements ContentEntityInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['last_update'] = BaseFieldDefinition::create('changed')
-      ->setLabel("Last Updated")
-      ->setDescription("Most recent successful update.")
+    $fields['last_update'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel("Last Update")
+      ->setDescription("Last time this journal was checked for new articles.")
       ->setRequired(FALSE);
 //       ->setSettings(array('default_value' => NOW));
+
+    $fields['queued_time'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel("Queued Time")
+      ->setDescription("Time this journal was queue for fetching (or 0 if not queued)")
+      ->setRequired(TRUE)
+      ->setSetting('default_value',0);
+
+    $fields['last_num_articles'] = BaseFieldDefinition::create('integer')
+      ->setLabel("Articles Retrieved")
+      ->setDescription("Number of articles retrieved at last check.")
+      ->setRequired(FALSE);
 
     return $fields;
   }

@@ -25,11 +25,20 @@ function blender_cron() {
 
   $jids = \Drupal::entityQuery('blender_journal')
     ->condition('active', TRUE, '==')
+    ->condition('last_update',REQUEST_TIME-(12*60*60),'<')
+    ->condition('queued_time',0,'==')
     ->execute();
 
   $journals = $storage->loadMultiple($jids);
 
+  $queue = \Drupal::queue('journal_fetcher');
+
   foreach( $journals as $j ) {
-     \Drupal::logger('blender')->notice($j->get('abbr')->value);
+    if($queue->createItem($j))
+    {
+      \Drupal::logger('blender')->notice("Queued ".$j->abbr->value);
+      $j->set('queued_time',REQUEST_TIME);
+      $j->save();
+    }
   }
 }
