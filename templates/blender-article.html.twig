@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * Default theme implementation to print Articles.
+ *
+ * Available variables:
+ *   - articles
+ *
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% if articles %}
+{% for a in articles %}
+  <div class="article" id="article-{{ a.id }}">
+  <span class="article-title">{{ a.title }}</span>
+  <span class="article-authors">{{ a.authors }}</span>
+  <span class="article-citation">
+  <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a></span>
+  {% if a.inbox %}
+  <button class="inbox" id="inbox-{{ a.id }}">Inbox</button>
+  {% else %}
+  <button class="inbox archive" id="inbox-{{ a.id }}">Inbox</button>
+  {% endif %}
+  </div>
+{% endfor %}
+{% endif %}

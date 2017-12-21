@@ -35,7 +35,11 @@ class JournalForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
 
+    $this->entity->set('last_num_articles',0);
+    $this->entity->set('queued_time',0);
+    $this->entity->set('last_update',REQUEST_TIME);
     $entity = $this->entity;
+
 
     $status = parent::save($form, $form_state);
 

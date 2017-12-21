@@ -4,3 +4,9 @@ blender:
       css/blender-layout.css: {}
     theme:
       css/blender-theme.css: {}
+  js:
+    js/blender.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

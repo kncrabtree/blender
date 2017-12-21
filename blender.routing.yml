@@ -1,10 +1,32 @@
-blender.content:
-  path: '/journals'
+blender.inbox:
+  path: '/journals/inbox'
   defaults:
-    _controller: '\Drupal\blender\Controller\BlenderController::content'
-    _title: 'Journal Blender'
+    _controller: '\Drupal\blender\Controller\BlenderController::inbox'
+    _title: 'Inbox'
   requirements:
-    _permission: 'access content'
+    _permission: 'access blender'
+
+blender.user-archive:
+  path: '/journals/my-articles'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::all_user_articles'
+    _title: 'My Articles'
+  requirements:
+    _permission: 'access blender'
+
+blender.toggle-archive:
+  path: '/journals/toggle-archive'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::toggle_archive'
+  requirements:
+    _permission: 'access blender'
+
+blender.more-articles:
+  path: '/journals/more-articles'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::more_articles'
+  requirements:
+    _permission: 'access blender'
 
 entity.blender_journal.canonical:
   path: '/journals/journal/{blender_journal}'
@@ -20,7 +42,7 @@ entity.blender_journal.collection:
     _entity_list: 'blender_journal'
     _title: 'Journal List'
   requirements:
-    _permission: 'view blender'
+    _permission: 'access blender'
 
 entity.blender_journal.journal_add:
   path: '/journals/add_journal'
@@ -44,4 +66,4 @@ entity.blender_article.canonical:
     _entity_view: 'blender_article'
     _title: 'Article Details'
   requirements:
-    _permission: 'view blender'
+    _permission: 'access blender'

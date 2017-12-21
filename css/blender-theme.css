@@ -1,5 +1,49 @@
 .article {
-  color: green;
   border: 1px solid black;
   border-radius: 5px;
+  font-family: Sans-serif;
+  padding: 5px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: auto auto auto;
+  font-size: 0.875em;
 }
+
+.article-title {
+  grid-row: 1;
+  grid-column: 1 / 4;
+  font-size: 1.25em;
+  font-weight: bold;
+  padding: 0px;
+}
+
+.article-authors {
+  grid-row: 2;
+  grid column: 1;
+  padding: 0px;
+}
+
+.article-volume {
+  font-weight: bold;
+}
+
+button {
+    border-radius: 10px;
+    padding: 1em 1em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.inbox {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.inbox.archive {
+  background-color: white; /* Green */
+  color: #4CAF50;
+  border: 1px solid #4CAF50;
+}
+

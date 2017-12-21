@@ -3,3 +3,31 @@
     grid-auto-rows: minmax(100px, auto);
     grid-row-gap: 5px;
 }
+
+.article {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: auto auto auto;
+  grid-row-gap: 0px;
+  grid-column-gap: 0px;
+}
+
+.article-title {
+  grid-row: 1;
+  grid-column: 1 / 4;
+}
+
+.article-authors {
+  grid-row: 2;
+  grid column: 1;
+}
+
+.article-citation {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.inbox {
+  grid-row: 2;
+  grid-column: 3;
+}

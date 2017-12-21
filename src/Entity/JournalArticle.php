@@ -134,6 +134,7 @@ class JournalArticle extends ContentEntityBase implements ContentEntityInterface
     $name = $owner->getDisplayName();
 
     $out = array (
+        'id' => $this->get('id')->value,
         'user_id' => $this->get('user_id')->target_id,
         'inbox' => $this->get('inbox')->value,
         'new' => $this->get('new')->value,
@@ -144,9 +145,9 @@ class JournalArticle extends ContentEntityBase implements ContentEntityInterface
         'abstract' => $this->get('abstract')->value,
         'volume' => $this->get('volume')->value,
         'pages' => $this->get('pages')->value,
+        'year' => $this->get('year')->value,
         'doi' => $this->get('doi')->value,
-        'url' => $this->get('url')->value,
-//         'date_added' => DrupalDateTime::createFromTimestamp($this->get('date_added')),
+        'date_added' => DrupalDateTime::createFromTimestamp($this->get('date_added')->value)->format('Y-m-d')
     );
 
     return $out;

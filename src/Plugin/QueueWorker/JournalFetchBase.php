@@ -89,48 +89,49 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
 
         $journal->set('queued_time',0);
         $journal->set('last_num_articles',$article_count);
-//         $journal->set('last_update',REQUEST_TIME);
+         $journal->set('last_update',REQUEST_TIME);
         $journal->save();
-      }
 
-      $articles = $data['message']['items'];
-      foreach($articles as $a)
-      {
-        $article = $this->article_storage->create();
 
-        $article->set('user_id',4);
-        $article->set('inbox',true);
-        $article->set('new',true);
-        $article->set('journal_id',$journal->id->value);
-
-        $author_string = "";
-        $author_count = 0;
-        foreach($a['author'] as $author)
+        $articles = $data['message']['items'];
+        foreach($articles as $a)
         {
-          $author_count++;
-          $author_name = $author['given'].' '.$author['family'];
-          if($author_string === "")
-            $author_string .= $author_name;
-          else
-            $author_string .= ', '.$author_name;
+          $article = $this->article_storage->create();
 
-          if($author_count >= 10)
+          $article->set('user_id',4);
+          $article->set('inbox',true);
+          $article->set('new',true);
+          $article->set('journal_id',$journal->id->value);
+
+          $author_string = "";
+          $author_count = 0;
+          foreach($a['author'] as $author)
           {
-            $author_string .= ', et al.';
-            break;
+            $author_count++;
+            $author_name = $author['given'].' '.$author['family'];
+            if($author_string === "")
+              $author_string .= $author_name;
+            else
+              $author_string .= ', '.$author_name;
+
+            if($author_count >= 10)
+            {
+              $author_string .= ', et al.';
+              break;
+            }
           }
+          $article->set('authors',$author_string);
+          $article->set('title',$a['title']);
+          if(isset($a['abstract']))
+            $article->set('abstract',$a['abstract']);
+          if(isset($a['volume']))
+            $article->set('volume',$a['volume']);
+          if(isset($a['page']))
+            $article->set('pages',$a['page']);
+          $article->set('year',$a['issued']['date-parts'][0][0]);
+          $article->set('doi',$a['DOI']);
+          $article->save();
         }
-        $article->set('authors',$author_string);
-        $article->set('title',$a['title']);
-        if(isset($a['abstract']))
-          $article->set('abstract',$a['abstract']);
-        if(isset($a['volume']))
-          $article->set('volume',$a['volume']);
-        if(isset($a['page']))
-          $article->set('pages',$a['page']);
-        $article->set('year',$a['issued']['date-parts'][0][0]);
-        $article->set('doi',$a['DOI']);
-        $article->save();
       }
 
     }

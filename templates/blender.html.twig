@@ -5,13 +5,20 @@
  *
  * Available variables:
  *   - articles
+ *   - more
  *
  *
  * @ingroup themeable
  */
 #}
+
+{% if articles %}
 <div class="articles-table">
-{% for a in articles %}
-  <div class="article"><span class="article-title">{{ a.title }}</span> <span class="article-authors">{{ a.authors }}</span> <span class="article-owner">{{ a.user_id }}: {{ a.owner }}</span>. <span class="article-journal">{{ a.journal }}</span></div>
-{% endfor %}
+{% include '@blender/blender-article.html.twig' %}
+{% if more %}
+<div id="articles-more">Show more</div>
+{% endif %}
 </div>
+{% else %}
+<div class="no-articles">No articles to display.</div>
+{% endif %}

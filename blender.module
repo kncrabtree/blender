@@ -8,8 +8,15 @@ function blender_theme($existing, $type, $theme, $path) {
     'blender' => array(
       'variables' => array(
         'articles' => NULL,
+        'more' => NULL,
       ),
       'template' => 'blender',
+    ),
+    'blender-article' => array(
+      'variables' => array(
+        'articles' => NULL,
+      ),
+      'template' => 'blender-article',
     ),
   );
   return $variables;
@@ -25,8 +32,8 @@ function blender_cron() {
 
   $jids = \Drupal::entityQuery('blender_journal')
     ->condition('active', TRUE, '==')
-    ->condition('last_update',REQUEST_TIME-(12*60*60),'<')
     ->condition('queued_time',0,'==')
+    ->condition('last_update',REQUEST_TIME-(24*60*60),'<')
     ->execute();
 
   $journals = $storage->loadMultiple($jids);
@@ -42,3 +49,17 @@ function blender_cron() {
     }
   }
 }
+/*
+function blender_menu_links_discovered_alter(&$links) {
+  $user = \Drupal::currentUser();
+
+  \Drupal::logger('blender')->notice("Menu alter user: ".$user->id());
+
+  //get unread items in inbox
+  $unread_inbox = \Drupal::entityQuery('blender_article')
+    ->condition('user_id',$user->id())
+    ->condition('inbox',true)
+    ->count()->execute();
+
+  $links['blender.inbox']['title'].= ' ('.$unread_inbox.')';
+}*/

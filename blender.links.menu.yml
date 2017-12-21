@@ -2,4 +2,16 @@ entity.blender_journal.collection:
   title: 'View All Journals'
   route_name: entity.blender_journal.collection
   description: 'List information about all journals in the system.'
+  weight: 100
+
+blender.inbox:
+  title: 'Inbox'
+  route_name: blender.inbox
+  description: 'View assigned articles'
   weight: 10
+
+blender.user_all:
+  title: 'My Articles'
+  route_name: blender.user-archive
+  description: 'View all of your articles in the system.'
+  weight: 11
