@@ -1,5 +1,5 @@
 blender.inbox:
-  path: '/journals/inbox'
+  path: '/journals/user/inbox'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::inbox'
     _title: 'Inbox'
@@ -7,10 +7,18 @@ blender.inbox:
     _permission: 'access blender'
 
 blender.user-archive:
-  path: '/journals/my-articles'
+  path: '/journals/user/articles'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::all_user_articles'
     _title: 'My Articles'
+  requirements:
+    _permission: 'access blender'
+
+blender.all:
+  path: '/journals/all-articles'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::all_articles'
+    _title: 'All Articles'
   requirements:
     _permission: 'access blender'
 

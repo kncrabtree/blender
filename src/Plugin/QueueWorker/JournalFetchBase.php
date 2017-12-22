@@ -3,6 +3,7 @@
 namespace Drupal\blender\Plugin\QueueWorker;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\blender\JournalInterface;
@@ -82,16 +83,16 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
     //2.) Get ISSN
     $issn = $journal->issn->value;
 
-    $url = "https://api.crossref.org/journals/".$issn."/works?filter=from-created-date:".$start.",until-created-date:".$end.",type:journal-article";
+    $summary_url = "https://api.crossref.org/journals/".$issn."/works?filter=from-created-date:".$start.",until-created-date:".$end.",type:journal-article&rows=0";
 
-    \Drupal::logger('blender')->notice('Querying '.$journal->abbr->value.'. URL: '.$url);
+    $url = "https://api.crossref.org/journals/".$issn."/works?filter=from-created-date:".$start.",until-created-date:".$end.",type:journal-article&select=author,title,issued,DOI,abstract,volume,page";
 
-    //3.) Send request to CrossRef
-
+    \Drupal::logger('blender')->notice('Querying '.$journal->abbr->value.'. URL: '.$summary_url);
     $client = \Drupal::httpClient();
 
+    $articles_count = 0;
     try {
-      $response = $client->get($url, [
+      $response = $client->get($summary_url, [
         'headers' => [
           "User-Agent" => "Crabtree Lab (http://crabtreelab.ucdavis.edu; mailto:kncrabtree@ucdavis.edu)"
         ],
@@ -99,104 +100,160 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
       ]);
       if($response->getStatusCode() != 200)
       {
-        \Drupal::logger('blender')->warning("HTTP status ".$response->getStatusCode()." when requesting ".$journal->abbr->value.". URL: ".$url);
+        \Drupal::logger('blender')->warning("HTTP status ".$response->getStatusCode()." when requesting ".$journal->abbr->value.". URL: ".$summary_url);
+        $journal->set('queued_time',0);
+        $journal->save();
+        return;
       }
       else
       {
         $data = json_decode($response->getBody(),true);
-
         $article_count = $data['message']['total-results'];
+      }
+    }
+    catch(RequestException $e)
+    {
+      \Drupal::logger('blender')->warning("Exception occurred when requesting summary of ".$journal->abbr->value.". URL: ".$summary_url,". ".$e->getMessage());
+      $journal->set('queued_time',0);
+      $journal->save();
+      return;
+    }
 
-        $journal->set('queued_time',0);
-        $journal->set('last_num_articles',$article_count);
-        $journal->set('last_update',REQUEST_TIME);
-        $journal->save();
+    \Drupal::logger('blender')->notice('Journal '.$journal->abbr->value.' has '.$article_count.' results.');
+    //3.) Send request to CrossRef
 
+    $perpage = 20;
+    $count = 0;
+    for($offset = 0; $offset*$perpage < $article_count; $offset++)
+    {
+      try
+      {
+        $this_url = $url.'&rows='.$perpage.'&offset='.$offset*$perpage;
+        \Drupal::logger('blender')->notice('Page '.($offset+1).' of '.$journal->abbr->value.'. URL: '.$this_url);
 
-        $articles = $data['message']['items'];
-        $i = 0;
-        $required_tags = [
-          'author',
-          'title',
-          'issued',
-          'DOI'
-        ];
-
-        foreach($articles as $a)
+        $response = $client->get($this_url, [
+          'headers' => [
+            "User-Agent" => "Crabtree Lab (http://crabtreelab.ucdavis.edu; mailto:kncrabtree@ucdavis.edu)"
+          ],
+          'http_errors' => false,
+        ]);
+        if($response->getStatusCode() != 200)
         {
-          //ensure that all required fields are set
-          $success = true;
-          foreach($required_tags as $tag)
+          \Drupal::logger('blender')->warning("HTTP status ".$response->getStatusCode()." when requesting ".$journal->abbr->value.". URL: ".$this_url);
+          $journal->set('queued_time',0);
+          $journal->save();
+          return;
+        }
+        else
+        {
+          $data = json_decode($response->getBody(),true);
+
+          $journal->set('queued_time',0);
+          $journal->save();
+
+
+          $articles = $data['message']['items'];
+          $i = 0;
+          $required_tags = [
+            'author',
+            'title',
+            'issued',
+            'DOI'
+          ];
+
+
+          foreach($articles as $a)
           {
-            if(!isset($a[$tag]))
+            //ensure that all required fields are set
+            $success = true;
+            foreach($required_tags as $tag)
             {
-              $success = false;
-              break;
+              if(!isset($a[$tag]))
+              {
+                $success = false;
+                break;
+              }
             }
-          }
 
-          if(!$success)
-          {
-            $article_count--;
-            continue;
-          }
-
-          //select a user from the user_list
-          $this_user = $user_list[$i];
-          $i++;
-          if($i >= sizeof($user_list))
-            $i = 0;
-
-          //create article; set all possible metadata
-          $article = $this->article_storage->create();
-
-          $article->set('user_id',$this_user);
-          $article->set('inbox',true);
-          $article->set('new',true);
-          $article->set('journal_id',$journal->id->value);
-
-          //build up sensible author string from list
-          $author_string = "";
-          $author_count = 0;
-          foreach($a['author'] as $author)
-          {
-            $author_count++;
-            $author_name = $author['given'].' '.$author['family'];
-            if($author_string === "")
-              $author_string .= $author_name;
-            else
-              $author_string .= ', '.$author_name;
-
-            if($author_count >= 10)
+            if(!$success)
             {
-              $author_string .= ', et al.';
-              break;
+              $article_count--;
+              continue;
             }
-          }
-          $article->set('authors',$author_string);
-          $article->set('title',$a['title']);
 
-          //abstract, volume, and page are optional
-          if(isset($a['abstract']))
-            $article->set('abstract',$a['abstract']);
-          if(isset($a['volume']))
-            $article->set('volume',$a['volume']);
-          if(isset($a['page']))
-            $article->set('pages',$a['page']);
-          $article->set('year',$a['issued']['date-parts'][0][0]);
-          $article->set('doi',$a['DOI']);
-          $article->save();
+            //select a user from the user_list
+            $this_user = $user_list[$i];
+            $i++;
+            if($i >= sizeof($user_list))
+              $i = 0;
+
+            //create article; set all possible metadata
+            $article = $this->article_storage->create();
+
+            $article->set('user_id',$this_user);
+            $article->set('inbox',true);
+            $article->set('new',true);
+            $article->set('journal_id',$journal->id->value);
+
+            //build up sensible author string from list
+            $author_string = "";
+            $author_count = 0;
+            foreach($a['author'] as $author)
+            {
+              $author_count++;
+              $author_name = $author['given'].' '.$author['family'];
+              if($author_string === "")
+                $author_string .= $author_name;
+              else
+                $author_string .= ', '.$author_name;
+
+              if($author_count >= 10)
+              {
+                $author_string .= ', et al.';
+                break;
+              }
+            }
+            $article->set('authors',$author_string);
+            $article->set('title',$a['title']);
+
+            //abstract, volume, and page are optional
+            if(isset($a['abstract']))
+              $article->set('abstract',$a['abstract']);
+            if(isset($a['volume']))
+              $article->set('volume',$a['volume']);
+            if(isset($a['page']))
+              $article->set('pages',$a['page']);
+            $article->set('year',$a['issued']['date-parts'][0][0]);
+            $article->set('doi',$a['DOI']);
+
+            $violations = $article->validate();
+            if($violations->count() == 0)
+            {
+              $article->save();
+              $count++;
+            }
+//             else
+//             {
+//               foreach($violations as $v)
+//                 \Drupal::logger('blender')->warning($v->getMessage());
+//             }
+
+          }
+
+
         }
 
-        \Drupal::logger('blender')->notice("Found ".$article_count." articles in ".$journal->abbr->value);
-
+      }
+      catch (RequestException $e) {
+        \Drupal::logger('blender')->warning("Exception occurred when requesting ".$journal->abbr->value.". URL: ".$this_url.'. '.$e->getMessage());
       }
 
     }
-    catch (RequestException $e) {
-      \Drupal::logger('blender')->warning("Exception occurred when requesting ".$journal->abbr->value.". URL: ".$url);
-    }
 
+    \Drupal::logger('blender')->notice("Found ".$count." new articles in ".$journal->abbr->value);
+    $journal->set('last_num_articles',$article_count);
+    $journal->set('last_update',REQUEST_TIME);
+    $journal->save();
 
   }
 }

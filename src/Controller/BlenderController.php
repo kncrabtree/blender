@@ -84,7 +84,11 @@ class BlenderController extends ControllerBase {
 
     $a_array = array();
     foreach($articles as $a)
-      $a_array[] = $a->article_details();
+    {
+      $a_d = $a->article_details();
+      $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
+      $a_array[] = $a_d;
+    }
 
     $render = array(
       '#theme' => $theme,
@@ -116,6 +120,10 @@ class BlenderController extends ControllerBase {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
 
+    return $this->build_render_array();
+  }
+
+  public function all_articles() {
     return $this->build_render_array();
   }
 
@@ -164,8 +172,9 @@ class BlenderController extends ControllerBase {
     if(strpos($request->request->get('origin'),'inbox') !== false)
       $this->conditions['inbox'] = [true];
 
-    //need to remove this for bookmarks, etc.
-    $this->conditions['user_id'] = [$this->currentUser()->id()];
+    //should user be a filter?
+    if(strpos($request->request->get('origin'),'user') !== false)
+      $this->conditions['user_id'] = [$this->currentUser()->id()];
 
     $render = $this->build_render_array('blender-article');
 

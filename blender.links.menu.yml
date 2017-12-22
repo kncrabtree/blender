@@ -15,3 +15,9 @@ blender.user_all:
   route_name: blender.user-archive
   description: 'View all of your articles in the system.'
   weight: 11
+
+blender.all:
+  title: 'All Articles'
+  route_name: blender.all
+  description: 'View all articles in the system.'
+  weight: 20
