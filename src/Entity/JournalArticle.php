@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\user\Entity;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\blender\JournalArticleInterface;
 
 /**
  * Defines the journal article entity.
@@ -41,7 +42,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  * )
  */
 
-class JournalArticle extends ContentEntityBase implements ContentEntityInterface {
+class JournalArticle extends ContentEntityBase implements JournalArticleInterface {
 
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 

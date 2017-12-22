@@ -83,10 +83,15 @@ entity.blender_journal.edit_form:
   requirements:
     _entity_access: 'blender_journal.edit'
 
-entity.blender_article.canonical:
+blender.blender_article.canonical:
   path: 'journals/article/{blender_article}'
   defaults:
-    _entity_view: 'blender_article'
+    _controller: '\Drupal\blender\Controller\BlenderController::article'
     _title: 'Article Details'
   requirements:
     _permission: 'access blender'
+    #blender_article: '^[0-9]+'
+  options:
+    parameters:
+      blender_article:
+        type: entity:blender_article

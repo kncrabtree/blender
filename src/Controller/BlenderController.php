@@ -160,6 +160,11 @@ class BlenderController extends ControllerBase {
     return $this->build_render_array($articles,$more);
   }
 
+  public function article(JournalArticleInterface $blender_article)
+  {
+    return $this->build_render_array([$blender_article],false);
+  }
+
   public function all_articles() {
 
     $articles = $this->article_lookup_list();
@@ -171,6 +176,7 @@ class BlenderController extends ControllerBase {
   public function user_bookmarks() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
+    $this->conditions['status'] = [true];
 
     $articles = $this->bookmark_lookup_list();
     $more = $this->lookup_more_available('blender_bookmark');
