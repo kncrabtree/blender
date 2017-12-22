@@ -159,8 +159,8 @@ class Journal extends ContentEntityBase implements ContentEntityInterface {
     $fields['last_update'] = BaseFieldDefinition::create('timestamp')
       ->setLabel("Last Update")
       ->setDescription("Last time this journal was checked for new articles.")
-      ->setRequired(FALSE);
-//       ->setSettings(array('default_value' => NOW));
+      ->setRequired(FALSE)
+      ->setSettings(array('default_value' => 0));
 
     $fields['queued_time'] = BaseFieldDefinition::create('timestamp')
       ->setLabel("Queued Time")

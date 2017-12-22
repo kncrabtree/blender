@@ -2,6 +2,8 @@ blender:
   css:
     layout:
       css/blender-layout.css: {}
+    component:
+      css/blender-tooltip.css: {}
     theme:
       css/blender-theme.css: {}
   js:
@@ -10,3 +12,12 @@ blender:
     - core/drupal
     - core/jquery
     - core/jquery.once
+
+google.icons:
+  remote: https://fonts.googleapis.com/icon?family=Material+Icons
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  css:
+    theme:
+      'https://fonts.googleapis.com/icon?family=Material+Icons': { type: external }

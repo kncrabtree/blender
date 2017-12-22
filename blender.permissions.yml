@@ -1,5 +1,8 @@
-administer journals:
-  title: 'Administer journals'
+administer blender:
+  title: 'Administer blender'
+  restrict access: true
+  description: 'Add, edit, or activate journals in the blender.'
 access blender:
   title: 'Access blender'
+  description: 'View blender contents.'
 

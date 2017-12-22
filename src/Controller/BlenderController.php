@@ -90,7 +90,8 @@ class BlenderController extends ControllerBase {
       '#theme' => $theme,
       '#attached' => array(
         'library' => array (
-          'blender/blender'
+          'blender/blender',
+          'blender/google.icons'
         )
       ),
       '#articles' => $a_array,

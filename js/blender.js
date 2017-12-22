@@ -1,10 +1,10 @@
 (function ($, Drupal) {
   Drupal.behaviors.inboxBehavior = {
     attach: function (context, settings) {
-      $('.inbox', context).once('inboxBehavior').each(function () {
+      $('.done-icon', context).once('inboxBehavior').each(function () {
         $(this).click(function(){
           var aid = $(this).attr("id").split('-')[1];
-          var status = $(this).get("class");
+          var cls = $(this).attr("class");
           $.ajax({
             url: Drupal.url('journals/toggle-archive'),
             type: 'POST',
@@ -17,7 +17,13 @@
               if(response.remove)
                 $('#article-'+aid).remove();
               else
-                $('#inbox-'+aid).toggleClass('archive');
+              {
+                if(cls.includes("archive"))
+                  $('#donetooltip-'+aid).html("Mark as done");
+                else
+                  $('#donetooltip-'+aid).html("Move to inbox");
+                $('#done-'+aid).toggleClass('archive');
+              }
             },
             error: function(a, b, c) {
               alert("Error: " + a + ", " + b + ", " + c);

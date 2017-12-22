@@ -10,10 +10,26 @@ use Drupal\user\RoleInterface;
 /**
  * Implements hook_install().
  */
-// function blender_install() {
-//   user_role_change_permissions(RoleInterface::ANONYMOUS_ID, array(
-//     'view journal articles' => TRUE,
-//     'vote' => TRUE,
-//     'administer journals' => TRUE,
-//   ));
+function blender_install() {
+//   //Create Active Blender User role if it does not exist
+//
+//   $label = 'Blender Active User';
+//
+//   $role = \Drupal\user\Entity\Role::create([
+//     'id' => 'blender_active_user',
+//     'label' => $label
+//   ]);
+//
+//   $role->setIsAdmin(false);
+//   $role->grantPermission('acccess blender');
+//
+//   $role->save();
 // }
+//
+// function blender_uninstall() {
+//
+//   $role = \Drupal\user\Entity\Role::load('blender_active_user');
+//   if($role)
+//     $role->delete();
+
+}

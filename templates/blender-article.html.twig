@@ -14,15 +14,32 @@
 {% if articles %}
 {% for a in articles %}
   <div class="article" id="article-{{ a.id }}">
-  <span class="article-title">{{ a.title }}</span>
-  <span class="article-authors">{{ a.authors }}</span>
-  <span class="article-citation">
-  <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a></span>
-  {% if a.inbox %}
-  <button class="inbox" id="inbox-{{ a.id }}">Inbox</button>
-  {% else %}
-  <button class="inbox archive" id="inbox-{{ a.id }}">Inbox</button>
-  {% endif %}
+    <div class="article-icons">
+      <div class="tooltip">
+        <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">done</i>
+        <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+      </div>
+      <div class="tooltip">
+        <i class="material-icons md-dark icon bookmark-icon" id="bookmark-{{ a.id }}">bookmark_border</i>
+        <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">Add bookmark</span>
+      </div>
+      <div class="tooltip">
+        <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">plus_one</i>
+        <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
+      </div>
+    </div>
+
+
+    <div class="article-data">
+      <span class="article-title">{{ a.title }}</span>
+      <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
+      <br />
+      Assigned to {{ a.owner }} on {{ a.date_added}}.</span>
+    </div>
+
+    <div class="article-actions">
+      <i class="material-icons md-dark icon options-icon" id="options"-{{ a.id }}">menu</i>
+    </div>
   </div>
 {% endfor %}
 {% endif %}

@@ -1,25 +1,22 @@
 .article {
-  border: 1px solid black;
-  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
   font-family: Sans-serif;
   padding: 5px;
-  display: grid;
-  grid-template-rows: auto auto auto;
-  grid-template-columns: auto auto auto;
   font-size: 0.875em;
+  margin-bottom: -1px;
+}
+
+.article:hover {
+  cursor: pointer;
 }
 
 .article-title {
-  grid-row: 1;
-  grid-column: 1 / 4;
   font-size: 1.25em;
   font-weight: bold;
   padding: 0px;
 }
 
 .article-authors {
-  grid-row: 2;
-  grid column: 1;
   padding: 0px;
 }
 
@@ -46,4 +43,21 @@ button {
   color: #4CAF50;
   border: 1px solid #4CAF50;
 }
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark:hover { color: rgba(0, 0, 0, 0.87); }
+.material-icons.md-dark.done-icon.archive { color: rgba(20, 150, 30, 0.87); }
+.material-icons.md-dark.done-icon.archive:hover { color: rgba(20, 150, 30, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
 
