@@ -2,7 +2,7 @@
 
 namespace Drupal\blender\Plugin\QueueWorker;
 
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
@@ -21,9 +21,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
   *
   * @var \Drupal\Core\Entity\EntityStorageInterface
   */
-  protected $journal_storage;
-  protected $article_storage;
-  protected $user_storage;
+  protected $entity_manager;
   protected $query_service;
 
 
@@ -33,10 +31,8 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
    * @param \Drupal\Core\Entity\EntityStorageInterface $j_storage
    *   The node storage.
    */
-  public function __construct(EntityStorageInterface $j_storage, EntityStorageInterface $a_storage, EntityStorageInterface $u_storage, QueryFactory $qf) {
-    $this->journal_storage = $j_storage;
-    $this->article_storage = $a_storage;
-    $this->user_storage = $u_storage;
+  public function __construct(EntityTypeManager $em, QueryFactory $qf) {
+    $this->entity_manager = $em;
     $this->query_service = $qf;
   }
 
@@ -45,9 +41,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $container->get('entity.manager')->getStorage('blender_journal'),
-      $container->get('entity.manager')->getStorage('blender_article'),
-      $container->get('entity.manager')->getStorage('user'),
+      $container->get('entity_type.manager'),
       $container->get('entity.query')
     );
   }
@@ -57,7 +51,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
    */
   public function processItem($data) {
     /** @var JournalInterface $journal */
-    $journal = $this->journal_storage->load($data->id->value);
+    $journal = $this->entity_manager->getStorage('blender_journal')->load($data->id->value);
     $user_list = $this->query_service->get('user')
       ->condition('roles','blender_active_user')
       ->execute();
@@ -188,7 +182,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
               $i = 0;
 
             //create article; set all possible metadata
-            $article = $this->article_storage->create();
+            $article = $this->entity_manager->getStorage('blender_article')->create();
 
             $article->set('user_id',$this_user);
             $article->set('inbox',true);
