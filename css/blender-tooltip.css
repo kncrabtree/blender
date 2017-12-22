@@ -1,6 +1,6 @@
 .tooltip {
     position: relative;
-    display: inline-block;
+/*     display: inline-block; */
 }
 
 .tooltip .tooltiptext {
@@ -18,6 +18,8 @@
     opacity: 0;
     transition: opacity 0s;
     transition-delay: 1s;
+    font-family: Sans-serif;
+    font-size: 8pt;
 }
 
 .tooltip:hover .tooltiptext {

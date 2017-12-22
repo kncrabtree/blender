@@ -3,7 +3,6 @@
 namespace Drupal\blender\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\blender\JournalInterface;
 use Drupal\blender\JournalArticleInterface;
 use Drupal\user;
@@ -15,17 +14,6 @@ use Symfony\Component\HttpKernel\Exception;
 
 class BlenderController extends ControllerBase {
 
-  /**
-  * Entity access service
-  *
-  * @var \Drupal\Core\Entity\EntityStorageInterface
-  */
-  protected $journal_storage;
-
-  protected $user_storage;
-
-  protected $article_storage;
-
   protected $query_service;
 
   protected $page_size = 20;
@@ -33,12 +21,8 @@ class BlenderController extends ControllerBase {
   protected $conditions;
 
 
-  public function __construct(EntityStorageInterface $j_storage, EntityStorageInterface $u_storage, EntityStorageInterface $a_storage,
-  QueryFactory $qf)
+  public function __construct( QueryFactory $qf)
   {
-    $this->journal_storage = $j_storage;
-    $this->article_storage = $a_storage;
-    $this->user_storage = $u_storage;
     $this->query_service = $qf;
   }
 
@@ -47,63 +31,110 @@ class BlenderController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')->getStorage('blender_journal'),
-      $container->get('entity.manager')->getStorage('user'),
-      $container->get('entity.manager')->getStorage('blender_article'),
       $container->get('entity.query')
     );
   }
 
-  protected function build_render_array($theme = 'blender') {
-
-    $numquery = $this->query_service->get('blender_article');
-    $articlequery = $this->query_service->get('blender_article');
-    foreach($this->conditions as $key => $value)
+  protected function lookup_more_available($type)
+  {
+    $numquery = $this->query_service->get($type);
+    if(isset($this->conditions))
     {
-      if(isset($value[1]))
+      foreach($this->conditions as $key => $value)
       {
-        $numquery->condition($key,$value[0],$value[1]);
-        $articlequery->condition($key,$value[0],$value[1]);
-      }
-      else
-      {
-        $numquery->condition($key,$value[0]);
-        $articlequery->condition($key,$value[0]);
+        if(isset($value[1]))
+          $numquery->condition($key,$value[0],$value[1]);
+        else
+          $numquery->condition($key,$value[0]);
       }
     }
 
-    $num = $numquery->count()->execute();
+    return  ($numquery->count()->execute() > $this->page_size);
+  }
+
+  protected function article_lookup_list()
+  {
+    $articlequery = $this->query_service->get('blender_article');
+    if(isset($this->conditions))
+    {
+      foreach($this->conditions as $key => $value)
+      {
+        if(isset($value[1]))
+          $articlequery->condition($key,$value[0],$value[1]);
+        else
+          $articlequery->condition($key,$value[0]);
+      }
+    }
+
     $a_ids = $articlequery->sort('id','DESC')->pager($this->page_size)->execute();
+    $articles = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
 
+    return $articles;
 
-    $articles = $this->article_storage->loadMultiple($a_ids);
+  }
 
-    $more = false;
-    if($num > $this->page_size)
-      $more = true;
+  protected function bookmark_lookup_list()
+  {
+    $bmquery = $this->query_service->get('blender_bookmark');
+    if(isset($this->conditions))
+    {
+      foreach($this->conditions as $key => $value)
+      {
+        if(isset($value[1]))
+          $bmquery->condition($key,$value[0],$value[1]);
+        else
+          $bmquery->condition($key,$value[0]);
+      }
+    }
+
+    $bm_ids = $bmquery->sort('article_id','DESC')->pager($this->page_size)->execute();
+
+    $bmlist = $this->entityTypeManager()->getStorage('blender_bookmark')->loadMultiple($bm_ids);
+
+    $articles = array();
+    foreach($bmlist as $bm)
+      $articles[] = $bm->get('article_id')->entity;
+
+    return $articles;
+  }
+
+  protected function build_render_array($articles, $more, $standalone = false) {
 
     $a_array = array();
     foreach($articles as $a)
     {
       $a_d = $a->article_details();
       $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
+
+      $bm = ($this->query_service->get('blender_bookmark')
+        ->condition('user_id',$this->currentUser()->id())
+        ->condition('article_id',$a->id->value)
+        ->condition('status',true)
+        ->count()->execute() > 0);
+      $a_d['bookmark'] = $bm;
       $a_array[] = $a_d;
     }
 
     $render = array(
-      '#theme' => $theme,
-      '#attached' => array(
-        'library' => array (
-          'blender/blender',
-          'blender/google.icons'
-        )
-      ),
       '#articles' => $a_array,
       '#more' => $more,
       '#cache' => [
         'max-age' => 0,
       ],
     );
+
+    if($standalone)
+      $render['#theme'] = 'blender-article';
+    else
+    {
+      $render['#theme'] = 'blender';
+      $render['#attached'] = array(
+        'library' => array (
+          'blender/blender',
+          'blender/google.icons'
+        ),
+      );
+    }
 
     return $render;
   }
@@ -113,18 +144,84 @@ class BlenderController extends ControllerBase {
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->conditions['inbox'] = [true];
 
-    return $this->build_render_array();
+    $articles = $this->article_lookup_list();
+    $more = $this->lookup_more_available('blender_article');
+
+    return $this->build_render_array($articles,$more);
   }
 
   public function all_user_articles() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
 
-    return $this->build_render_array();
+    $articles = $this->article_lookup_list();
+    $more = $this->lookup_more_available('blender_article');
+
+    return $this->build_render_array($articles,$more);
   }
 
   public function all_articles() {
-    return $this->build_render_array();
+
+    $articles = $this->article_lookup_list();
+    $more = $this->lookup_more_available('blender_article');
+
+    return $this->build_render_array($articles,$more);
+  }
+
+  public function user_bookmarks() {
+
+    $this->conditions['user_id'] = [$this->currentUser()->id()];
+
+    $articles = $this->bookmark_lookup_list();
+    $more = $this->lookup_more_available('blender_bookmark');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
+  public function more_articles(Request $request) {
+
+    $a_id = $request->request->get('last_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    //use the page to determine what conditions to use
+    $page = $request->request->get('origin');
+
+    if(strpos($page,'inbox') !== false)
+      $this->conditions['inbox'] = [true];
+
+    //should user be a filter?
+    if(strpos($page,'user') !== false)
+      $this->conditions['user_id'] = [$this->currentUser()->id()];
+
+    $articles = array();
+    $type = 'blender_article';
+
+    if(strpos($page,'bookmarks') !== false)
+    {
+      $this->conditions['article_id'] = [$a_id,'<'];
+      $articles = $this->bookmark_lookup_list();
+      $type = 'blender_bookmark';
+    }
+    else
+    {
+      $this->conditions['id'] = [$a_id,'<'];
+      $articles = $this->article_lookup_list();
+    }
+
+    $more = $this->lookup_more_available($type);
+
+    $render = $this->build_render_array($articles,$more,true);
+
+    $return_data = array(
+      'html' => render($render),
+      'more' => $render['#more'],
+    );
+
+    return new JsonResponse($return_data);
+
   }
 
   public function toggle_archive(Request $request) {
@@ -135,7 +232,7 @@ class BlenderController extends ControllerBase {
 
     $user = $this->currentUser();
 
-    $article = $this->article_storage->load($a_id);
+    $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
     if($article->get('user_id')->target_id != $user->id())
       throw new NotFoundHttpException();
 
@@ -157,31 +254,48 @@ class BlenderController extends ControllerBase {
 
   }
 
-  public function more_articles(Request $request) {
-
-    $a_id = $request->request->get('last_article_id');
+  public function toggle_bookmark(Request $request) {
+    $a_id = $request->request->get('article_id');
 
     if(!isset($a_id))
       throw new NotFoundHttpException();
 
-    $this->conditions['id'] = [$a_id,'<'];
+    $user = $this->currentUser();
 
-    //use the page to determine what conditions to use
-    $page = $request->request->get('origin');
+    //load this bookmark if it exists
+    $bmlist = $this->entityTypeManager()->getStorage('blender_bookmark')->loadByProperties([
+      'user_id' => $user->id(),
+      'article_id' => $a_id,
+    ]);
 
-    if(strpos($request->request->get('origin'),'inbox') !== false)
-      $this->conditions['inbox'] = [true];
+    $is_bookmark = true;
 
-    //should user be a filter?
-    if(strpos($request->request->get('origin'),'user') !== false)
-      $this->conditions['user_id'] = [$this->currentUser()->id()];
+    if(count($bmlist) == 0)
+    {
+      //bookmark does not exist. Create it.
+      $bm = $this->entityTypeManager()->getStorage('blender_bookmark')->create();
+      $bm->set('user_id',$user->id());
+      $bm->set('article_id',$a_id);
+      $bm->set('status',$is_bookmark);
+      $bm->save();
+    }
+    else
+    {
+      $bm = array_shift($bmlist);
+      $is_bookmark = !($bm->get('status')->value);
+      $bm->set('status',$is_bookmark);
+      $bm->save();
+    }
 
-    $render = $this->build_render_array('blender-article');
+    $remove = false;
+    if(strpos($request->request->get('origin'),'bookmarks') !== false)
+      $remove = true;
 
-    $return_data = array(
-      'html' => render($render),
-      'more' => $render['#more'],
-    );
+    $return_data = [
+      'article_id' => $a_id,
+      'bookmark' => $is_bookmark,
+      'remove' => $remove
+    ];
 
     return new JsonResponse($return_data);
 

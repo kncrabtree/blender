@@ -10,6 +10,21 @@
   cursor: pointer;
 }
 
+#articles-more {
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  font-family: Sans-serif;
+  padding: 5px;
+  margin-bottom: -1px;
+}
+
+#articles-more:hover {
+  cursor: pointer;
+}
+
+#articles-more:hover i {
+  color: rgba(0, 0, 0, 0.87);
+}
+
 .article-title {
   font-size: 1.25em;
   font-weight: bold;
@@ -24,26 +39,6 @@
   font-weight: bold;
 }
 
-button {
-    border-radius: 10px;
-    padding: 1em 1em;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.inbox {
-  background-color: #4CAF50; /* Green */
-  color: white;
-  border: 1px solid #4CAF50;
-}
-
-.inbox.archive {
-  background-color: white; /* Green */
-  color: #4CAF50;
-  border: 1px solid #4CAF50;
-}
-
 /* Rules for sizing the icon. */
 .material-icons.md-18 { font-size: 18px; }
 .material-icons.md-24 { font-size: 24px; }
@@ -55,6 +50,8 @@ button {
 .material-icons.md-dark:hover { color: rgba(0, 0, 0, 0.87); }
 .material-icons.md-dark.done-icon.archive { color: rgba(20, 150, 30, 0.87); }
 .material-icons.md-dark.done-icon.archive:hover { color: rgba(20, 150, 30, 0.54); }
+.material-icons.md-dark.bookmark-icon.bookmarked { color: rgba(150, 20, 30, 0.87); }
+.material-icons.md-dark.bookmark-icon.bookmarked:hover { color: rgba(150, 20, 30, 0.54); }
 .material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
 
 /* Rules for using icons as white on a dark background. */

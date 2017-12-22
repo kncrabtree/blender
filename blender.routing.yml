@@ -14,6 +14,14 @@ blender.user-archive:
   requirements:
     _permission: 'access blender'
 
+blender.user-bookmarks:
+  path: '/journals/user/bookmarks'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::user_bookmarks'
+    _title: 'My Bookmarks'
+  requirements:
+    _permission: 'access blender'
+
 blender.all:
   path: '/journals/all-articles'
   defaults:
@@ -26,6 +34,13 @@ blender.toggle-archive:
   path: '/journals/toggle-archive'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::toggle_archive'
+  requirements:
+    _permission: 'access blender'
+
+blender.toggle-bookmark:
+  path: '/journals/toggle-bookmark'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::toggle_bookmark'
   requirements:
     _permission: 'access blender'
 

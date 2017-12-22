@@ -16,7 +16,14 @@
 <div class="articles-table">
 {% include '@blender/blender-article.html.twig' %}
 {% if more %}
-<div id="articles-more">Show more</div>
+<div id="articles-more">
+    <i class="material-icons md-dark md-48 icon">
+      <div class="tooltip">
+        file_download
+        <span class="tooltiptext">Show more articles</span>
+      </div>
+    </i>
+</div>
 {% endif %}
 </div>
 {% else %}

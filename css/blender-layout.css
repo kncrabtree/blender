@@ -6,7 +6,12 @@
 .article {
   display: grid;
   grid-template-columns: 30px auto 30px;
-  grid-column-gap: 0px;
+  grid-column-gap: 5px;
+}
+
+#articles-more {
+  display: grid;
+  grid-auto-rows: auto;
 }
 
 .article-icons {

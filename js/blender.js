@@ -35,6 +35,49 @@
   };
 })(jQuery, Drupal);
 
+(function ($, Drupal) {
+  Drupal.behaviors.bookmarkBehavior = {
+    attach: function (context, settings) {
+      $('.bookmark-icon', context).once('bookmarkBehavior').each(function () {
+        $(this).click(function(){
+          var aid = $(this).attr("id").split('-')[1];
+          var cls = $(this).attr("class");
+          $.ajax({
+            url: Drupal.url('journals/toggle-bookmark'),
+            type: 'POST',
+            data: {
+              'article_id' : aid,
+              'origin' : window.location.pathname
+            },
+            dataType: 'json',
+            success: function(response) {
+              if(response.remove)
+                $('#article-'+aid).remove();
+              else
+              {
+                if(response.bookmark)
+                {
+                  $('#bookmark-'+aid).find("span.icon-name").html("bookmark");
+                  $('#bookmark-'+aid).find("span.tooltiptext").html("Remove bookmark");
+                }
+                else
+                {
+                  $('#bookmark-'+aid).find("span.icon-name").html("bookmark_border");
+                  $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
+                }
+                $('#bookmark-'+aid).toggleClass('bookmarked');
+              }
+            },
+            error: function(a, b, c) {
+              alert("Error: " + a + ", " + b + ", " + c);
+            }
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
 
 (function ($, Drupal) {
   Drupal.behaviors.moreArticlesBehavior = {
@@ -46,7 +89,7 @@
             url: Drupal.url('journals/more-articles'),
             type: 'POST',
             data: {
-              'last_article_id' : last_id,
+              'last_id' : last_id,
               'origin' : window.location.pathname
             },
             dataType: 'json',

@@ -16,21 +16,33 @@
   <div class="article{% if not a.is_owner %} other{% endif %}" id="article-{{ a.id }}">
     <div class="article-icons">
       {% if a.is_owner %}
-        <div class="tooltip">
-          <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">done</i>
-          <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
-        </div>
+        <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
+          <div class="tooltip">
+            done
+            <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+          </div>
+        </i>
       {% else %}
         <i class="icon"></i>
       {% endif %}
-      <div class="tooltip">
-        <i class="material-icons md-dark icon bookmark-icon" id="bookmark-{{ a.id }}">bookmark_border</i>
-        <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">Add bookmark</span>
-      </div>
-      <div class="tooltip">
-        <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">plus_one</i>
-        <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
-      </div>
+      <i class="material-icons md-dark icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
+        <div class="tooltip">
+          <span class="icon-name">
+          {% if a.bookmark %}
+            bookmark
+          {% else %}
+            bookmark_border
+          {% endif %}
+          </span>
+          <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
+        </div>
+      </i>
+      <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">
+        <div class="tooltip">
+          plus_one
+          <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
+        </div>
+      </i>
     </div>
 
 

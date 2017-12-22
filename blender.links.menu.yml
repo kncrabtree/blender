@@ -10,11 +10,17 @@ blender.inbox:
   description: 'View assigned articles'
   weight: 10
 
+blender.user_bookmarks:
+  title: 'My Bookmarks'
+  route_name: blender.user-bookmarks
+  description: 'View your bookmarked articles.'
+  weight: 11
+
 blender.user_all:
   title: 'My Articles'
   route_name: blender.user-archive
   description: 'View all of your articles in the system.'
-  weight: 11
+  weight: 12
 
 blender.all:
   title: 'All Articles'
