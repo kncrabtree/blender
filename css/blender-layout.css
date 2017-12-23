@@ -1,12 +1,11 @@
 .articles-table {
     display: grid;
-    grid-auto-rows: minmax(100px, auto);
+    grid-auto-rows: auto;
 }
 
 .article {
   display: grid;
-  grid-template-columns: 30px auto 30px;
-  grid-column-gap: 5px;
+  grid-template-rows: auto auto;
 }
 
 #articles-more {
@@ -14,20 +13,29 @@
   grid-auto-rows: auto;
 }
 
+.article-display {
+  display: grid;
+  grid-template-columns: 30px auto 30px;
+  grid-column-gap: 5px;
+}
+
 .article-icons {
   display: grid;
+  grid-column: 1;
   grid-template-rows: 30px 30px 30px auto;
   grid-row-gap: 0px;
 }
 
 .article-data {
   display: grid;
+  grid-column:2;
   grid-template-rows: auto auto auto;
   grid-row-gap: 0px;
 }
 
 .article-actions {
   display: grid;
+  grid-column:3;
   grid-template-rows: auto;
   grid-row-gap: 0px;
 }
@@ -40,8 +48,13 @@
   grid-row: 2;
 }
 
-.inbox {
-  grid-row: 1;
+.article-comment {
+  display: none;
+  grid-row: 2;
+}
+
+.article-comment.visible {
+  display: block;
 }
 
 .icon {

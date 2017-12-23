@@ -15,7 +15,7 @@
             dataType: 'json',
             success: function(response) {
               if(response.remove)
-                $('#article-'+aid).remove();
+                $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
               else
               {
                 if(cls.includes("archive"))
@@ -52,7 +52,7 @@
             dataType: 'json',
             success: function(response) {
               if(response.remove)
-                $('#article-'+aid).remove();
+                $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
               else
               {
                 if(response.bookmark)
@@ -103,6 +103,43 @@
               alert("Error: " + a + ", " + b + ", " + c);
             }
           });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.showCommentsBehavior = {
+    attach: function (context, settings) {
+      $('.article-data', context).once('showCommentsBehavior').each(function () {
+        $(this).click(function() {
+          var comment = $(this).parents('.article-display').siblings('.article-comment');
+          var cls = comment.attr('class');
+          $(this).parents('.article').toggleClass('expanded');
+          if(cls.includes('visible'))
+            comment.slideUp(100, function(){ $(this).toggleClass('visible'); });
+          else
+            comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
+
+//           $.ajax({
+//             url: Drupal.url('journals/more-articles'),
+//             type: 'POST',
+//             data: {
+//               'last_id' : last_id,
+//               'origin' : window.location.pathname
+//             },
+//             dataType: 'json',
+//             success: function(response) {
+//               $(response.html).insertBefore("#articles-more");
+//               if(!response.more)
+//                 $('#articles-more').remove();
+//               Drupal.attachBehaviors();
+//             },
+//             error: function(a, b, c) {
+//               alert("Error: " + a + ", " + b + ", " + c);
+//             }
+//           });
         });
       });
     }

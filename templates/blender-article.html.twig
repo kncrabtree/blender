@@ -13,48 +13,54 @@
 
 {% if articles %}
 {% for a in articles %}
-  <div class="article{% if not a.is_owner %} other{% endif %}" id="article-{{ a.id }}">
-    <div class="article-icons">
-      {% if a.is_owner %}
-        <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
+  <div class="article{% if not a.is_owner %} other{% endif %}{% if articles|length == 1 %} expanded{% endif %}" id="article-{{ a.id }}">
+    <div class="article-display">
+      <div class="article-icons">
+        {% if a.is_owner %}
+          <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
+            <div class="tooltip">
+              done
+              <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+            </div>
+          </i>
+        {% else %}
+          <i class="icon"></i>
+        {% endif %}
+        <i class="material-icons md-dark icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
           <div class="tooltip">
-            done
-            <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+            <span class="icon-name">
+            {% if a.bookmark %}
+              bookmark
+            {% else %}
+              bookmark_border
+            {% endif %}
+            </span>
+            <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
           </div>
         </i>
-      {% else %}
-        <i class="icon"></i>
-      {% endif %}
-      <i class="material-icons md-dark icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
-        <div class="tooltip">
-          <span class="icon-name">
-          {% if a.bookmark %}
-            bookmark
-          {% else %}
-            bookmark_border
-          {% endif %}
-          </span>
-          <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
-        </div>
-      </i>
-      <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">
-        <div class="tooltip">
-          plus_one
-          <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
-        </div>
-      </i>
+        <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">
+          <div class="tooltip">
+            plus_one
+            <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
+          </div>
+        </i>
+      </div>
+
+
+      <div class="article-data">
+        <span class="article-title">{{ a.title }}</span>
+        <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
+        <br />
+        Assigned to {{ a.owner }} on {{ a.date_added}}.</span>
+      </div>
+
+      <div class="article-actions">
+        <i class="material-icons md-dark icon options-icon" id="options"-{{ a.id }}">menu</i>
+      </div>
     </div>
 
-
-    <div class="article-data">
-      <span class="article-title">{{ a.title }}</span>
-      <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
-      <br />
-      Assigned to {{ a.owner }} on {{ a.date_added}}.</span>
-    </div>
-
-    <div class="article-actions">
-      <i class="material-icons md-dark icon options-icon" id="options"-{{ a.id }}">menu</i>
+    <div class="article-comment {% if articles|length == 1 %} visible{% endif %}">
+      Comment Area!
     </div>
   </div>
 {% endfor %}
