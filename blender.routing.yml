@@ -44,6 +44,20 @@ blender.toggle-bookmark:
   requirements:
     _permission: 'access blender'
 
+blender.add-vote:
+  path: '/journals/add-vote'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::add_vote'
+  requirements:
+    _permission: 'access blender'
+
+blender.remove-vote:
+  path: '/journals/remove-vote'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::remove_vote'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:

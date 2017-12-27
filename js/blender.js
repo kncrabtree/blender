@@ -78,6 +78,52 @@
   };
 })(jQuery, Drupal);
 
+(function ($, Drupal) {
+  Drupal.behaviors.voteBehavior = {
+    attach: function (context, settings) {
+      $('.vote-icon', context).once('voteBehavior').each(function () {
+        $(this).click(function(){
+          var aid = $(this).attr("id").split('-')[1];
+          var cls = $(this).attr("class");
+          var url = Drupal.url('journals/add-vote');
+          if(cls.includes("voted"))
+            url = Drupal.url('journals/remove-vote');
+          $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+              'article_id' : aid,
+              'origin' : window.location.pathname
+            },
+            dataType: 'json',
+            success: function(response) {
+              if(response.remove)
+                $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
+              else
+              {
+                if(response.vote_added || response.vote_removed)
+                  $('#vote-'+aid).toggleClass('voted');
+                if(response.vote_added)
+                {
+                  $('#vote-'+aid).find("span.tooltiptext").html("Remove vote");
+                }
+                if(response.vote_removed)
+                {
+                  $('#vote-'+aid).find("span.tooltiptext").html("Add vote");
+                }
+                if(cls.includes("voted") && !response.vote_removed)
+                  alert("You cannot remove your vote from this article.");
+              }
+            },
+            error: function(a, b, c) {
+              alert("Error: " + a + ", " + b + ", " + c);
+            }
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
 
 (function ($, Drupal) {
   Drupal.behaviors.moreArticlesBehavior = {

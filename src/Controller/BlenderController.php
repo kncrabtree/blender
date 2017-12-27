@@ -112,6 +112,13 @@ class BlenderController extends ControllerBase {
         ->condition('status',true)
         ->count()->execute() > 0);
       $a_d['bookmark'] = $bm;
+
+      $voted = ($this->query_service->get('blender_vote')
+        ->condition('user_id',$this->currentUser()->id())
+        ->condition('article_id',$a->id->value)
+        ->count()->execute() > 0);
+      $a_d['voted'] = $voted;
+
       $a_array[] = $a_d;
     }
 
@@ -307,4 +314,91 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function add_vote(Request $request) {
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $user = $this->currentUser();
+
+    $vs = $this->entityTypeManager()->getStorage('blender_vote');
+
+    //see if the vote is already in the database
+    $vl = $vs->loadByProperties([
+      'user_id' => $user->id(),
+      'article_id' => $a_id
+    ]);
+
+    $return_data = [
+      'article_id' => $a_id,
+    ];
+
+    if(count($vl) == 0)
+    {
+      //add vote to system
+      $vote = $vs->create();
+      $vote->set('user_id',$user->id());
+      $vote->set('article_id',$a_id);
+      $vote->save();
+      $return_data['vote_added'] = true;
+    }
+    else
+    {
+      $vote = array_shift($vl);
+      if($vote->get('article_id')->entity->get('is_starred')->value)
+        $return_data['can_remove_vote'] = false;
+      else
+        $return_data['can_remove_vote'] = true;
+
+      $return_data['vote_added'] = false;
+
+    }
+
+    return new JsonResponse($return_data);
+
+  }
+
+  public function remove_vote(Request $request) {
+
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $user = $this->currentUser();
+
+    $vs = $this->entityTypeManager()->getStorage('blender_vote');
+
+    //see if the vote is already in the database
+    $vl = $vs->loadByProperties([
+      'user_id' => $user->id(),
+      'article_id' => $a_id
+    ]);
+
+    $return_data['article_id'] = $a_id;
+
+    if(count($vl) == 0)
+    {
+      //this should never happen, but if it does, just pretend like it was successful
+      $return_data['vote_removed'] = true;
+    }
+    else
+    {
+      $vote = array_shift($vl);
+      if($vote->get('article_id')->entity->get('is_starred')->value)
+        $return_data['vote_removed'] = false;
+      else
+      {
+        $vote->delete();
+        $return_data['vote_removed'] = true;
+      }
+    }
+
+
+    return new JsonResponse($return_data);
+
+  }
+
 }
+

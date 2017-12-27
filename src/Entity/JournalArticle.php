@@ -34,7 +34,8 @@ use Drupal\blender\JournalArticleInterface;
  *     "authors" = "authors",
  *     "title" = "title",
  *     "doi" = "doi",
- *     "date_added" = "date_added"
+ *     "date_added" = "date_added",
+ *     "is_starred" = "is_starred",
  *   },
  *   links = {
  *     "canonical" = "/journals/article/{blender_article}",
@@ -123,6 +124,17 @@ class JournalArticle extends ContentEntityBase implements JournalArticleInterfac
       ->setDescription("When the article was added to the system.")
       ->setRequired(true);
 
+    $fields['is_starred'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Is starred'))
+      ->setDescription(t('Starred articles are selected for group discussion.'))
+      ->setRequired(false)
+      ->setSetting('default_value',false);
+
+    $fields['star_date'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Date starred'))
+      ->setDescription(t('Date this article was chosen for discussion.'))
+      ->setRequired(false);
+
     return $fields;
   }
 
@@ -148,7 +160,9 @@ class JournalArticle extends ContentEntityBase implements JournalArticleInterfac
         'pages' => $this->get('pages')->value,
         'year' => $this->get('year')->value,
         'doi' => $this->get('doi')->value,
-        'date_added' => DrupalDateTime::createFromTimestamp($this->get('date_added')->value)->format('Y-m-d')
+        'date_added' => DrupalDateTime::createFromTimestamp($this->get('date_added')->value)->format('Y-m-d'),
+        'is_starred' => $this->get('is_starred')->value,
+        'star_date' => isset($this->get('star_date')->value) ? DrupalDateTime::createFromTimestamp($this->get('star_date')->value)->format('Y-m-d') : NULL,
     );
 
     return $out;

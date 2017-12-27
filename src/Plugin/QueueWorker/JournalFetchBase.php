@@ -219,6 +219,8 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
               $article->set('pages',$a['page']);
             $article->set('year',$a['issued']['date-parts'][0][0]);
             $article->set('doi',$a['DOI']);
+            $article->set('is_starred',false);
+            $article->set('star_date',NULL);
 
             $violations = $article->validate();
             if($violations->count() == 0)

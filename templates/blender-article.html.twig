@@ -38,7 +38,7 @@
             <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
           </div>
         </i>
-        <i class="material-icons md-dark icon vote-icon" id="vote-{{ a.id }}">
+        <i class="material-icons md-dark icon vote-icon{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
           <div class="tooltip">
             plus_one
             <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
