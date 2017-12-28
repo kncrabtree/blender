@@ -140,6 +140,14 @@ class BlenderController extends ControllerBase {
       $a_d = $a->article_details();
       $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
 
+      //remove "new" tag from article if owner is seeing it
+      //It will still render as "new" this time, but not next
+      if($a_d['is_owner'] && $a_d['new'])
+      {
+        $a->set('new',false);
+        $a->save();
+      }
+
       $bm = ($this->query_service->get('blender_bookmark')
         ->condition('user_id',$this->currentUser()->id())
         ->condition('article_id',$a->id->value)

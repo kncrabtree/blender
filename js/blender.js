@@ -163,6 +163,8 @@
           var comment = $(this).parents('.article-display').siblings('.article-comment');
           var cls = comment.attr('class');
           $(this).parents('.article').toggleClass('expanded');
+          if($(this).attr('class').includes('new'))
+            $(this).toggleClass('new');
           if(cls.includes('visible'))
             comment.slideUp(100, function(){ $(this).toggleClass('visible'); });
           else

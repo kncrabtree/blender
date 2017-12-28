@@ -36,6 +36,7 @@ use Drupal\blender\JournalArticleInterface;
  *     "doi" = "doi",
  *     "date_added" = "date_added",
  *     "is_starred" = "is_starred",
+ *     "preserve" = "preserve",
  *   },
  *   links = {
  *     "canonical" = "/journals/article/{blender_article}",
@@ -127,13 +128,18 @@ class JournalArticle extends ContentEntityBase implements JournalArticleInterfac
     $fields['is_starred'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Is starred'))
       ->setDescription(t('Starred articles are selected for group discussion.'))
-      ->setRequired(false)
+      ->setRequired(true)
       ->setSetting('default_value',false);
 
     $fields['star_date'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Date starred'))
       ->setDescription(t('Date this article was chosen for discussion.'))
       ->setRequired(false);
+
+    $fields['preserve'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Preserve'))
+      ->setDescription(t('Preserved articles are not automatically purged.'))
+      ->setSetting('default_value',false);
 
     return $fields;
   }

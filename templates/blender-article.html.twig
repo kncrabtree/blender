@@ -47,7 +47,7 @@
       </div>
 
 
-      <div class="article-data">
+      <div class="article-data{% if a.is_owner and a.new %} new{% endif %}">
         <span class="article-title">{{ a.title }}</span>
         <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
         <br />

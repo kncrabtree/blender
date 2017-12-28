@@ -21,6 +21,10 @@
   cursor: pointer;
 }
 
+.article-data.new .article-title{
+  font-weight: bold;
+}
+
 #articles-more {
   border: 1px solid rgba(0, 0, 0, 0.13);
   font-family: Sans-serif;
@@ -38,7 +42,7 @@
 
 .article-title {
   font-size: 1.25em;
-  font-weight: bold;
+  font-weight: normal;
   padding: 0px;
 }
 
