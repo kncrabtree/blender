@@ -74,6 +74,8 @@
 .material-icons.md-dark.bookmark-icon.bookmarked:hover { color: rgba(150, 20, 30, 0.54); }
 .material-icons.md-dark.vote-icon.voted { color: rgba(255, 102, 30, 0.87); }
 .material-icons.md-dark.vote-icon.voted:hover { color: rgba(255, 102, 30, 0.54); }
+.material-icons.md-dark.star-icon { color: rgba(255, 175, 30, 0.87); }
+.material-icons.md-dark.star-icon:hover { color: rgba(255, 175, 30, 0.87); cursor:default; }
 .material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
 
 /* Rules for using icons as white on a dark background. */

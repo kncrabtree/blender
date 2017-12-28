@@ -15,7 +15,7 @@
 {% for a in articles %}
   <div class="article{% if not a.is_owner %} other{% endif %}{% if articles|length == 1 %} expanded{% endif %}" id="article-{{ a.id }}">
     <div class="article-display">
-      <div class="article-icons">
+      <div class="article-icons left">
         {% if a.is_owner %}
           <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
             <div class="tooltip">
@@ -54,8 +54,14 @@
         Assigned to {{ a.owner }} on {{ a.date_added}}.</span>
       </div>
 
-      <div class="article-actions">
+      <div class="article-icons right">
+        {% if a.is_starred %}
+          <i class="material-icons md-dark icon star-icon">star</i>
+        {% else %}
+          <i class="icon"></i>
+        {% endif %}
         <i class="material-icons md-dark icon options-icon" id="options"-{{ a.id }}">menu</i>
+        <i class="material-icons md-dark icon share-icon">share</i>
       </div>
     </div>
 
