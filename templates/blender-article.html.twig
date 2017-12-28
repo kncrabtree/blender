@@ -41,7 +41,7 @@
         <i class="material-icons md-dark icon vote-icon{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
           <div class="tooltip">
             plus_one
-            <span class="tooltiptext" id="votetooltip-{{ a.id }}">Add vote</span>
+            <span class="tooltiptext" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
           </div>
         </i>
       </div>

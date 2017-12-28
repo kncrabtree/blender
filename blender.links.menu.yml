@@ -16,14 +16,26 @@ blender.user_bookmarks:
   description: 'View your bookmarked articles.'
   weight: 11
 
+blender.user_votes:
+  title: 'My Votes'
+  route_name: blender.user-votes
+  description: 'View articles you have voted for.'
+  weight: 12
+
 blender.user_all:
   title: 'My Articles'
   route_name: blender.user-archive
   description: 'View all of your articles in the system.'
-  weight: 12
+  weight: 13
+
+blender.all_votes:
+  title: 'All Votes'
+  route_name: blender.all-votes
+  description: 'View all articles that have votes.'
+  weight: 20
 
 blender.all:
   title: 'All Articles'
   route_name: blender.all
   description: 'View all articles in the system.'
-  weight: 20
+  weight: 21

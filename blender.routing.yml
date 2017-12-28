@@ -22,6 +22,22 @@ blender.user-bookmarks:
   requirements:
     _permission: 'access blender'
 
+blender.user-votes:
+  path: '/journals/user/votes'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::user_votes'
+    _title: 'My Votes'
+  requirements:
+    _permission: 'access blender'
+
+blender.all-votes:
+  path: '/journals/votes'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::all_votes'
+    _title: 'All Votes'
+  requirements:
+    _permission: 'access blender'
+
 blender.all:
   path: '/journals/all-articles'
   defaults:

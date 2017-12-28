@@ -73,27 +73,61 @@ class BlenderController extends ControllerBase {
 
   }
 
-  protected function bookmark_lookup_list()
+  protected function other_lookup_list($type,$sort='article_id',$order='DESC')
   {
-    $bmquery = $this->query_service->get('blender_bookmark');
-    if(isset($this->conditions))
-    {
-      foreach($this->conditions as $key => $value)
-      {
-        if(isset($value[1]))
-          $bmquery->condition($key,$value[0],$value[1]);
-        else
-          $bmquery->condition($key,$value[0]);
-      }
-    }
-
-    $bm_ids = $bmquery->sort('article_id','DESC')->pager($this->page_size)->execute();
-
-    $bmlist = $this->entityTypeManager()->getStorage('blender_bookmark')->loadMultiple($bm_ids);
-
+    $done = false;
+    //in some cases (e.g., votes or comments), the same article may appear multiple times. Remove any duplicates
     $articles = array();
-    foreach($bmlist as $bm)
-      $articles[] = $bm->get('article_id')->entity;
+    $article_ids = array();
+    $duplicates = 0;
+
+    while(!$done)
+    {
+      $query = $this->query_service->get($type);
+      if(isset($this->conditions))
+      {
+        foreach($this->conditions as $key => $value)
+        {
+          if(isset($value[1]))
+            $query->condition($key,$value[0],$value[1]);
+          else
+            $query->condition($key,$value[0]);
+        }
+      }
+
+      $fetch = ($duplicates > 0 ? $duplicates : $this->page_size);
+
+      $ids = $query->sort($sort,$order)->pager($fetch)->execute();
+
+      $list = $this->entityTypeManager()->getStorage($type)->loadMultiple($ids);
+
+
+      $duplicates = 0;
+
+      foreach($list as $item)
+      {
+        $this_article = $item->get('article_id')->entity;
+        $this_id = $this_article->get('id')->value;
+        if(!in_array($this_id,$article_ids))
+        {
+          $articles[] = $this_article;
+          $article_ids[] = $this_id;
+        }
+        else
+          $duplicates++;
+      }
+
+      //if several duplicates, get more articles
+      if($duplicates > $this->page_size/10)
+      {
+        $this->conditions['article_id'] = [
+          $article_ids[count($article_ids)-1],
+          '<'
+        ];
+      }
+      else
+        $done = true;
+    }
 
     return $articles;
   }
@@ -185,8 +219,28 @@ class BlenderController extends ControllerBase {
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->conditions['status'] = [true];
 
-    $articles = $this->bookmark_lookup_list();
+    $articles = $this->other_lookup_list('blender_bookmark');
     $more = $this->lookup_more_available('blender_bookmark');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
+  public function user_votes() {
+
+    $this->conditions['user_id'] = [$this->currentUser()->id()];
+
+    $articles = $this->other_lookup_list('blender_vote');
+    $more = $this->lookup_more_available('blender_vote');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
+  public function all_votes() {
+
+    $articles = $this->other_lookup_list('blender_vote');
+    $more = $this->lookup_more_available('blender_vote');
 
     return $this->build_render_array($articles,$more);
 
@@ -215,8 +269,14 @@ class BlenderController extends ControllerBase {
     if(strpos($page,'bookmarks') !== false)
     {
       $this->conditions['article_id'] = [$a_id,'<'];
-      $articles = $this->bookmark_lookup_list();
       $type = 'blender_bookmark';
+      $articles = $this->other_lookup_list($type);
+    }
+    else if(strpos($page,'votes') !== false)
+    {
+      $this->conditions['article_id'] = [$a_id,'<'];
+      $type = 'blender_vote';
+      $articles = $this->other_lookup_list($type);
     }
     else
     {
@@ -377,6 +437,7 @@ class BlenderController extends ControllerBase {
     ]);
 
     $return_data['article_id'] = $a_id;
+    $return_data['remove'] = false;
 
     if(count($vl) == 0)
     {
@@ -392,6 +453,8 @@ class BlenderController extends ControllerBase {
       {
         $vote->delete();
         $return_data['vote_removed'] = true;
+        if(strpos($request->request->get('origin'),'user') !== false && strpos($request->request->get('origin'),'votes') !== false)
+          $return_data['remove'] = true;
       }
     }
 
