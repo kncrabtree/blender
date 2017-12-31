@@ -12,6 +12,7 @@ blender:
     - core/drupal
     - core/jquery
     - core/jquery.once
+    - core/ckeditor
 
 google.icons:
   remote: https://fonts.googleapis.com/icon?family=Material+Icons

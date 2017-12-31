@@ -26,26 +26,28 @@ function blender_theme($existing, $type, $theme, $path) {
  * Implements hook_cron().
  */
 function blender_cron() {
-  \Drupal::logger('blender')->notice("Blender Cron Triggered.");
+
+  $queue = \Drupal::queue('journal_fetcher');
+
+  if($queue->numberOfItems > 0)
+  {
+    \Drupal::logger('blender')->notice("Not queuing more journals; queue not empty.");
+    return;
+  }
 
   $storage = \Drupal::entityManager()->getStorage('blender_journal');
-
   $jids = \Drupal::entityQuery('blender_journal')
     ->condition('active', TRUE, '==')
-    ->condition('queued_time',0,'==')
     ->condition('last_update',REQUEST_TIME-(24*60*60),'<')
     ->execute();
 
   $journals = $storage->loadMultiple($jids);
 
-  $queue = \Drupal::queue('journal_fetcher');
 
   foreach( $journals as $j ) {
     if($queue->createItem($j))
     {
       \Drupal::logger('blender')->notice("Queued ".$j->abbr->value);
-      $j->set('queued_time',REQUEST_TIME);
-      $j->save();
     }
   }
 }

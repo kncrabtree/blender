@@ -13,20 +13,22 @@
 
 {% if articles %}
 {% for a in articles %}
-  <div class="article{% if not a.is_owner %} other{% endif %}{% if articles|length == 1 %} expanded{% endif %}" id="article-{{ a.id }}">
+  <div class="article{% if not a.is_owner %} other{% endif %}{% if articles|length == 1 %} expanded{% endif %}{% if a.is_owner and a.new %} new{% endif %}" id="article-{{ a.id }}">
     <div class="article-display">
+
+
       <div class="article-icons left">
         {% if a.is_owner %}
-          <i class="material-icons md-dark icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
+          <i class="material-icons md-dark clickable icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
             <div class="tooltip">
               done
-              <span class="tooltiptext" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+              <span class="tooltiptext top right" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
             </div>
           </i>
         {% else %}
           <i class="icon"></i>
         {% endif %}
-        <i class="material-icons md-dark icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
+        <i class="material-icons md-dark clickable icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
           <div class="tooltip">
             <span class="icon-name">
             {% if a.bookmark %}
@@ -35,24 +37,20 @@
               bookmark_border
             {% endif %}
             </span>
-            <span class="tooltiptext" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
+            <span class="tooltiptext bottom right" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
           </div>
         </i>
-        <i class="material-icons md-dark icon vote-icon{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
-          <div class="tooltip">
-            plus_one
-            <span class="tooltiptext" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
-          </div>
-        </i>
+        <i class="material-icons md-dark clickable icon comment-icon" id="commenticon-{{ a.id }}">comment</i>
       </div>
 
 
-      <div class="article-data{% if a.is_owner and a.new %} new{% endif %}">
+      <div class="article-data">
         <span class="article-title">{{ a.title }}</span>
         <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
         <br />
-        Assigned to {{ a.owner }} on {{ a.date_added}}.</span>
+        Assigned to {{ a.owner }} on {{ a.date_added}}.{% if a.is_starred %} Starred on {{ a.star_date }}.{% endif %}</span>
       </div>
+
 
       <div class="article-icons right">
         {% if a.is_starred %}
@@ -60,13 +58,40 @@
         {% else %}
           <i class="icon"></i>
         {% endif %}
-        <i class="material-icons md-dark icon options-icon" id="options"-{{ a.id }}">menu</i>
-        <i class="material-icons md-dark icon share-icon">share</i>
+        <i class="material-icons md-dark clickable icon options-icon">
+          <div class="tooltip">
+            menu
+            <span class="tooltiptext bottom left">More actions</span>
+          </div>
+          <div class="article-actions-container">
+            <div class="article-actions-menu" id="menu-{{ a.id }}" tabindex="1">
+              {% if a.is_owner %}
+                <div class="article-actions-menu-item unread-action">
+                  <i class="material-icons md-dark icon unread-icon">markunread</i>
+                  <span class="article-actions-menu-item-desc">Keep unread</span>
+                </div>
+              {% endif %}
+              <div class="article-actions-menu-item share-action">
+                <i class="material-icons md-dark icon share-icon">share</i>
+                <span class="article-actions-menu-item-desc">Recommend article</span>
+              </div>
+            </div>
+          </div>
+        </i>
+        <i class="material-icons md-dark clickable icon vote-icon{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
+          <div class="tooltip">
+            plus_one
+            <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
+          </div>
+        </i>
       </div>
     </div>
 
+
     <div class="article-comment {% if articles|length == 1 %} visible{% endif %}">
-      Comment Area!
+      <span class="comment-add">Add comment</span>
+      <div class="comment-editor-wrapper">
+      </div>
     </div>
   </div>
 {% endfor %}

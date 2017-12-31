@@ -471,5 +471,32 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function mark_unread(Request $request) {
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $user = $this->currentUser();
+
+    ///TODO: handle case if recommendation here!
+
+    $a = $this->entityTypeManager()->getStorage('blender_article')->loadByProperties([
+      'user_id' =>$this->currentUser()->id(),
+      'id' => $a_id,
+    ]);
+
+    if(count($a) > 0)
+    {
+      $article = array_shift($a);
+      $article->set('new',true);
+      $article->save();
+    }
+
+    $return_data['article_id'] = $a_id;
+    return new JsonResponse($return_data);
+
+  }
+
 }
 

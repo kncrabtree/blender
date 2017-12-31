@@ -156,15 +156,17 @@
 })(jQuery, Drupal);
 
 (function ($, Drupal) {
-  Drupal.behaviors.showCommentsBehavior = {
+  Drupal.behaviors.articleClickBehavior = {
     attach: function (context, settings) {
-      $('.article-data', context).once('showCommentsBehavior').each(function () {
+      $('.article', context).once('articleClickBehavior').each(function () {
+        var aid = $(this).attr('id').split('-')[1];
         $(this).click(function() {
-          var comment = $(this).parents('.article-display').siblings('.article-comment');
+          $(this).removeClass('new');
+        });
+        $('.article-data', this).add('.comment-icon',this).click(function() {
+          var comment = $('.article-comment','#article-'+aid );
           var cls = comment.attr('class');
-          $(this).parents('.article').toggleClass('expanded');
-          if($(this).attr('class').includes('new'))
-            $(this).toggleClass('new');
+          $('#article-'+aid).toggleClass('expanded');
           if(cls.includes('visible'))
             comment.slideUp(100, function(){ $(this).toggleClass('visible'); });
           else
@@ -188,6 +190,55 @@
 //               alert("Error: " + a + ", " + b + ", " + c);
 //             }
 //           });
+        });
+
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.articleMenuBehavior = {
+    attach: function (context, settings) {
+      $('.options-icon', context).once('articleMenuBehavior').each(function () {
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        $('#menu-'+aid).blur(function() {
+          $(this).slideUp(100, function(){ $(this).removeClass('visible'); });
+        });
+        $(this).click(function() {
+          if($('#menu-'+aid).attr('class').includes('visible'))
+            $('#menu-'+aid).blur();
+          else
+          {
+            $('#menu-'+aid).slideDown(100, function(){
+              $(this).addClass('visible');
+              $(this).focus();
+            });
+          }
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.keepUnreadBehavior = {
+    attach: function (context, settings) {
+      $('.unread-action', context).once('keepUnreadBehavior').each(function () {
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        $(this).click(function(event) {
+          event.stopPropagation();
+          $('#article-'+aid).addClass('new');
+          $('#menu-'+aid).blur();
+          $.ajax({
+            url: Drupal.url('journals/mark-unread'),
+            type: 'POST',
+            data: {
+              'article_id' : aid,
+              'origin' : window.location.pathname
+            },
+            dataType: 'json'
+          });
         });
       });
     }

@@ -13,13 +13,27 @@
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    bottom: 100%;
-    left: 100%;
     opacity: 0;
     transition: opacity 0s;
     transition-delay: 1s;
     font-family: Sans-serif;
     font-size: 8pt;
+}
+
+.tooltiptext.left {
+  right: 100%
+}
+
+.tooltiptext.right {
+  left: 100%
+}
+
+.tooltiptext.top {
+  bottom: 100%
+}
+
+.tooltiptext.bottom {
+  top: 100%
 }
 
 .tooltip:hover .tooltiptext {

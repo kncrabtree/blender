@@ -74,6 +74,13 @@ blender.remove-vote:
   requirements:
     _permission: 'access blender'
 
+blender.mark-unread:
+  path: '/journals/mark-unread'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::mark_unread'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:
