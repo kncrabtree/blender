@@ -20,6 +20,8 @@ class BlenderController extends ControllerBase {
 
   protected $conditions;
 
+  protected $page;
+
 
   public function __construct( QueryFactory $qf)
   {
@@ -177,6 +179,7 @@ class BlenderController extends ControllerBase {
     else
     {
       $render['#theme'] = 'blender';
+      $render['#page'] = $this->page;
       $render['#attached'] = array(
         'library' => array (
           'blender/blender',
@@ -192,6 +195,7 @@ class BlenderController extends ControllerBase {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->conditions['inbox'] = [true];
+    $this->page = 'inbox';
 
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
@@ -202,6 +206,7 @@ class BlenderController extends ControllerBase {
   public function all_user_articles() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
+    $this->page = 'user-archive';
 
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
@@ -218,6 +223,7 @@ class BlenderController extends ControllerBase {
 
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
+    $this->page = 'archive';
 
     return $this->build_render_array($articles,$more);
   }
@@ -226,6 +232,7 @@ class BlenderController extends ControllerBase {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->conditions['status'] = [true];
+    $this->page = 'bookmarks';
 
     $articles = $this->other_lookup_list('blender_bookmark');
     $more = $this->lookup_more_available('blender_bookmark');
@@ -237,6 +244,7 @@ class BlenderController extends ControllerBase {
   public function user_votes() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
+    $this->page = 'user-votes';
 
     $articles = $this->other_lookup_list('blender_vote');
     $more = $this->lookup_more_available('blender_vote');
@@ -249,6 +257,7 @@ class BlenderController extends ControllerBase {
 
     $articles = $this->other_lookup_list('blender_vote');
     $more = $this->lookup_more_available('blender_vote');
+    $this->page = 'votes';
 
     return $this->build_render_array($articles,$more);
 

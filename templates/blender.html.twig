@@ -6,6 +6,7 @@
  * Available variables:
  *   - articles
  *   - more
+ *   - page
  *
  *
  * @ingroup themeable
@@ -13,22 +14,30 @@
 #}
 
 <div class="blender-navigation">
-  <div class="blender-navigation-item selected">
-    <i class="material-icons md-dark icon clickable inbox-nav-icon">markunread</i>
-    <span class="blender-navigation-desc">Inbox</span>
-  </div>
-  <div class="blender-navigation-item">
-    <i class="material-icons md-dark icon clickable bookmark-nav-icon">bookmark</i>
-    <span class="blender-navigation-desc">My Bookmarks</span>
-  </div>
-  <div class="blender-navigation-item">
-    <i class="material-icons md-dark icon clickable vote-nav-icon">plus_one</i>
-    <span class="blender-navigation-desc">My Votes</span>
-  </div>
-  <div class="blender-navigation-item">
-    <i class="material-icons md-dark icon clickable archive-nav-icon">done</i>
-    <span class="blender-navigation-desc">My Articles</span>
-  </div>
+  <a href="{{ url('blender.inbox') }}">
+    <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %}">
+      <i class="material-icons md-dark icon clickable inbox-nav-icon{% if page is same as('inbox') %} selected{% endif %}">markunread</i>
+      <span class="blender-navigation-desc">Inbox</span>
+    </div>
+  </a>
+  <a href="{{ url('blender.user-bookmarks') }}">
+    <div class="blender-navigation-item{% if page is same as('bookmarks') %} selected{% endif %}">
+      <i class="material-icons md-dark icon clickable bookmark-nav-icon{% if page is same as('bookmarks') %} selected{% endif %}">bookmark</i>
+      <span class="blender-navigation-desc">My Bookmarks</span>
+    </div>
+  </a>
+  <a href="{{ url('blender.user-votes') }}">
+    <div class="blender-navigation-item{% if page is same as('user-votes') %} selected{% endif %}">
+      <i class="material-icons md-dark icon clickable vote-nav-icon{% if page is same as('user-votes') %} selected{% endif %}">plus_one</i>
+      <span class="blender-navigation-desc">My Votes</span>
+    </div>
+  </a>
+    <a href="{{ url('blender.user-archive') }}">
+    <div class="blender-navigation-item{% if page is same as('user-archive') %} selected{% endif %}">
+      <i class="material-icons md-dark icon clickable archive-nav-icon{% if page is same as('user-archive') %} selected{% endif %}">done</i>
+      <span class="blender-navigation-desc">My Articles</span>
+    </div>
+  </a>
 </div>
 
 {% if articles %}

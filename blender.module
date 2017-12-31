@@ -9,6 +9,7 @@ function blender_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'articles' => NULL,
         'more' => NULL,
+        'page' => 'inbox',
       ),
       'template' => 'blender',
     ),
