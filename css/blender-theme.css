@@ -13,6 +13,7 @@
 
 .article.new .article-icons.left {
   border-left: 3px solid rgba(255, 0, 0, 0.87);
+  margin-left: -3px;
 }
 
 .article.expanded {
