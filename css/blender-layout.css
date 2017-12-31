@@ -1,6 +1,16 @@
+.blender-navigation {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px,8fr));
+}
+
+.blender-navigation-item {
+  display: grid;
+  grid-template-columns: 40px auto;
+}
+
 .articles-table {
-    display: grid;
-    grid-auto-rows: auto;
+  display: grid;
+  grid-auto-rows: auto;
 }
 
 .article {

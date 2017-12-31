@@ -1,9 +1,8 @@
 .tooltip {
     position: relative;
-/*     display: inline-block; */
 }
 
-.tooltip .tooltiptext {
+.tooltiptext {
     visibility: hidden;
     min-width: 100px;
     max-width: 300px;
@@ -21,19 +20,19 @@
 }
 
 .tooltiptext.left {
-  right: 100%
+  right: 100%;
 }
 
 .tooltiptext.right {
-  left: 100%
+  left: 100%;
 }
 
 .tooltiptext.top {
-  bottom: 100%
+  bottom: 100%;
 }
 
 .tooltiptext.bottom {
-  top: 100%
+  top: 100%;
 }
 
 .tooltip:hover .tooltiptext {

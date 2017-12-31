@@ -2,7 +2,7 @@ blender.inbox:
   path: '/journals/user/inbox'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::inbox'
-    _title: 'Inbox'
+    #_title: 'Inbox'
   requirements:
     _permission: 'access blender'
 
@@ -10,7 +10,7 @@ blender.user-archive:
   path: '/journals/user/articles'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::all_user_articles'
-    _title: 'My Articles'
+    #_title: 'My Articles'
   requirements:
     _permission: 'access blender'
 
@@ -18,7 +18,7 @@ blender.user-bookmarks:
   path: '/journals/user/bookmarks'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::user_bookmarks'
-    _title: 'My Bookmarks'
+    #_title: 'My Bookmarks'
   requirements:
     _permission: 'access blender'
 
@@ -26,7 +26,7 @@ blender.user-votes:
   path: '/journals/user/votes'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::user_votes'
-    _title: 'My Votes'
+    #_title: 'My Votes'
   requirements:
     _permission: 'access blender'
 
@@ -34,7 +34,7 @@ blender.all-votes:
   path: '/journals/votes'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::all_votes'
-    _title: 'All Votes'
+    #_title: 'All Votes'
   requirements:
     _permission: 'access blender'
 
@@ -42,7 +42,7 @@ blender.all:
   path: '/journals/all-articles'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::all_articles'
-    _title: 'All Articles'
+    #_title: 'All Articles'
   requirements:
     _permission: 'access blender'
 
@@ -124,7 +124,7 @@ blender.blender_article.canonical:
   path: 'journals/article/{blender_article}'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::article'
-    _title: 'Article Details'
+    #_title: 'Article Details'
   requirements:
     _permission: 'access blender'
     #blender_article: '^[0-9]+'

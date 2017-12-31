@@ -12,20 +12,39 @@
  */
 #}
 
+<div class="blender-navigation">
+  <div class="blender-navigation-item selected">
+    <i class="material-icons md-dark icon clickable inbox-nav-icon">markunread</i>
+    <span class="blender-navigation-desc">Inbox</span>
+  </div>
+  <div class="blender-navigation-item">
+    <i class="material-icons md-dark icon clickable bookmark-nav-icon">bookmark</i>
+    <span class="blender-navigation-desc">My Bookmarks</span>
+  </div>
+  <div class="blender-navigation-item">
+    <i class="material-icons md-dark icon clickable vote-nav-icon">plus_one</i>
+    <span class="blender-navigation-desc">My Votes</span>
+  </div>
+  <div class="blender-navigation-item">
+    <i class="material-icons md-dark icon clickable archive-nav-icon">done</i>
+    <span class="blender-navigation-desc">My Articles</span>
+  </div>
+</div>
+
 {% if articles %}
-<div class="articles-table">
-{% include '@blender/blender-article.html.twig' %}
-{% if more %}
-<div id="articles-more">
-    <i class="material-icons md-dark md-48 icon">
+  <div class="articles-table">
+  {% include '@blender/blender-article.html.twig' %}
+  {% if more %}
+    <div id="articles-more">
+      <i class="material-icons md-dark clickable md-48 icon">
       <div class="tooltip">
         file_download
         <span class="tooltiptext">Show more articles</span>
       </div>
-    </i>
-</div>
-{% endif %}
-</div>
+      </i>
+    </div>
+  {% endif %}
+  </div>
 {% else %}
-<div class="no-articles">No articles to display.</div>
+  <div class="no-articles">No articles to display.</div>
 {% endif %}
