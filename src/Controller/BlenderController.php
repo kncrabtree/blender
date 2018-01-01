@@ -112,6 +112,20 @@ class BlenderController extends ControllerBase {
         $this_id = $this_article->get('id')->value;
         if(!in_array($this_id,$article_ids))
         {
+          if(strpos($type,'recommendation') !== false)
+          {
+            $this_article->set_recommended($item);
+            if($item->get('new')->value)
+            {
+              $item->set('new',false);
+              $item->save();
+            }
+          }
+          else if($this_article->get('user_id')->target_id == $this->currentUser()->id() && $this_article->get('new')->value)
+          {
+            $this_article->set('new',false);
+            $this->article->save();
+          }
           $articles[] = $this_article;
           $article_ids[] = $this_id;
         }
@@ -122,9 +136,9 @@ class BlenderController extends ControllerBase {
       //if several duplicates, get more articles
       if($duplicates > $this->page_size/10)
       {
-        $this->conditions['article_id'] = [
-          $article_ids[count($article_ids)-1],
-          '<'
+        $this->conditions[$sort] = [
+          $list[count($list)-1]->get($sort)->value,
+          $order === 'DESC' ? '<' : '>',
         ];
       }
       else
@@ -141,14 +155,6 @@ class BlenderController extends ControllerBase {
     {
       $a_d = $a->article_details();
       $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
-
-      //remove "new" tag from article if owner is seeing it
-      //It will still render as "new" this time, but not next
-      if($a_d['is_owner'] && $a_d['new'])
-      {
-        $a->set('new',false);
-        $a->save();
-      }
 
       $bm = ($this->query_service->get('blender_bookmark')
         ->condition('user_id',$this->currentUser()->id())
@@ -253,6 +259,18 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function user_recommendations() {
+
+    $this->conditions['user_id'] = [$this->currentUser()->id()];
+    $this->page = 'user-recommendations';
+
+    $articles = $this->other_lookup_list('blender_recommendation','timestamp','DESC');
+    $more = $this->lookup_more_available('blender_recommendation');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
   public function all_votes() {
 
     $articles = $this->other_lookup_list('blender_vote');
@@ -293,6 +311,15 @@ class BlenderController extends ControllerBase {
     {
       $this->conditions['article_id'] = [$a_id,'<'];
       $type = 'blender_vote';
+      $articles = $this->other_lookup_list($type);
+    }
+    else if(strpos($page,'recommendations') !== false)
+    {
+      //retrieve article; get its timestamp
+      $a = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+      $this->conditions['timestamp'] = [$a->get('timestamp')->value,'<'];
+      $type = 'blender_recommendation';
+
       $articles = $this->other_lookup_list($type);
     }
     else
@@ -489,17 +516,27 @@ class BlenderController extends ControllerBase {
     $user = $this->currentUser();
 
     ///TODO: handle case if recommendation here!
-
-    $a = $this->entityTypeManager()->getStorage('blender_article')->loadByProperties([
-      'user_id' =>$this->currentUser()->id(),
-      'id' => $a_id,
-    ]);
-
-    if(count($a) > 0)
+    $list = array();
+    if(strpos($request->request->get('origin'),'recommendation') !== false)
     {
-      $article = array_shift($a);
-      $article->set('new',true);
-      $article->save();
+      $list = $this->entityTypeManager()->getStorage('blender_recommendation')->loadByProperties([
+        'user_id' =>$this->currentUser()->id(),
+        'article_id' => $a_id,
+      ]);
+    }
+    else
+    {
+      $list = $this->entityTypeManager()->getStorage('blender_article')->loadByProperties([
+        'user_id' =>$this->currentUser()->id(),
+        'id' => $a_id,
+      ]);
+    }
+
+    if(count($list) > 0)
+    {
+      $item = array_shift($list);
+      $item->set('new',true);
+      $item->save();
     }
 
     $return_data['article_id'] = $a_id;

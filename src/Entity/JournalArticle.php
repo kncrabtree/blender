@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\user\Entity;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\blender\JournalArticleInterface;
+use Drupal\Blender\Entity\BlenderRecommendation;
 
 /**
  * Defines the journal article entity.
@@ -45,6 +46,14 @@ use Drupal\blender\JournalArticleInterface;
  */
 
 class JournalArticle extends ContentEntityBase implements JournalArticleInterface {
+
+  protected $is_recommendation = false;
+  protected $recommendation = NULL;
+
+  public function set_recommended($recommendation) {
+    $this->is_recommendation = true;
+    $this->recommendation = $recommendation;
+  }
 
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
@@ -169,7 +178,14 @@ class JournalArticle extends ContentEntityBase implements JournalArticleInterfac
         'date_added' => DrupalDateTime::createFromTimestamp($this->get('date_added')->value)->format('Y-m-d'),
         'is_starred' => $this->get('is_starred')->value,
         'star_date' => isset($this->get('star_date')->value) ? DrupalDateTime::createFromTimestamp($this->get('star_date')->value)->format('Y-m-d') : NULL,
+        'is_recommendation' => $this->is_recommendation,
     );
+
+    if($this->is_recommendation)
+    {
+      $out['rec_sender'] = $this->recommendation->get('sender_id')->entity->getDisplayName();
+      $out['rec_timestamp'] = DrupalDateTime::createFromTimestamp($this->recommendation->get('timestamp')->value)->format('Y-m-d');
+    }
 
     return $out;
   }

@@ -30,6 +30,14 @@ blender.user-votes:
   requirements:
     _permission: 'access blender'
 
+blender.user-recommendations:
+  path: '/journals/user/recommendations'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::user_recommendations'
+    #_title: 'My Recommendations'
+  requirements:
+    _permission: 'access blender'
+
 blender.all-votes:
   path: '/journals/votes'
   defaults:

@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Defines the bookmark entity.
+ * Defines the vote entity.
  *
  * @ingroup blender
  *

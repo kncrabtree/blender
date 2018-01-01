@@ -32,7 +32,13 @@
       <span class="blender-navigation-desc">My Votes</span>
     </div>
   </a>
-    <a href="{{ url('blender.user-archive') }}">
+  <a href="{{ url('blender.user-recommendations') }}">
+    <div class="blender-navigation-item{% if page is same as('user-recommendations') %} selected{% endif %}">
+      <i class="material-icons md-dark icon clickable rec-nav-icon{% if page is same as('user-recommendations') %} selected{% endif %}">share</i>
+      <span class="blender-navigation-desc">Shared With Me</span>
+    </div>
+  </a>
+  <a href="{{ url('blender.user-archive') }}">
     <div class="blender-navigation-item{% if page is same as('user-archive') %} selected{% endif %}">
       <i class="material-icons md-dark icon clickable archive-nav-icon{% if page is same as('user-archive') %} selected{% endif %}">done</i>
       <span class="blender-navigation-desc">My Articles</span>
