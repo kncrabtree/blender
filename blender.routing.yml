@@ -89,6 +89,13 @@ blender.mark-unread:
   requirements:
     _permission: 'access blender'
 
+blender.get-eligible-recommend:
+  path: 'journals/get-eligible-recommend'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::get_eligible_recommend'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:

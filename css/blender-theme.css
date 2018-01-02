@@ -1,14 +1,31 @@
-.blender-navigation {
+#recommend-bg {
+ background: rgba(0, 0, 0, 0.13)
+}
+
+#recommend-container {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-family: Sans-serif;
+  padding: 10px;
+}
+
+#recommend-container h2 {
+  margin-top:0px;
+  margin-bottom: 5px;
+}
+
+#blender-navigation {
   margin-bottom: 5px;
   font-family: Sans-serif;
 }
 
-.blender-navigation a {
+#blender-navigation a {
   color: inherit;
   border: inherit;
 }
 
-.blender-navigation a:hover {
+#blender-navigation a:hover {
   color: inherit;
   border:inherit;
 }

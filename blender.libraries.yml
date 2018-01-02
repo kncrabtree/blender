@@ -4,10 +4,12 @@ blender:
       css/blender-layout.css: {}
     component:
       css/blender-tooltip.css: {}
+      css/blender-autocomplete.css: {}
     theme:
       css/blender-theme.css: {}
   js:
     js/blender.js: {}
+    js/autocomplete.js: {}
   dependencies:
     - core/drupal
     - core/jquery

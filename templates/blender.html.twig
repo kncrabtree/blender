@@ -13,7 +13,20 @@
  */
 #}
 
-<div class="blender-navigation">
+
+
+<div id="recommend-bg">
+  <div id="recommend-container">
+    <h2 id="recommend-header">Share this article</h2>
+    <span id="recommend-instructions">Type the name of the person you want to share this article with, and choose the user from the autocomplete box below it. If the person does not appear, then someone else already shared this article with them.</span>
+    <div id="recommend-autocomplete">
+      <input type="text" id="recommend-input" />
+    </div>
+    <span>Placeholder for buttons</span>
+  </div>
+</div>
+
+<div id="blender-navigation">
   <a href="{{ url('blender.inbox') }}">
     <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %}">
       <i class="material-icons md-dark icon clickable inbox-nav-icon{% if page is same as('inbox') %} selected{% endif %}">markunread</i>
@@ -47,7 +60,7 @@
 </div>
 
 {% if articles %}
-  <div class="articles-table">
+  <div id="articles-table">
   {% include '@blender/blender-article.html.twig' %}
   {% if more %}
     <div id="articles-more">

@@ -515,7 +515,7 @@ class BlenderController extends ControllerBase {
 
     $user = $this->currentUser();
 
-    ///TODO: handle case if recommendation here!
+    //handle case if recommendation here
     $list = array();
     if(strpos($request->request->get('origin'),'recommendation') !== false)
     {
@@ -543,6 +543,52 @@ class BlenderController extends ControllerBase {
     return new JsonResponse($return_data);
 
   }
+
+  public function get_eligible_recommend(Request $request) {
+
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+
+    //get all active users
+    $user_list = $this->entityTypeManager()->getStorage('user')->loadByProperties([
+      'roles' => 'blender_active_user',
+    ]);
+
+    //lookup any existing recommendations for this article
+    $rec_list = $this->entityTypeManager()->getStorage('blender_recommendation')->loadByProperties([
+      'article_id' => $a_id,
+    ]);
+
+    $ineligible = array();
+
+    if(count($rec_list) > 0)
+    {
+      foreach($rec_list as $rec)
+        $ineligible[] = $rec->get('user_id')->target_id;
+    }
+
+    $return_data['query'] = 'Unit';
+
+    foreach($user_list as $u)
+    {
+      if(!in_array($u->id(),$ineligible))
+      {
+        $return_data['suggestions'][] = [
+          'value' => $u->getDisplayName(),
+          'data' => $u->id(),
+        ];
+      }
+    }
+
+    return new JsonResponse($return_data);
+
+  }
+
+
+
 
 }
 

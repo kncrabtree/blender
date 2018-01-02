@@ -244,3 +244,38 @@
     }
   };
 })(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.recommendOpenBehavior = {
+    attach: function (context, settings) {
+      $('.share-action', context).once('recommendOpenBehavior').each(function () {
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        $(this).click(function(event) {
+          event.stopPropagation();
+          $('#menu-'+aid).blur();
+          //lookup eligible users and enable autocompletion
+          $.ajax({
+            url: Drupal.url('journals/get-eligible-recommend'),
+            type: 'POST',
+            data: {
+              'article_id' : aid,
+              'origin' : window.location.pathname
+            },
+            dataType: 'json',
+            success: function rec_list(response) {
+              var users = response.suggestions;
+              $('#recommend-bg').toggleClass('visible')
+              $('#recommend-input').autocomplete({
+                lookup: users,
+                appendTo: $('#recommend-autocomplete'),
+                onSelect: function (suggestion) {
+                  alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+                },
+              });
+            },
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);

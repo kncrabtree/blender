@@ -1,4 +1,42 @@
-.blender-navigation {
+#recommend-bg {
+  display:none;
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  z-index:100;
+}
+
+#recommend-bg.visible {
+  display:block;
+}
+
+#recommend-container {
+  display: grid;
+  max-width: 750px;
+  margin:auto;
+  grid-auto-rows: auto;
+  position:relative;
+  top:50%;
+  transform: translate(0%,-50%);
+}
+
+#recommend-input {
+  max-width:300px;
+  margin:auto;
+}
+
+#recommend-autocomplete {
+  position:relative;
+  margin:auto;
+  width:auto;
+  max-width: 300px;
+  height:auto;
+  max-height: 200px;
+}
+
+#blender-navigation {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px,8fr));
 }
@@ -8,7 +46,7 @@
   grid-template-columns: 40px auto;
 }
 
-.articles-table {
+#articles-table {
   display: grid;
   grid-auto-rows: auto;
 }
