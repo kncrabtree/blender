@@ -562,7 +562,11 @@ class BlenderController extends ControllerBase {
       'article_id' => $a_id,
     ]);
 
-    $ineligible = array();
+    //cannot share an article with its owner or with oneself.
+    $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+    $owner_id = $article->get('user_id')->target_id;
+
+    $ineligible = [$owner_id,$this->currentUser()->id()];
 
     if(count($rec_list) > 0)
     {

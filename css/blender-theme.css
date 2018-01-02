@@ -10,9 +10,18 @@
   padding: 10px;
 }
 
-#recommend-container h2 {
-  margin-top:0px;
-  margin-bottom: 5px;
+#recommend-success {
+  color: black;
+  border: 1px solid rgba(20,150,30,0.87);
+  background: rgba(20,150,30,0.26);
+  padding: 15px;
+}
+
+#recommend-fail {
+  color:black;
+  border: 1px solid rgba(150,20,30,0.87);
+  background: rgba(150,20,30,0.26);
+  padding: 15px;
 }
 
 #blender-navigation {

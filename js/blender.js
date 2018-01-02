@@ -264,16 +264,50 @@
             dataType: 'json',
             success: function rec_list(response) {
               var users = response.suggestions;
+              $('#recommend-input').val('');
+              $('#recommend-article-title').html($(".article-title", "#article-"+aid).html());
+              $('#recommend-article-metadata').html($(".article-metadata", "#article-"+aid).html());
               $('#recommend-bg').toggleClass('visible')
               $('#recommend-input').autocomplete({
                 lookup: users,
+                minchars: 1,
                 appendTo: $('#recommend-autocomplete'),
                 onSelect: function (suggestion) {
-                  alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+                  $('#recommend-success-user').html(suggestion.value);
+                  $('#recommend-success').addClass('visible');
+                  users = users.filter(function(el){ return el.data != suggestion.data; });
+                  $('#recommend-input').autocomplete('setOptions',{
+                    lookup: users,
+                  });
+                  $('#recommend-input').val('');
                 },
               });
             },
           });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.recommendCloseBehavior = {
+    attach: function (context, settings) {
+      $('#recommend-bg', context).once('recommendCloseBehavior').each(function () {
+        $(this).click(function(event) {
+          if(!$.contains($(this).get(0),event.target))
+          {
+            event.stopPropagation();
+            $(this).toggleClass('visible');
+            $('#recommend-input').val('');
+            $('#recommend-article-title').html('');
+            $('#recommend-article-metadata').html('');
+            $('#recommend-success-user').html('');
+            $('#recommend-fail-user').html('');
+            $('#recommend-success-user').removeClass('visible');
+            $('#recommend-fail-user').removeClass('visible');
+            $('#recommend-input').autocomplete().dispose();
+          }
         });
       });
     }
