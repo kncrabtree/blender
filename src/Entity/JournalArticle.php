@@ -185,6 +185,7 @@ class JournalArticle extends ContentEntityBase implements JournalArticleInterfac
     {
       $out['rec_sender'] = $this->recommendation->get('sender_id')->entity->getDisplayName();
       $out['rec_timestamp'] = DrupalDateTime::createFromTimestamp($this->recommendation->get('timestamp')->value)->format('Y-m-d');
+      $out['new'] = $this->recommendation->get('new')->value;
     }
 
     return $out;

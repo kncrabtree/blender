@@ -96,6 +96,13 @@ blender.get-eligible-recommend:
   requirements:
     _permission: 'access blender'
 
+blender.recommend:
+  path: 'journals/recommend'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::recommend'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:

@@ -121,11 +121,7 @@ class BlenderController extends ControllerBase {
               $item->save();
             }
           }
-          else if($this_article->get('user_id')->target_id == $this->currentUser()->id() && $this_article->get('new')->value)
-          {
-            $this_article->set('new',false);
-            $this->article->save();
-          }
+
           $articles[] = $this_article;
           $article_ids[] = $this_id;
         }
@@ -155,6 +151,12 @@ class BlenderController extends ControllerBase {
     {
       $a_d = $a->article_details();
       $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
+
+      if($a->get('user_id')->target_id == $this->currentUser()->id() && $a->get('new')->value)
+      {
+        $a->set('new',false);
+        $a->save();
+      }
 
       $bm = ($this->query_service->get('blender_bookmark')
         ->condition('user_id',$this->currentUser()->id())
@@ -585,6 +587,44 @@ class BlenderController extends ControllerBase {
           'data' => $u->id(),
         ];
       }
+    }
+
+    return new JsonResponse($return_data);
+
+  }
+
+  public function recommend(Request $request) {
+
+    $a_id = $request->request->get('article_id');
+    $target_user = $request->get('user_id');
+
+    if(!isset($a_id) || !isset($target_user))
+      throw new NotFoundHttpException();
+
+    $this_user = $this->currentUser()->id();
+
+    //make sure that this article hasn't already been sent to this user.
+    $rec_list = $this->entityTypeManager()->getStorage('blender_recommendation')->loadByProperties([
+      'article_id' => $a_id,
+      'user_id' => $target_user,
+    ]);
+
+    $return_data['article_id'] = $a_id;
+
+    if(count($rec_list) > 0)
+    {
+      $return_data['success'] = false;
+      $return_data['msg'] = 'This article has already been recommended to that user.';
+    }
+    else
+    {
+      $rec = $this->entityTypeManager()->getStorage('blender_recommendation')->create();
+      $rec->set('article_id',$a_id);
+      $rec->set('user_id',$target_user);
+      $rec->set('sender_id',$this_user);
+      $rec->set('new',true);
+      $rec->save();
+      $return_data['success'] = true;
     }
 
     return new JsonResponse($return_data);

@@ -49,7 +49,7 @@
         <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
         <br />
         {% if a.is_recommendation %}
-          Recommended by {{ a.rec_sender }} on {{ a.timestamp }}.
+          Recommended by {{ a.rec_sender }} on {{ a.rec_timestamp }}.
         {% else %}
           Assigned to {{ a.owner }} on {{ a.date_added }}.
         {% endif %}

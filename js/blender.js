@@ -273,13 +273,39 @@
                 minchars: 1,
                 appendTo: $('#recommend-autocomplete'),
                 onSelect: function (suggestion) {
-                  $('#recommend-success-user').html(suggestion.value);
-                  $('#recommend-success').addClass('visible');
-                  users = users.filter(function(el){ return el.data != suggestion.data; });
-                  $('#recommend-input').autocomplete('setOptions',{
-                    lookup: users,
+                  $.ajax({
+                    url: Drupal.url('journals/recommend'),
+                    type:'POST',
+                    data: {
+                      'article_id' : aid,
+                      'user_id' : suggestion.data,
+                      'origin' : window.location.pathname
+                    },
+                    dataType: 'json',
+                    success: function rec_action(response2) {
+                      if(response2.success)
+                      {
+                        $('#recommend-success-user').html(suggestion.value);
+                        $('#recommend-success').addClass('visible');
+                      }
+                      else
+                      {
+                        $('#recommend-fail-user').html(suggestion.value);
+                        $('#recommend-fail-msg').html(response2.msg);
+                        $('#recommend-fail').addClass('visible');
+                      }
+                      users = users.filter(function(el){ return el.data != suggestion.data; });
+                      $('#recommend-input').autocomplete('setOptions',{
+                        lookup: users,
+                      });
+                      $('#recommend-input').val('');
+                    },
+                    error: function rec_action_fail(a, b, c) {
+                      $('#recommend-fail-user').html(suggestion.value);
+                      $('#recommend-fail-msg').html('An error occured when trying to communicate with the server. Try again later.');
+                      $('#recommend-fail').addClass('visible');
+                    }
                   });
-                  $('#recommend-input').val('');
                 },
               });
             },
