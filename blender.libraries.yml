@@ -5,6 +5,7 @@ blender:
     component:
       css/blender-tooltip.css: {}
       css/blender-autocomplete.css: {}
+      css/blender-badge.css: {}
     theme:
       css/blender-theme.css: {}
   js:
