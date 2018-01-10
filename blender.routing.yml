@@ -110,6 +110,13 @@ blender.more-articles:
   requirements:
     _permission: 'access blender'
 
+blender.mark-read-if-owner:
+  path: '/journals/mark-read-if-owner'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::mark_read_if_owner'
+  requirements:
+    _permission: 'access blender'
+
 entity.blender_journal.canonical:
   path: '/journals/journal/{blender_journal}'
   defaults:

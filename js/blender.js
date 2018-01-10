@@ -2,7 +2,8 @@
   Drupal.behaviors.inboxBehavior = {
     attach: function (context, settings) {
       $('.done-icon', context).once('inboxBehavior').each(function () {
-        $(this).click(function(){
+        $(this).click(function(event){
+          event.stopPropagation();
           var aid = $(this).attr("id").split('-')[1];
           var cls = $(this).attr("class");
           $.ajax({
@@ -18,12 +19,18 @@
                 $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
               else
               {
+                $('#article-'+aid).removeClass('new');
                 if(cls.includes("archive"))
                   $('#donetooltip-'+aid).html("Mark as done");
                 else
                   $('#donetooltip-'+aid).html("Move to inbox");
                 $('#done-'+aid).toggleClass('archive');
               }
+              if(response.new_inbox > 0)
+                $('#inbox-new-count').addClass('visible');
+              else
+                $('#inbox-new-count').removeClass('visible');
+              $('#inbox-new-count').html(response.new_inbox);
             },
             error: function(a, b, c) {
               alert("Error: " + a + ", " + b + ", " + c);
@@ -39,9 +46,11 @@
   Drupal.behaviors.bookmarkBehavior = {
     attach: function (context, settings) {
       $('.bookmark-icon', context).once('bookmarkBehavior').each(function () {
-        $(this).click(function(){
+        $(this).click(function(event){
+          event.stopPropagation();
           var aid = $(this).attr("id").split('-')[1];
           var cls = $(this).attr("class");
+          $('#article-'+aid).removeClass('new');
           $.ajax({
             url: Drupal.url('journals/toggle-bookmark'),
             type: 'POST',
@@ -66,6 +75,16 @@
                   $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
                 }
                 $('#bookmark-'+aid).toggleClass('bookmarked');
+                if(response.new_inbox > 0)
+                  $('#inbox-new-count').addClass('visible');
+                else
+                  $('#inbox-new-count').removeClass('visible');
+                $('#inbox-new-count').html(response.new_inbox);
+                if(response.new_recommend > 0)
+                  $('#recommend-new-count').addClass('visible');
+                else
+                  $('#recommend-new-count').removeClass('visible');
+                $('#recommend-new-count').html(response.new_recommend);
               }
             },
             error: function(a, b, c) {
@@ -82,10 +101,12 @@
   Drupal.behaviors.voteBehavior = {
     attach: function (context, settings) {
       $('.vote-icon', context).once('voteBehavior').each(function () {
-        $(this).click(function(){
+        $(this).click(function(event){
+          event.stopPropagation();
           var aid = $(this).attr("id").split('-')[1];
           var cls = $(this).attr("class");
           var url = Drupal.url('journals/add-vote');
+          $('#article-'+aid).removeClass('new');
           if(cls.includes("voted"))
             url = Drupal.url('journals/remove-vote');
           $.ajax({
@@ -114,6 +135,16 @@
                 if(cls.includes("voted") && !response.vote_removed)
                   alert("You cannot remove your vote from this article.");
               }
+              if(response.new_inbox > 0)
+                $('#inbox-new-count').addClass('visible');
+              else
+                $('#inbox-new-count').removeClass('visible');
+              $('#inbox-new-count').html(response.new_inbox);
+              if(response.new_recommend > 0)
+                $('#recommend-new-count').addClass('visible');
+              else
+                $('#recommend-new-count').removeClass('visible');
+              $('#recommend-new-count').html(response.new_recommend);
             },
             error: function(a, b, c) {
               alert("Error: " + a + ", " + b + ", " + c);
@@ -161,7 +192,32 @@
       $('.article', context).once('articleClickBehavior').each(function () {
         var aid = $(this).attr('id').split('-')[1];
         $(this).click(function() {
-          $(this).removeClass('new');
+          if($(this).attr('class').includes('new'))
+          {
+            $.ajax({
+              url: Drupal.url('journals/mark-read-if-owner'),
+              type: 'POST',
+              data: {
+                'article_id' : aid,
+                'origin' : window.location.pathname
+              },
+              dataType: 'json',
+              success: function(response) {
+  //               if(response.remove_new)
+                $('#article-'+aid).removeClass('new');
+                if(response.new_inbox > 0)
+                  $('#inbox-new-count').addClass('visible');
+                else
+                  $('#inbox-new-count').removeClass('visible');
+                $('#inbox-new-count').html(response.new_inbox);
+                if(response.new_recommend > 0)
+                  $('#recommend-new-count').addClass('visible');
+                else
+                  $('#recommend-new-count').removeClass('visible');
+                $('#recommend-new-count').html(response.new_recommend);
+              }
+            });
+          }
         });
         $('.article-data', this).add('.comment-icon',this).click(function() {
           var comment = $('.article-comment','#article-'+aid );
@@ -171,27 +227,7 @@
             comment.slideUp(100, function(){ $(this).toggleClass('visible'); });
           else
             comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
-
-//           $.ajax({
-//             url: Drupal.url('journals/more-articles'),
-//             type: 'POST',
-//             data: {
-//               'last_id' : last_id,
-//               'origin' : window.location.pathname
-//             },
-//             dataType: 'json',
-//             success: function(response) {
-//               $(response.html).insertBefore("#articles-more");
-//               if(!response.more)
-//                 $('#articles-more').remove();
-//               Drupal.attachBehaviors();
-//             },
-//             error: function(a, b, c) {
-//               alert("Error: " + a + ", " + b + ", " + c);
-//             }
-//           });
         });
-
       });
     }
   };
@@ -205,7 +241,8 @@
         $('#menu-'+aid).blur(function() {
           $(this).slideUp(100, function(){ $(this).removeClass('visible'); });
         });
-        $(this).click(function() {
+        $(this).click(function(event) {
+          event.stopPropagation();
           if($('#menu-'+aid).attr('class').includes('visible'))
             $('#menu-'+aid).blur();
           else
@@ -237,7 +274,19 @@
               'article_id' : aid,
               'origin' : window.location.pathname
             },
-            dataType: 'json'
+            dataType: 'json',
+            success: function(response) {
+              if(response.new_inbox > 0)
+                $('#inbox-new-count').addClass('visible');
+              else
+                $('#inbox-new-count').removeClass('visible');
+              $('#inbox-new-count').html(response.new_inbox);
+              if(response.new_recommend > 0)
+                $('#recommend-new-count').addClass('visible');
+              else
+                $('#recommend-new-count').removeClass('visible');
+              $('#recommend-new-count').html(response.new_recommend);
+            }
           });
         });
       });
@@ -252,6 +301,7 @@
         var aid = $(this).parents('.article').attr('id').split('-')[1];
         $(this).click(function(event) {
           event.stopPropagation();
+          $('#article-'+aid).removeClass('new');
           $('#menu-'+aid).blur();
           //lookup eligible users and enable autocompletion
           $.ajax({
@@ -263,6 +313,16 @@
             },
             dataType: 'json',
             success: function rec_list(response) {
+              if(response.new_inbox > 0)
+                $('#inbox-new-count').addClass('visible');
+              else
+                $('#inbox-new-count').removeClass('visible');
+              $('#inbox-new-count').html(response.new_inbox);
+              if(response.new_recommend > 0)
+                $('#recommend-new-count').addClass('visible');
+              else
+                $('#recommend-new-count').removeClass('visible');
+              $('#recommend-new-count').html(response.new_recommend);
               var users = response.suggestions;
               $('#recommend-input').val('');
               $('#recommend-article-title').html($(".article-title", "#article-"+aid).html());

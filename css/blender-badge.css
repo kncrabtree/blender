@@ -1,5 +1,6 @@
 .badge {
   display:inline-block;
+  visibility: hidden;
   background: red;
   color: white;
   font-family: Sans-serif;
@@ -10,4 +11,8 @@
   text-align:center;
   margin-left:5px;
   min-width:10px;
+}
+
+.badge.visible {
+  visibility: visible;
 }

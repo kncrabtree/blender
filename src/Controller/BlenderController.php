@@ -113,14 +113,7 @@ class BlenderController extends ControllerBase {
         if(!in_array($this_id,$article_ids))
         {
           if(strpos($type,'recommendation') !== false)
-          {
             $this_article->set_recommended($item);
-            if($item->get('new')->value)
-            {
-              $item->set('new',false);
-              $item->save();
-            }
-          }
 
           $articles[] = $this_article;
           $article_ids[] = $this_id;
@@ -152,12 +145,6 @@ class BlenderController extends ControllerBase {
       $a_d = $a->article_details();
       $a_d['is_owner'] = ($a_d['user_id'] == $this->currentUser()->id());
 
-      if($a->get('user_id')->target_id == $this->currentUser()->id() && $a->get('new')->value)
-      {
-        $a->set('new',false);
-        $a->save();
-      }
-
       $bm = ($this->query_service->get('blender_bookmark')
         ->condition('user_id',$this->currentUser()->id())
         ->condition('article_id',$a->id->value)
@@ -188,6 +175,8 @@ class BlenderController extends ControllerBase {
     {
       $render['#theme'] = 'blender';
       $render['#page'] = $this->page;
+      $render['#inbox_new'] = $this->get_new_inbox();
+      $render['#recommend_new'] = $this->get_new_recommend();
       $render['#attached'] = array(
         'library' => array (
           'blender/blender',
@@ -352,11 +341,13 @@ class BlenderController extends ControllerBase {
     $user = $this->currentUser();
 
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
     if($article->get('user_id')->target_id != $user->id())
       throw new NotFoundHttpException();
 
     $inbox = !($article->get('inbox')->value);
     $article->set('inbox',$inbox);
+    $article->set('new',false);
     $article->save();
 
     $remove = false;
@@ -366,7 +357,8 @@ class BlenderController extends ControllerBase {
     $return_data = array(
       'article_id' => $a_id,
       'inbox' => $inbox,
-      'remove' => $remove
+      'remove' => $remove,
+      'new_inbox' => $this->get_new_inbox(),
     );
 
     return new JsonResponse($return_data);
@@ -410,11 +402,11 @@ class BlenderController extends ControllerBase {
     if(strpos($request->request->get('origin'),'bookmarks') !== false)
       $remove = true;
 
-    $return_data = [
-      'article_id' => $a_id,
-      'bookmark' => $is_bookmark,
-      'remove' => $remove
-    ];
+    $return_data = $this->mark_read($a_id,$request->request->get('origin'));
+
+    $return_data['article_id'] = $a_id;
+    $return_data['bookmark'] = $is_bookmark;
+    $return_data['remove'] = $remove;
 
     return new JsonResponse($return_data);
 
@@ -436,9 +428,9 @@ class BlenderController extends ControllerBase {
       'article_id' => $a_id
     ]);
 
-    $return_data = [
-      'article_id' => $a_id,
-    ];
+    $return_data = $this->mark_read($a_id,$request->request->get('origin'));
+
+    $return_data['article_id'] = $a_id;
 
     if(count($vl) == 0)
     {
@@ -482,6 +474,7 @@ class BlenderController extends ControllerBase {
       'article_id' => $a_id
     ]);
 
+    $return_data = $this->mark_read($a_id,$request->request->get('origin'));
     $return_data['article_id'] = $a_id;
     $return_data['remove'] = false;
 
@@ -542,6 +535,9 @@ class BlenderController extends ControllerBase {
     }
 
     $return_data['article_id'] = $a_id;
+    $return_data['new_inbox'] = $this->get_new_inbox();
+    $return_data['new_recommend'] = $this->get_new_recommend();
+
     return new JsonResponse($return_data);
 
   }
@@ -576,6 +572,7 @@ class BlenderController extends ControllerBase {
         $ineligible[] = $rec->get('user_id')->target_id;
     }
 
+    $return_data = $this->mark_read($a_id,$request->request->get('origin'));
     $return_data['query'] = 'Unit';
 
     foreach($user_list as $u)
@@ -631,7 +628,69 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function mark_read_if_owner(Request $request) {
 
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $return_data = $this->mark_read($a_id,$request->request->get('origin'));
+
+    return new JsonResponse($return_data);
+
+  }
+
+  protected function mark_read($a_id,$page) {
+    $return_data['remove_new'] = false;
+
+    if(strpos($page,'recommendation') !== false)
+    {
+      $rec_list = $this->entityTypeManager()->getStorage('blender_recommendation')->loadByProperties([
+      'article_id' => $a_id,
+      'user_id' => $this->currentUser()->id(),
+      ]);
+
+      if(count($rec_list) > 0)
+      {
+        $rec = array_shift($rec_list);
+        $rec->set('new',false);
+        $rec->save();
+        $return_data['remove_new'] = true;
+      }
+    }
+    else
+    {
+      $art = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
+      if($this->currentUser()->id() == $art->get('user_id')->target_id)
+      {
+        $return_data['remove_new'] = true;
+        $art->set('new',false);
+        $art->save();
+      }
+    }
+
+    $return_data['new_inbox'] = $this->get_new_inbox();
+    $return_data['new_recommend'] = $this->get_new_recommend();
+
+    return $return_data;
+  }
+
+  public function get_new_inbox() {
+    return $this->query_service->get('blender_article')
+      ->condition('user_id',$this->currentUser()->id())
+      ->condition('inbox',true)
+      ->condition('new',true)
+      ->count()->execute();
+  }
+
+  public function get_new_recommend() {
+    return $this->query_service->get('blender_recommendation')
+      ->condition('user_id',$this->currentUser()->id())
+      ->condition('new',true)
+      ->count()->execute();
+  }
 
 
 }

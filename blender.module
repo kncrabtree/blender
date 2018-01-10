@@ -10,6 +10,8 @@ function blender_theme($existing, $type, $theme, $path) {
         'articles' => NULL,
         'more' => NULL,
         'page' => 'inbox',
+        'inbox_new' => 0,
+        'recommend_new' => 0,
       ),
       'template' => 'blender',
     ),
