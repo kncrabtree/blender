@@ -15,7 +15,6 @@ blender:
     - core/drupal
     - core/jquery
     - core/jquery.once
-    - core/ckeditor
 
 google.icons:
   remote: https://fonts.googleapis.com/css?family=Material+Icons
@@ -25,3 +24,13 @@ google.icons:
   css:
     theme:
       'https://fonts.googleapis.com/css?family=Material+Icons': { type: external }
+
+ckeditor:
+  remote: https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js
+  license:
+    name: GPL 3.0
+    url: http://www.gnu.org/licenses/gpl.html
+  js:
+    https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js: { type: external }
+    https://cdn.ckeditor.com/4.8.0/standard/adapters/jquery.js: { type: external }
+

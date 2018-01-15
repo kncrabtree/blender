@@ -97,9 +97,13 @@
     </div>
 
 
-    <div class="article-comment {% if articles|length == 1 %} visible{% endif %}">
-      <span class="comment-add">Add comment</span>
-      <div class="comment-editor-wrapper">
+    <div class="article-comment-box {% if articles|length == 1 %} visible{% endif %}">
+      <div class="comments-wrapper" id="comment_display-{{ a.id }}"></div>
+      <div class="comment-add" id="add_comment-{{ a.id }}">Add comment</div>
+      <div class="comment-editor-wrapper hidden" id="comment_wrapper-{{ a.id }}">
+        <textarea id="textarea-{{ a.id }}"></textarea>
+        <button id="comment_submit-{{ a.id }}">Submit</button>
+        <button id="comment_cancel-{{ a.id }}">Cancel</button>
       </div>
     </div>
   </div>

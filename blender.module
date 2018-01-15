@@ -21,6 +21,12 @@ function blender_theme($existing, $type, $theme, $path) {
       ),
       'template' => 'blender-article',
     ),
+    'blender-comment' => array(
+      'variables' => array(
+        'comments' => NULL,
+      ),
+      'template' => 'blender-comment',
+    ),
   );
   return $variables;
 }

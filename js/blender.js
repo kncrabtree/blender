@@ -220,13 +220,28 @@
           }
         });
         $('.article-data', this).add('.comment-icon',this).click(function() {
-          var comment = $('.article-comment','#article-'+aid );
+          var comment = $('.article-comment-box','#article-'+aid );
           var cls = comment.attr('class');
           $('#article-'+aid).toggleClass('expanded');
           if(cls.includes('visible'))
             comment.slideUp(100, function(){ $(this).toggleClass('visible'); });
           else
-            comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
+          {
+            //fetch comments and display
+            $.ajax({
+              url: Drupal.url('journals/fetch-article-comments'),
+              type: 'POST',
+              data: {
+                'article_id' : aid,
+                'origin' : window.location.pathname
+              },
+              dataType: 'json',
+              success: function showComments(response) {
+                $('#comment_display-'+aid).html(response.html);
+                comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
+              }
+            });
+          }
         });
       });
     }
@@ -394,6 +409,33 @@
             $('#recommend-fail-user').removeClass('visible');
             $('#recommend-input').autocomplete().dispose();
           }
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.addCommentBehavior = {
+    attach: function (context, settings) {
+      $('.comment-add', context).once('addCommentBehavior').each(function () {
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        $(this).click(function(event) {
+          $('#textarea-'+aid).ckeditor( function editorReady() {
+            var editor = $('#textarea-'+aid).ckeditor();
+            $('#comment_wrapper-'+aid).removeClass('hidden');
+            $('#add_comment-'+aid).addClass('hidden');
+            $('#comment_submit-'+aid).click( function submitComment() {
+              var comment = editor.val();
+              alert(comment);
+            });
+            $('#comment_cancel-'+aid).click( function cancelComment() {
+              $('#comment_wrapper-'+aid).addClass('hidden');
+              $('#add_comment-'+aid).removeClass('hidden');
+              $('#comment_submit-'+aid).off('click');
+              editor.val('');
+            });
+          });
         });
       });
     }

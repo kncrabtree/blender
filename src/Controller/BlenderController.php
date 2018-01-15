@@ -180,7 +180,8 @@ class BlenderController extends ControllerBase {
       $render['#attached'] = array(
         'library' => array (
           'blender/blender',
-          'blender/google.icons'
+          'blender/google.icons',
+          'blender/ckeditor',
         ),
       );
     }
@@ -677,6 +678,41 @@ class BlenderController extends ControllerBase {
     return $return_data;
   }
 
+  public function fetch_article_comments(Request $request) {
+
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $c_ids = $this->query_service->get('blender_comment')
+      ->condition('article_id',$a_id)
+      ->sort('timestamp','ASC')->execute();
+
+    $comments = $this->entityTypeManager()->getStorage('blender_comment')->loadMultiple($c_ids);
+
+    $render = array(
+      '#cache' => [
+        'max-age' => 0,
+      ],
+    );
+
+    foreach($comments as $c)
+    {
+      $c_data = $c->get_comment_details();
+      $c_data['is_author'] = $c_data['user_id'] == $this->currentUser()->id();
+    }
+
+    $render['#comments'] = $comments;
+    $render['#theme'] = 'blender-comment';
+
+    $return_data['html'] = render($render);
+    $return_data['count'] = $this->get_comment_count($a_id);
+
+    return new JsonResponse($return_data);
+
+  }
+
   public function get_new_inbox() {
     return $this->query_service->get('blender_article')
       ->condition('user_id',$this->currentUser()->id())
@@ -689,6 +725,12 @@ class BlenderController extends ControllerBase {
     return $this->query_service->get('blender_recommendation')
       ->condition('user_id',$this->currentUser()->id())
       ->condition('new',true)
+      ->count()->execute();
+  }
+
+  public function get_comment_count($a_id) {
+    return $c_ids = $this->query_service->get('blender_comment')
+      ->condition('article_id',$a_id)
       ->count()->execute();
   }
 

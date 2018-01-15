@@ -83,27 +83,27 @@
 
 .article-display {
   display: grid;
-  grid-template-columns: 30px auto 30px;
+  grid-template-columns: 40px auto 40px;
   grid-column-gap: 5px;
 }
 
 .article-icons {
   display: grid;
-  grid-template-rows: 30px 30px 30px auto;
+  grid-auto-rows: 35px;
   grid-row-gap: 0px;
 }
 
 .article-data {
   display: grid;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto;
   grid-row-gap: 0px;
 }
 
-.article-comment {
+.article-comment-box {
   display: none;
 }
 
-.article-comment.visible {
+.article-comment-box.visible {
   display: block;
 }
 
@@ -143,3 +143,13 @@
 .article-actions-menu-item-desc {
   align-self: center;
 }
+
+.comment-add {
+  display:block;
+}
+
+}
+.comment-editor-wrapper {
+  display:block;
+}
+

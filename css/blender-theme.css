@@ -203,11 +203,11 @@
   cursor: pointer;
 }
 
-span.comment-add {
+div.comment-add {
   color: rgba(0,0,255,0.87);
 }
 
-span.comment-add:hover {
+div.comment-add:hover {
   color: rgba(0,0,255,0.54);
   cursor:pointer;
 }

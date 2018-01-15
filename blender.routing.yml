@@ -103,6 +103,13 @@ blender.recommend:
   requirements:
     _permission: 'access blender'
 
+blender.fetch-article-comments:
+  path: 'journals/fetch-article-comments'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::fetch_article_comments'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:
