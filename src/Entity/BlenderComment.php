@@ -55,7 +55,7 @@ class BlenderComment extends ContentEntityBase implements JournalArticleInterfac
       ->setSetting('target_type', 'blender_article')
       ->setReadOnly(true);
 
-    $fields['text'] = BaseFieldDefinition::create('text')
+    $fields['text'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Comment text'))
       ->setDescription(t("Text of comment"))
       ->setRequired(true);
@@ -79,7 +79,9 @@ class BlenderComment extends ContentEntityBase implements JournalArticleInterfac
     $out['author'] = $this->get('user_id')->entity->getDisplayName();
     $out['timestamp'] = DrupalDateTime::createFromTimestamp($this->get('timestamp')->value)->format('Y-m-d g:i:s A');
     $out['edited'] = isset($this->get('edited_time')->value) ? DrupalDateTime::createFromTimestamp($this->get('edited_time')->value)->format('Y-m-d g:i:s A') : NULL;
-    $out['text'] = $this->get('text')->value;
+    $out['text'] = $this->get('text')->get(0)->get('value')->getValue();
+
+    return $out;
   }
 
 }

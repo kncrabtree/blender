@@ -110,6 +110,13 @@ blender.fetch-article-comments:
   requirements:
     _permission: 'access blender'
 
+blender.add-comment:
+  path: 'journals/add-comment'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::add_comment'
+  requirements:
+    _permission: 'access blender'
+
 blender.more-articles:
   path: '/journals/more-articles'
   defaults:

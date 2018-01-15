@@ -427,7 +427,37 @@
             $('#add_comment-'+aid).addClass('hidden');
             $('#comment_submit-'+aid).click( function submitComment() {
               var comment = editor.val();
-              alert(comment);
+              if(comment.length > 0)
+              {
+                $.ajax({
+                  url: Drupal.url('journals/add-comment'),
+                  type: 'POST',
+                  data: {
+                    'article_id' : aid,
+                    'origin' : window.location.pathname,
+                    'comment' : comment
+                  },
+                  dataType: 'json',
+                  success: function commentAdded() {
+                    $('#comment_wrapper-'+aid).addClass('hidden');
+                    $('#add_comment-'+aid).removeClass('hidden');
+                    $('#comment_submit-'+aid).off('click');
+                    //fetch comments and display
+                    $.ajax({
+                      url: Drupal.url('journals/fetch-article-comments'),
+                      type: 'POST',
+                      data: {
+                        'article_id' : aid,
+                      'origin' : window.location.pathname
+                      },
+                      dataType: 'json',
+                      success: function showComments(response) {
+                        $('#comment_display-'+aid).html(response.html);
+                      }
+                    });
+                  }
+                });
+              }
             });
             $('#comment_cancel-'+aid).click( function cancelComment() {
               $('#comment_wrapper-'+aid).addClass('hidden');
@@ -441,3 +471,5 @@
     }
   };
 })(jQuery, Drupal);
+
+

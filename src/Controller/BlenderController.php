@@ -697,17 +697,46 @@ class BlenderController extends ControllerBase {
       ],
     );
 
+    $c_array = [];
     foreach($comments as $c)
     {
       $c_data = $c->get_comment_details();
       $c_data['is_author'] = $c_data['user_id'] == $this->currentUser()->id();
+      $c_array[] = $c_data;
     }
 
-    $render['#comments'] = $comments;
+    $render['#comments'] = $c_array;
     $render['#theme'] = 'blender-comment';
 
     $return_data['html'] = render($render);
     $return_data['count'] = $this->get_comment_count($a_id);
+
+    return new JsonResponse($return_data);
+
+  }
+
+  public function add_comment(Request $request) {
+
+    $a_id = $request->request->get('article_id');
+
+    if(!isset($a_id))
+      throw new NotFoundHttpException();
+
+    $comment = $request->request->get('comment');
+
+    if(!isset($comment))
+      throw new NotFoundHttpException();
+
+    $c = $this->entityTypeManager()->getStorage('blender_comment')->create();
+    $c->set('user_id',$this->currentUser()->id());
+    $c->set('article_id',$a_id);
+    $c->set('text',[
+      'value' => $comment,
+      'format' => 'Basic HTML',
+    ]);
+    $c->save();
+
+    $return_data['success'] = true;
 
     return new JsonResponse($return_data);
 
