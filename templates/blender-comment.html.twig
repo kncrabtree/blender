@@ -24,7 +24,7 @@
 
 
     <div class="comment-body">
-      {{ c.text }}
+      {{ c.text|raw }}
     </div>
 
     {% if c.is_author %}
