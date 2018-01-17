@@ -11,10 +11,13 @@ use Drupal\Core\Entity\Query\QueryFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception;
+use Drupal\Component\Datetime\Time;
 
 class BlenderController extends ControllerBase {
 
   protected $query_service;
+
+  protected $time_service;
 
   protected $page_size = 20;
 
@@ -23,9 +26,10 @@ class BlenderController extends ControllerBase {
   protected $page;
 
 
-  public function __construct( QueryFactory $qf)
+  public function __construct( QueryFactory $qf, Time $time)
   {
     $this->query_service = $qf;
+    $this->time_service = $time;
   }
 
   /**
@@ -33,7 +37,8 @@ class BlenderController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.query')
+      $container->get('entity.query'),
+      $container->get('datetime.time')
     );
   }
 
@@ -714,6 +719,81 @@ class BlenderController extends ControllerBase {
     return new JsonResponse($return_data);
 
   }
+
+  public function fetch_comment(Request $request) {
+
+    $c_id = $request->request->get('comment_id');
+
+    if(!isset($c_id))
+      throw new NotFoundHttpException();
+
+    $c = $this->entityTypeManager()->getStorage('blender_comment')->load($c_id);
+
+    $c_data = $c->get_comment_details();
+    $c_data['is_author'] = $c_data['user_id'] == $this->currentUser()->id();
+
+    return new JsonResponse($c_data);
+
+  }
+
+
+  public function edit_comment(Request $request) {
+
+    $c_id = $request->request->get('comment_id');
+
+    if(!isset($c_id))
+      throw new NotFoundHttpException();
+
+    $comment = $request->request->get('comment');
+
+    if(!isset($comment))
+      throw new NotFoundHttpException();
+
+    $c = $this->entityTypeManager()->getStorage('blender_comment')->load($c_id);
+
+    if($c->get('user_id')->target_id != $this->currentUser()->id())
+      throw new NotFoundHttpException();
+
+    $return_data['success'] = true;
+
+    if(!isset($c))
+      $return_data['success'] = false;
+    else
+    {
+      $c->set('text',[
+        'value' => $comment,
+        'format' => 'Basic HTML',
+      ]);
+      $c->set('edited_time',$this->time_service->getRequestTime());
+      $c->save();
+    }
+
+    return new JsonResponse($return_data);
+
+
+  }
+
+  public function delete_comment(Request $request) {
+
+    $c_id = $request->request->get('comment_id');
+
+    if(!isset($c_id))
+      throw new NotFoundHttpException();
+
+    $c = $this->entityTypeManager()->getStorage('blender_comment')->load($c_id);
+
+    if($c->get('user_id')->target_id != $this->currentUser()->id())
+      throw new NotFoundHttpException();
+
+
+    $c->delete();
+    $return_data['success'] = true;
+
+    return new JsonResponse($return_data);
+
+
+  }
+
 
   public function add_comment(Request $request) {
 

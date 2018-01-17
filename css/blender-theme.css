@@ -1,8 +1,16 @@
-#recommend-bg {
+.overlay {
  background: rgba(0, 0, 0, 0.13)
 }
 
 #recommend-container {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-family: Sans-serif;
+  padding: 10px;
+}
+
+#delete-confirm-container {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.13);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -172,6 +180,27 @@
   color: rgba(0, 0, 0, 0.87);
 }
 
+.blender-comment {
+  border-top: 1px solid rgba(0, 0, 0, 0.26);
+}
+
+.blender-comment .comment-author {
+  font-weight: bold;
+}
+
+a.comment-link {
+  border: none;
+}
+
+a.comment-link:hover {
+  cursor: pointer;
+  border: none;
+}
+
+.blender-comment .comment-body {
+  border-left: 1px solid rgba(0,0,0,0.13);
+}
+
 /* Rules for sizing the icon. */
 .material-icons.md-18 { font-size: 18px; }
 .material-icons.md-24 { font-size: 24px; }
@@ -203,12 +232,20 @@
   cursor: pointer;
 }
 
-div.comment-add {
-  color: rgba(0,0,255,0.87);
+.comment-add a {
+  border: none;
 }
 
-div.comment-add:hover {
-  color: rgba(0,0,255,0.54);
+.comment-add:hover {
+  background: rgba(0,0,0,0.13);
   cursor:pointer;
+}
+
+.comment-add:hover i {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.comment-add:hover a {
+  color: inherit;
 }
 

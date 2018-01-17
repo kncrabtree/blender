@@ -110,10 +110,31 @@ blender.fetch-article-comments:
   requirements:
     _permission: 'access blender'
 
+blender.fetch-comment:
+  path: 'journals/fetch-comment'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::fetch_comment'
+  requirements:
+    _permission: 'access blender'
+
 blender.add-comment:
   path: 'journals/add-comment'
   defaults:
     _controller: '\Drupal\blender\Controller\BlenderController::add_comment'
+  requirements:
+    _permission: 'access blender'
+
+blender.edit-comment:
+  path: 'journals/edit-comment'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::edit_comment'
+  requirements:
+    _permission: 'access blender'
+
+blender.delete-comment:
+  path: 'journals/delete-comment'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::delete_comment'
   requirements:
     _permission: 'access blender'
 

@@ -1,4 +1,4 @@
-#recommend-bg {
+.overlay {
   display:none;
   position:fixed;
   left:0;
@@ -8,8 +8,31 @@
   z-index:100;
 }
 
-#recommend-bg.visible {
+.overlay.visible {
   display:block;
+}
+
+#delete-confirm-container {
+  display: grid;
+  max-width: 300px;
+  margin:auto;
+  grid-auto-rows: auto;
+  position:relative;
+  top:50%;
+  transform: translate(0%,-50%);
+  text-align:center;
+}
+
+.button-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 1em 0 1em 0;
+
+}
+
+.button-container button {
+  max-width: 5em;
+  justify-self:center;
 }
 
 #recommend-container {
@@ -145,11 +168,73 @@
 }
 
 .comment-add {
-  display:block;
+  display: grid;
+  margin-left:auto;
+  margin-right:auto;
+  height:3em;
+  text-align:left;
+  grid-template-columns: auto auto;
+}
+
+.comment-add a {
+  align-self:center;
+  justify-self:left;
+  margin-left:0.25em;
+}
+
+.comment-add i {
+  align-self:center;
+  justify-self:right;
+  margin-right: 0.25em;
 }
 
 }
 .comment-editor-wrapper {
   display:block;
+}
+
+.comments-wrapper {
+  display: grid;
+  grid-auto-rows:auto;
+}
+
+.blender-comment {
+  width:inherit;
+  padding: 10px 5px 10px 5px;
+}
+
+.blender-comment p {
+  margin-bottom: 0.5em;
+}
+
+.blender-comment br {
+  line-height: 0.25em;
+}
+
+.blender-comment .comment-metadata {
+  margin-bottom: 1em;
+}
+
+.blender-comment .comment-timestamp {
+  margin-left: 0.5em;
+  font-size: 0.875em;
+  font-style: italic;
+}
+
+.blender-comment .comment-actions {
+  float:right;
+  clear:right;
+  margin-left:1em;
+}
+
+.blender-comment .comment-actions a {
+  margin-left:0.5em;
+}
+
+.blender-comment .comment-body {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin-left: 1em;
+  margin-right: 1em;
 }
 

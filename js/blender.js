@@ -238,6 +238,7 @@
               dataType: 'json',
               success: function showComments(response) {
                 $('#comment_display-'+aid).html(response.html);
+                Drupal.attachBehaviors();
                 comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
               }
             });
@@ -418,11 +419,14 @@
 (function ($, Drupal) {
   Drupal.behaviors.addCommentBehavior = {
     attach: function (context, settings) {
+      // Enable local plugins
+      CKEDITOR.plugins.addExternal( 'texzilla', '/journals/drupal/modules/custom/blender/ckeditor-plugins/texzilla/src/' );
       $('.comment-add', context).once('addCommentBehavior').each(function () {
         var aid = $(this).parents('.article').attr('id').split('-')[1];
         $(this).click(function(event) {
           $('#textarea-'+aid).ckeditor( function editorReady() {
             var editor = $('#textarea-'+aid).ckeditor();
+            editor.val('');
             $('#comment_wrapper-'+aid).removeClass('hidden');
             $('#add_comment-'+aid).addClass('hidden');
             $('#comment_submit-'+aid).click( function submitComment() {
@@ -448,11 +452,12 @@
                       type: 'POST',
                       data: {
                         'article_id' : aid,
-                      'origin' : window.location.pathname
+                        'origin' : window.location.pathname
                       },
                       dataType: 'json',
                       success: function showComments(response) {
                         $('#comment_display-'+aid).html(response.html);
+                        Drupal.attachBehaviors();
                       }
                     });
                   }
@@ -465,6 +470,8 @@
               $('#comment_submit-'+aid).off('click');
               editor.val('');
             });
+          }, {
+            extraPlugins: 'texzilla'
           });
         });
       });
@@ -473,3 +480,155 @@
 })(jQuery, Drupal);
 
 
+(function ($, Drupal) {
+  Drupal.behaviors.editCommentBehavior = {
+    attach: function (context, settings) {
+      $('.comment-link.edit', context).once('editCommentBehavior').each(function () {
+        var cid = $(this).attr('id').split('-')[1];
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        var actions = $(this).parents('.comment-actions');
+        $(this).click(function edit_comment() {
+          $.ajax({
+            url: Drupal.url('journals/fetch-comment'),
+            type: 'POST',
+            data: {
+              'comment_id' : cid,
+              'origin' : window.location.pathname
+            },
+            dataType: 'json',
+            success: function create_edit_box(response) {
+              actions.addClass('hidden');
+              $('#comment-'+cid).children('.comment-body').addClass('hidden');
+              var editwrapper = $("<div></div>").addClass('comment-editor-wrapper hidden');
+              var editbox = $("<textarea></textarea>");
+              var submit = $("<button></button>").html("Submit");
+              var cancel = $("<button></button>").html("Cancel");
+              editwrapper.append(editbox);
+              editwrapper.append(submit);
+              editwrapper.append(cancel);
+              $('#comment-'+cid).children('.comment-body').after(editwrapper).promise().done( function () {
+                editbox.ckeditor( function editEditorReady() {
+                  editbox.val(response.text);
+                  editwrapper.removeClass('hidden');
+                  cancel.click( function cancelEdit() {
+                    editwrapper.remove();
+                    $('#comment-'+cid).children('.comment-body').removeClass('hidden');
+                    actions.removeClass('hidden');
+                  });
+                  submit.click( function submitEdit() {
+                    var comment = editbox.val();
+                    editwrapper.remove();
+                    actions.removeClass('hidden');
+                    $.ajax({
+                      url: Drupal.url('journals/edit-comment'),
+                      type: 'POST',
+                      data: {
+                        'comment_id' : cid,
+                        'origin' : window.location.pathname,
+                        'comment' : comment
+                      },
+                      dataType: 'json',
+                      success: function editSuccess(response2) {
+                        //fetch comments and display
+                        $.ajax({
+                          url: Drupal.url('journals/fetch-article-comments'),
+                          type: 'POST',
+                          data: {
+                            'article_id' : aid,
+                            'origin' : window.location.pathname
+                          },
+                          dataType: 'json',
+                          success: function showComments(response3) {
+                            $('#comment_display-'+aid).html(response3.html);
+                            Drupal.attachBehaviors();
+                          }
+                        });
+                      }
+                    });
+                  });
+                },
+                {
+                  extraPlugins: 'texzilla'
+                });
+              });
+            }
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+
+(function ($, Drupal) {
+  Drupal.behaviors.deleteCommentBehavior = {
+    attach: function (context, settings) {
+      $('.comment-link.delete', context).once('deleteCommentBehavior').each(function () {
+        var cid = $(this).attr('id').split('-')[1];
+        var aid = $(this).parents('.article').attr('id').split('-')[1];
+        var bg = $('#delete-bg');
+        $(this).click(function delete_comment_confirm() {
+          var container = $('<div></div>').attr('id','delete-confirm-container');
+          bg.append(container);
+          var msg = $('<div></div>').html('Are you sure you want to delete this comment?');
+          container.append(msg);
+          var btns = $('<div></div>').addClass('button-container');
+          var yesbutton = $('<button></button>').html("Yes");
+          var nobutton = $('<button></button>').html("No");
+          btns.append(yesbutton).append(nobutton);
+          container.append(btns);
+          bg.addClass("visible");
+          nobutton.click( function() {
+            bg.removeClass('visible');
+            bg.html('');
+          });
+          yesbutton.click( function deleteComment() {
+            $.ajax({
+              url: Drupal.url('journals/delete-comment'),
+              type: 'POST',
+              data: {
+                'comment_id' : cid,
+                'origin' : window.location.pathname
+              },
+              dataType: 'json',
+              success: function(response) {
+                bg.removeClass('visible');
+                bg.html('');
+                //fetch comments and display
+                $.ajax({
+                  url: Drupal.url('journals/fetch-article-comments'),
+                  type: 'POST',
+                  data: {
+                    'article_id' : aid,
+                    'origin' : window.location.pathname
+                  },
+                  dataType: 'json',
+                  success: function showComments(response2) {
+                    $('#comment_display-'+aid).html(response2.html);
+                    Drupal.attachBehaviors();
+                  }
+                });
+              }
+            });
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.deleteConfirmCloseBehavior = {
+    attach: function (context, settings) {
+      $('#delete-bg', context).once('deleteConfirmCloseBehavior').each(function () {
+        $(this).click(function (event) {
+          if(!$.contains($(this).get(0),event.target))
+          {
+            $(this).removeClass('visible');
+            $(this).html('');
+          }
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);

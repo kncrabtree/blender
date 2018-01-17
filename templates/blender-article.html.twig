@@ -46,12 +46,12 @@
 
       <div class="article-data">
         <span class="article-title">{{ a.title }}</span>
-        <span class="article-metadata">{{ a.authors }}, <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
+        <span class="article-metadata">{{ a.authors }}. <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
         <br />
         {% if a.is_recommendation %}
-          Recommended by {{ a.rec_sender }} on {{ a.rec_timestamp }}.
+          Recommended by {{ a.rec_sender|title }} on {{ a.rec_timestamp }}.
         {% else %}
-          Assigned to {{ a.owner }} on {{ a.date_added }}.
+          Assigned to {{ a.owner|title }} on {{ a.date_added }}.
         {% endif %}
         {% if a.is_starred %} Starred on {{ a.star_date }}.{% endif %}</span>
       </div>
@@ -99,7 +99,10 @@
 
     <div class="article-comment-box {% if articles|length == 1 %} visible{% endif %}">
       <div class="comments-wrapper" id="comment_display-{{ a.id }}"></div>
-      <div class="comment-add" id="add_comment-{{ a.id }}">Add comment</div>
+      <div class="comment-add" id="add_comment-{{ a.id }}">
+          <i class="material-icons md-dark icon clickable">add_circle</i>
+          <a class="comment-link">Add comment</a>
+      </div>
       <div class="comment-editor-wrapper hidden" id="comment_wrapper-{{ a.id }}">
         <textarea id="textarea-{{ a.id }}"></textarea>
         <button id="comment_submit-{{ a.id }}">Submit</button>

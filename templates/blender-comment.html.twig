@@ -13,12 +13,18 @@
 
 {% if comments %}
 {% for c in comments %}
-  <div class="comment" id="comment-{{ c.id }}">
+  <div class="blender-comment" id="comment-{{ c.id }}">
     <div class="comment-metadata">
-      <span class="comment-author">{{ c.author }}</span>
+      <span class="comment-author">{{ c.author|title }}</span>
       <span class="comment-timestamp">{{ c.timestamp }}</span>
       {% if c.edited %}
-        <span class="comment-edit-timestamp">Last edited: {{ c.edited }}</span>
+        <span class="comment-timestamp">Last edited: {{ c.edited }}</span>
+      {% endif %}
+      {% if c.is_author %}
+      <div class="comment-actions">
+        <a class="comment-link edit" id="comment_edit-{{ c.id }}">Edit</a>
+        <a class="comment-link delete" id="comment_delete-{{ c.id }}">Delete</a>
+      </div>
       {% endif %}
     </div>
 
@@ -26,13 +32,7 @@
     <div class="comment-body">
       {{ c.text|raw }}
     </div>
-
-    {% if c.is_author %}
-      <div class="comment-actions">
-        <span class="comment-edit-link" id="comment_edit-{{ c.id }}">Edit</span>
-        <span class="comment-delete-link" id="comment_delete-{{ c.id }}">Delete</span>
-      </div>
-    {% endif %}
+  </div>
 
 {% endfor %}
 {% else %}
