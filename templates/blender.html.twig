@@ -38,7 +38,7 @@
   <a href="{{ url('blender.inbox') }}">
     <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %} tooltip">
         <i class="material-icons md-dark icon clickable inbox-nav-icon{% if page is same as('inbox') %} selected{% endif %}">markunread</i>
-        <div class="badge{% if inbox_new > 0 %} visible{% endif %}" id="inbox-new-count">{{ inbox_new }}</div>
+        <div class="badge{% if inbox_new > 0 %} visible{% endif %} bottom right" id="inbox-new-count">{{ inbox_new }}</div>
         <span class="tooltiptext bottom">View articles in inbox.</span>
     </div>
   </a>
@@ -57,7 +57,7 @@
   <a href="{{ url('blender.user-recommendations') }}">
     <div class="blender-navigation-item{% if page is same as('user-recommendations') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable rec-nav-icon{% if page is same as('user-recommendations') %} selected{% endif %}">share</i>
-      <div class="badge{% if recommend_new > 0 %} visible{% endif %}" id="recommend-new-count">{{ recommend_new }}</div>
+      <div class="badge{% if recommend_new > 0 %} visible{% endif %} bottom right" id="recommend-new-count">{{ recommend_new }}</div>
       <span class="tooltiptext bottom">View articles shared with you.</span>
     </div>
   </a>

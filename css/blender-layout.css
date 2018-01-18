@@ -119,6 +119,7 @@
   display: grid;
   grid-auto-rows: 35px;
   grid-row-gap: 0px;
+  position: relative;
 }
 
 .article-data {

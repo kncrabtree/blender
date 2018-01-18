@@ -163,6 +163,8 @@ class BlenderController extends ControllerBase {
         ->count()->execute() > 0);
       $a_d['voted'] = $voted;
 
+      $a_d['num_comments'] = $this->get_comment_count($a_d['id']);
+
       $a_array[] = $a_d;
     }
 

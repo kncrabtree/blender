@@ -41,6 +41,10 @@
           </div>
         </i>
         <i class="material-icons md-dark clickable icon comment-icon" id="commenticon-{{ a.id }}">comment</i>
+
+        <div class="badge{% if a.num_comments > 0 %} visible{% endif %} bottom left" id="comment_count-{{ a.id }}">{{ a.num_comments }}</div>
+
+
       </div>
 
 

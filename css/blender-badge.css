@@ -10,12 +10,26 @@
   font-size: 8pt;
   padding:2px;
   text-align:center;
-  right:0;
-  bottom:0;
   min-width:10px;
   margin:2px;
 }
 
 .badge.visible {
   visibility: visible;
+}
+
+.badge.bottom {
+  bottom:0;
+}
+
+.badge.top {
+  top:0;
+}
+
+.badge.left {
+  left:0;
+}
+
+.badge.right {
+  right:0;
 }

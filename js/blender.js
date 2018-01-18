@@ -238,6 +238,11 @@
               dataType: 'json',
               success: function showComments(response) {
                 $('#comment_display-'+aid).html(response.html);
+                $('#comment_count-'+aid).html(response.count);
+                if(response.count < 1)
+                  $('#comment_count-'+aid).removeClass('visible');
+                else
+                  $('#comment_count-'+aid).addClass('visible');
                 Drupal.attachBehaviors();
                 comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
               }
@@ -457,6 +462,11 @@
                       dataType: 'json',
                       success: function showComments(response) {
                         $('#comment_display-'+aid).html(response.html);
+                        $('#comment_count-'+aid).html(response.count);
+                        if(response.count < 1)
+                          $('#comment_count-'+aid).removeClass('visible');
+                        else
+                          $('#comment_count-'+aid).addClass('visible');
                         Drupal.attachBehaviors();
                       }
                     });
@@ -540,6 +550,11 @@
                           dataType: 'json',
                           success: function showComments(response3) {
                             $('#comment_display-'+aid).html(response3.html);
+                            $('#comment_count-'+aid).html(response3.count);
+                            if(response3.count < 1)
+                              $('#comment_count-'+aid).removeClass('visible');
+                            else
+                              $('#comment_count-'+aid).addClass('visible');
                             Drupal.attachBehaviors();
                           }
                         });
@@ -605,6 +620,11 @@
                   dataType: 'json',
                   success: function showComments(response2) {
                     $('#comment_display-'+aid).html(response2.html);
+                    $('#comment_count-'+aid).html(response2.count);
+                    if(response2.count < 1)
+                      $('#comment_count-'+aid).removeClass('visible');
+                    else
+                      $('#comment_count-'+aid).addClass('visible');
                     Drupal.attachBehaviors();
                   }
                 });
