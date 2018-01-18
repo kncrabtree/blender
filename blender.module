@@ -38,7 +38,7 @@ function blender_cron() {
 
   $queue = \Drupal::queue('journal_fetcher');
 
-  if($queue->numberOfItems > 0)
+  if($queue->numberOfItems() > 0)
   {
     \Drupal::logger('blender')->notice("Not queuing more journals; queue not empty.");
     return;

@@ -48,10 +48,7 @@
 }
 
 .blender-navigation-item {
-  padding: 5px;
   border: 1px solid rgba(0,0,0,0.13);
-  margin-left:-1px;
-  margin-bottom: -1px;
   background: rgba(0,0,0,0.06);
 }
 

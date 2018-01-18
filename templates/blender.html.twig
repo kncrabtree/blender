@@ -36,33 +36,35 @@
 
 <div id="blender-navigation">
   <a href="{{ url('blender.inbox') }}">
-    <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %}">
+    <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %} tooltip">
         <i class="material-icons md-dark icon clickable inbox-nav-icon{% if page is same as('inbox') %} selected{% endif %}">markunread</i>
-      <span class="blender-navigation-desc">Inbox <div class="badge{% if inbox_new > 0 %} visible{% endif %}" id="inbox-new-count">{{ inbox_new }}</div></span>
+        <div class="badge{% if inbox_new > 0 %} visible{% endif %}" id="inbox-new-count">{{ inbox_new }}</div>
+        <span class="tooltiptext bottom">View articles in inbox.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-bookmarks') }}">
-    <div class="blender-navigation-item{% if page is same as('bookmarks') %} selected{% endif %}">
+    <div class="blender-navigation-item{% if page is same as('bookmarks') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable bookmark-nav-icon{% if page is same as('bookmarks') %} selected{% endif %}">bookmark</i>
-      <span class="blender-navigation-desc">My Bookmarks</span>
+      <span class="tooltiptext bottom">View bookmarked articles.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-votes') }}">
-    <div class="blender-navigation-item{% if page is same as('user-votes') %} selected{% endif %}">
+    <div class="blender-navigation-item{% if page is same as('user-votes') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable vote-nav-icon{% if page is same as('user-votes') %} selected{% endif %}">plus_one</i>
-      <span class="blender-navigation-desc">My Votes</span>
+      <span class="tooltiptext bottom">View articles you have voted for.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-recommendations') }}">
-    <div class="blender-navigation-item{% if page is same as('user-recommendations') %} selected{% endif %}">
+    <div class="blender-navigation-item{% if page is same as('user-recommendations') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable rec-nav-icon{% if page is same as('user-recommendations') %} selected{% endif %}">share</i>
-      <span class="blender-navigation-desc">Shared With Me <div class="badge{% if recommend_new > 0 %} visible{% endif %}" id="recommend-new-count">{{ recommend_new }}</div></span>
+      <div class="badge{% if recommend_new > 0 %} visible{% endif %}" id="recommend-new-count">{{ recommend_new }}</div>
+      <span class="tooltiptext bottom">View articles shared with you.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-archive') }}">
-    <div class="blender-navigation-item{% if page is same as('user-archive') %} selected{% endif %}">
+    <div class="blender-navigation-item{% if page is same as('user-archive') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable archive-nav-icon{% if page is same as('user-archive') %} selected{% endif %}">done</i>
-      <span class="blender-navigation-desc">My Articles</span>
+      <span class="tooltiptext bottom">View all articles assigned to you.</span>
     </div>
   </a>
 </div>

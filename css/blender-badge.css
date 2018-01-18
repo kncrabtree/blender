@@ -1,16 +1,19 @@
 .badge {
   display:inline-block;
+  position: absolute;
   visibility: hidden;
   background: red;
   color: white;
   font-family: Sans-serif;
-  z-index:9999;
+  z-index:99;
   border-radius: 8px;
   font-size: 8pt;
   padding:2px;
   text-align:center;
-  margin-left:5px;
+  right:0;
+  bottom:0;
   min-width:10px;
+  margin:2px;
 }
 
 .badge.visible {

@@ -17,6 +17,7 @@
     transition-delay: 1s;
     font-family: Sans-serif;
     font-size: 8pt;
+    font-weight: normal;
 }
 
 .tooltiptext.left {
