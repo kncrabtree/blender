@@ -33,3 +33,19 @@
 .badge.right {
   right:0;
 }
+
+.badge.bottom-icon {
+  bottom:-6px;
+}
+
+.badge.top-icon {
+  top:6px;
+}
+
+.badge.left-icon {
+  left:-6px;
+}
+
+.badge.right-icon {
+  right:6px;
+}

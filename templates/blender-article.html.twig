@@ -40,9 +40,14 @@
             <span class="tooltiptext bottom right" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
           </div>
         </i>
-        <i class="material-icons md-dark clickable icon comment-icon" id="commenticon-{{ a.id }}">comment</i>
+        <i class="material-icons md-dark clickable icon comment-icon" id="commenticon-{{ a.id }}">
+          <div class="tooltip">
+            comment
+            <div class="badge{% if a.num_comments > 0 %} visible{% endif %} bottom-icon left-icon" id="comment_count-{{ a.id }}">{{ a.num_comments }}</div>
+          </div>
+        </i>
 
-        <div class="badge{% if a.num_comments > 0 %} visible{% endif %} bottom left" id="comment_count-{{ a.id }}">{{ a.num_comments }}</div>
+
 
 
       </div>
@@ -63,7 +68,13 @@
 
       <div class="article-icons right">
         {% if a.is_starred %}
-          <i class="material-icons md-dark icon star-icon">star</i>
+          <i class="material-icons md-dark icon star-icon">
+            <div class="tooltip">
+              star
+              <div class="badge left-icon top-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
+            </div>
+          </i>
+
         {% else %}
           <i class="icon"></i>
         {% endif %}
@@ -92,6 +103,7 @@
             <div class="tooltip">
               plus_one
               <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
+              <div class="badge left-icon bottom-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
             </div>
           </i>
         {% else %}

@@ -145,6 +145,16 @@
               else
                 $('#recommend-new-count').removeClass('visible');
               $('#recommend-new-count').html(response.new_recommend);
+              if(response.count > 0)
+              {
+                $('#vote_count-'+aid).html(response.count);
+                $('#vote_count-'+aid).addClass('visible');
+              }
+              else
+              {
+                $('#vote_count-'+aid).html(response.count);
+                $('#vote_count-'+aid).removeClass('visible');
+              }
             },
             error: function(a, b, c) {
               alert("Error: " + a + ", " + b + ", " + c);

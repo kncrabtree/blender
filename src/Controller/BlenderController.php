@@ -164,6 +164,7 @@ class BlenderController extends ControllerBase {
       $a_d['voted'] = $voted;
 
       $a_d['num_comments'] = $this->get_comment_count($a_d['id']);
+      $a_d['num_votes'] = $this->get_vote_count($a_d['id']);
 
       $a_array[] = $a_d;
     }
@@ -461,6 +462,8 @@ class BlenderController extends ControllerBase {
 
     }
 
+    $return_data['count'] = $this->get_vote_count($a_id);
+
     return new JsonResponse($return_data);
 
   }
@@ -505,6 +508,8 @@ class BlenderController extends ControllerBase {
       }
     }
 
+
+    $return_data['count'] = $this->get_vote_count($a_id);
 
     return new JsonResponse($return_data);
 
@@ -843,7 +848,13 @@ class BlenderController extends ControllerBase {
   }
 
   public function get_comment_count($a_id) {
-    return $c_ids = $this->query_service->get('blender_comment')
+    return $this->query_service->get('blender_comment')
+      ->condition('article_id',$a_id)
+      ->count()->execute();
+  }
+
+  public function get_vote_count($a_id) {
+    return $this->query_service->get('blender_vote')
       ->condition('article_id',$a_id)
       ->count()->execute();
   }
