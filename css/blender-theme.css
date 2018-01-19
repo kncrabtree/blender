@@ -53,13 +53,7 @@
 }
 
 .blender-navigation-item.selected {
-  font-weight: bold;
   background: white;
-}
-
-.blender-navigation-desc {
-  font-size: 1em;
-  align-self: center;
 }
 
 .blender-navigation-item:hover {
@@ -97,6 +91,30 @@
 
 .material-icons.md-dark.archive-nav-icon.selected {
   color: rgba(20, 150, 30, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.rec-nav-icon {
+  color: rgba(0, 102, 204, 0.87);
+}
+
+.material-icons.md-dark.rec-nav-icon.selected {
+  color: rgba(0, 102, 204, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.comment-nav-icon {
+  color: rgba(153, 102, 51, 0.87);
+}
+
+.material-icons.md-dark.comment-nav-icon.selected {
+  color: rgba(153, 102, 51, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.star-nav-icon {
+  color: rgba(255, 175, 30, 0.87);
+}
+
+.material-icons.md-dark.star-nav-icon.selected {
+  color: rgba(255, 175, 30, 0.87);
 }
 
 .article {

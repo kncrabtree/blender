@@ -558,10 +558,13 @@ class BlenderController extends ControllerBase {
       throw new NotFoundHttpException();
 
 
-    //get all active users
-    $user_list = $this->entityTypeManager()->getStorage('user')->loadByProperties([
-      'roles' => 'blender_active_user',
-    ]);
+    //get all active and passive users
+    $query = $this->query_service->get('user');
+    $group = $query->orConditionGroup()
+      ->condition('roles','blender_active_user')
+      ->condition('roles','blender_passive_user');
+    $u_ids = $query->condition($group)->execute();
+    $user_list = $this->entityTypeManager()->getStorage('user')->loadMultiple($u_ids);
 
     //lookup any existing recommendations for this article
     $rec_list = $this->entityTypeManager()->getStorage('blender_recommendation')->loadByProperties([
@@ -588,7 +591,7 @@ class BlenderController extends ControllerBase {
       if(!in_array($u->id(),$ineligible))
       {
         $return_data['suggestions'][] = [
-          'value' => $u->getDisplayName(),
+          'value' => ucwords($u->getDisplayName()),
           'data' => $u->id(),
         ];
       }
