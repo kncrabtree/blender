@@ -56,7 +56,7 @@ class BlenderController extends ControllerBase {
       }
     }
 
-    return  ($numquery->count()->execute() > $this->page_size);
+    return  ($numquery->count()->execute() > 0);
   }
 
   protected function article_lookup_list()
@@ -75,6 +75,11 @@ class BlenderController extends ControllerBase {
 
     $a_ids = $articlequery->sort('id','DESC')->pager($this->page_size)->execute();
     $articles = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+
+    $this->conditions['id'] = [
+      end($a_ids),
+      '<'
+    ];
 
     return $articles;
 
@@ -104,6 +109,13 @@ class BlenderController extends ControllerBase {
 
       $fetch = ($duplicates > 0 ? $duplicates : $this->page_size);
 
+      //Debugging statements
+//       $str = "Fetching ".$fetch." entries from ".$type;
+//       if(isset($this->conditions[$sort]))
+//         $str.=" with condition ".$sort.$this->conditions[$sort][1].$this->conditions[$sort][0];
+//       $str.=" sorted by ".$sort." ".$order;
+//       \Drupal::logger('blender')->notice($str);
+
       $ids = $query->sort($sort,$order)->pager($fetch)->execute();
 
       $list = $this->entityTypeManager()->getStorage($type)->loadMultiple($ids);
@@ -127,16 +139,24 @@ class BlenderController extends ControllerBase {
           $duplicates++;
       }
 
+      //Debugging statements
+//       $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
+//       reset($article_ids);
+
+//       \Drupal::logger('blender')->notice($str);
+
       //if several duplicates, get more articles
-      if($duplicates > $this->page_size/10)
+      if($duplicates < $this->page_size/10 || count($list)==0)
+        $done = true;
+
+      if(count($list)>0)
       {
         $this->conditions[$sort] = [
-          $list[count($list)-1]->get($sort)->value,
+          end($list)->get($sort)->target_id,
           $order === 'DESC' ? '<' : '>',
         ];
       }
-      else
-        $done = true;
+
     }
 
     return $articles;
