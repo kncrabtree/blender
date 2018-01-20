@@ -359,6 +359,7 @@
               $('#recommend-article-title').html($(".article-title", "#article-"+aid).html());
               $('#recommend-article-metadata').html($(".article-metadata", "#article-"+aid).html());
               $('#recommend-bg').toggleClass('visible')
+              $('#recommend-input').focus();
               $('#recommend-input').autocomplete({
                 lookup: users,
                 minchars: 1,
@@ -421,8 +422,8 @@
             $('#recommend-article-metadata').html('');
             $('#recommend-success-user').html('');
             $('#recommend-fail-user').html('');
-            $('#recommend-success-user').removeClass('visible');
-            $('#recommend-fail-user').removeClass('visible');
+            $('#recommend-success').removeClass('visible');
+            $('#recommend-fail').removeClass('visible');
             $('#recommend-input').autocomplete().dispose();
           }
         });

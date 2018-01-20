@@ -56,6 +56,27 @@ class BlenderController extends ControllerBase {
       }
     }
 
+    //Debugging statements
+    $str = "Checking ".$type." for entries with conditions:";
+    if(isset($this->conditions))
+    {
+      foreach($this->conditions as $key => $value)
+      {
+        $str.=' '.$key;
+        if(isset($value[1]))
+          $str.=$value[1].$value[0];
+        else
+          $str.='=='.$value[0];
+      }
+    }
+    else
+      $str.= " none";
+    $str .= ".";
+    \Drupal::logger('blender')->notice($str);
+    $count = $numquery->count()->execute();
+    \Drupal::logger('blender')->notice("Found ".$count." articles.");
+
+
     return  ($numquery->count()->execute() > 0);
   }
 
@@ -110,11 +131,11 @@ class BlenderController extends ControllerBase {
       $fetch = ($duplicates > 0 ? $duplicates : $this->page_size);
 
       //Debugging statements
-//       $str = "Fetching ".$fetch." entries from ".$type;
-//       if(isset($this->conditions[$sort]))
-//         $str.=" with condition ".$sort.$this->conditions[$sort][1].$this->conditions[$sort][0];
-//       $str.=" sorted by ".$sort." ".$order;
-//       \Drupal::logger('blender')->notice($str);
+      $str = "Fetching ".$fetch." entries from ".$type;
+      if(isset($this->conditions[$sort]))
+        $str.=" with condition ".$sort.$this->conditions[$sort][1].$this->conditions[$sort][0];
+      $str.=" sorted by ".$sort." ".$order;
+      \Drupal::logger('blender')->notice($str);
 
       $ids = $query->sort($sort,$order)->pager($fetch)->execute();
 
@@ -140,10 +161,10 @@ class BlenderController extends ControllerBase {
       }
 
       //Debugging statements
-//       $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
-//       reset($article_ids);
+      $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
+      reset($article_ids);
 
-//       \Drupal::logger('blender')->notice($str);
+      \Drupal::logger('blender')->notice($str);
 
       //if several duplicates, get more articles
       if($duplicates < $this->page_size/10 || count($list)==0)
@@ -152,7 +173,7 @@ class BlenderController extends ControllerBase {
       if(count($list)>0)
       {
         $this->conditions[$sort] = [
-          end($list)->get($sort)->target_id,
+          isset(end($list)->get($sort)->target_id) ? end($list)->get($sort)->target_id : end($list)->get($sort)->value,
           $order === 'DESC' ? '<' : '>',
         ];
       }
@@ -309,7 +330,7 @@ class BlenderController extends ControllerBase {
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'user-recommendations';
 
-    $articles = $this->other_lookup_list('blender_recommendation','timestamp','DESC');
+    $articles = $this->other_lookup_list('blender_recommendation','id','DESC');
     $more = $this->lookup_more_available('blender_recommendation');
 
     return $this->build_render_array($articles,$more);
@@ -379,30 +400,43 @@ class BlenderController extends ControllerBase {
         ->sort('id','DESC')
         ->execute();
 
-      $this->conditions['id'] = [$c_id[0],'<'];
+      $val = isset($c_ids[0]) ? $c_ids[0] : $c_ids;
+      $this->conditions['id'] = [$val,'<'];
       $type = 'blender_comment';
       $sort = 'id';
       $articles = $this->other_lookup_list($type,$sort);
     }
     else if(strpos($page,'recommendations') !== false)
     {
-      //retrieve article; get its timestamp
-      $a = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
-      $this->conditions['timestamp'] = [$a->get('timestamp')->value,'<'];
-      $type = 'blender_recommendation';
+      //retrieve id of last rec
+      $r_ids = $this->query_service->get('blender_recommendation')
+        ->condition('article_id',$a_id)
+        ->condition('user_id',$this->currentUser()->id())
+        ->execute();
 
-      $articles = $this->other_lookup_list($type);
+      $val = isset($r_ids[0]) ? $r_ids[0] : $r_ids;
+      $this->conditions['id'] = [$r_id,'<'];
+      $type = 'blender_recommendation';
+      $sort = 'id';
+
+      $articles = $this->other_lookup_list($type,$sort);
+    }
+    else if(strpos($page,'starred') !== false)
+    {
+      //get star timestamp of last article
+      $a = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+      $this->conditions['is_starred'] = [true];
+      $this->conditions['star_date'] = [$a->get('star_date')->value,'<'];
+      $sort = 'star_date';
     }
     else
     {
       $this->conditions['id'] = [$a_id,'<'];
-      if(strpos($page,'starred') !== false)
-        $this->conditions['is_starred'] = [true];
 
       $articles = $this->article_lookup_list();
     }
 
-    $more = $this->lookup_more_available($type,$sort);
+    $more = $this->lookup_more_available($type);
 
     $render = $this->build_render_array($articles,$more,true);
 
