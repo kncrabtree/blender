@@ -68,13 +68,7 @@
 
       <div class="article-icons right">
         {% if a.is_starred %}
-          <i class="material-icons md-dark icon star-icon">
-            <div class="tooltip">
-              star
-              <div class="badge left-icon top-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
-            </div>
-          </i>
-
+          <i class="material-icons md-dark icon star-icon">star</i>
         {% else %}
           <i class="icon"></i>
         {% endif %}
@@ -98,17 +92,13 @@
             </div>
           </div>
         </i>
-        {% if not a.is_starred %}
-          <i class="material-icons md-dark clickable icon vote-icon{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
-            <div class="tooltip">
-              plus_one
-              <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
-              <div class="badge left-icon bottom-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
-            </div>
-          </i>
-        {% else %}
-          <i class="material-icons md-dark icon md-inactive vote-icon-disabled">plus_one</i>
-        {% endif %}
+        <i class="material-icons md-dark clickable icon vote-icon{% if a.starred %}-disabled{% endif %}{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
+          <div class="tooltip">
+            plus_one
+            <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
+            <div class="badge left-icon bottom-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
+          </div>
+        </i>
       </div>
     </div>
 
