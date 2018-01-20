@@ -230,6 +230,7 @@ a.comment-link:hover {
 .material-icons.md-dark.bookmark-icon.bookmarked { color: rgba(150, 20, 30, 0.87); }
 .material-icons.md-dark.bookmark-icon.bookmarked:hover { color: rgba(150, 20, 30, 0.54); }
 .material-icons.md-dark.vote-icon.voted { color: rgba(255, 102, 30, 0.87); }
+.material-icons.md-dark.vote-icon-disabled.voted { color: rgba(255, 102, 30, 0.87); }
 .material-icons.md-dark.vote-icon.voted:hover { color: rgba(255, 102, 30, 0.54); }
 .material-icons.md-dark.star-icon { color: rgba(255, 175, 30, 0.87); }
 .material-icons.md-dark.star-icon:hover { color: rgba(255, 175, 30, 0.87); }

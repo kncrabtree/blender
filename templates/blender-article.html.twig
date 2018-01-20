@@ -92,7 +92,7 @@
             </div>
           </div>
         </i>
-        <i class="material-icons md-dark clickable icon vote-icon{% if a.starred %}-disabled{% endif %}{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
+        <i class="material-icons md-dark icon{% if not a.is_starred %} clickable vote-icon{% else %} vote-icon-disabled{% endif %}{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
           <div class="tooltip">
             plus_one
             <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
