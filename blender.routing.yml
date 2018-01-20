@@ -38,6 +38,20 @@ blender.user-recommendations:
   requirements:
     _permission: 'access blender'
 
+blender.user-comments:
+  path: '/journals/user/comments'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::user_comments'
+  requirements:
+    _permission: 'access blender'
+
+blender.all-comments:
+  path: '/journals/comments'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::all_comments'
+  requirements:
+    _permission: 'access blender'
+
 blender.all-votes:
   path: '/journals/votes'
   defaults:

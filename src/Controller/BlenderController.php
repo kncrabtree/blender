@@ -173,7 +173,6 @@ class BlenderController extends ControllerBase {
       $bm = ($this->query_service->get('blender_bookmark')
         ->condition('user_id',$this->currentUser()->id())
         ->condition('article_id',$a->id->value)
-        ->condition('status',true)
         ->count()->execute() > 0);
       $a_d['bookmark'] = $bm;
 
@@ -257,11 +256,37 @@ class BlenderController extends ControllerBase {
   public function user_bookmarks() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
-    $this->conditions['status'] = [true];
     $this->page = 'bookmarks';
 
     $articles = $this->other_lookup_list('blender_bookmark');
     $more = $this->lookup_more_available('blender_bookmark');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
+  public function user_comments() {
+
+    $this->conditions['user_id'] = [$this->currentUser()->id()];
+    $this->page = 'user-comments';
+
+    $articles = $this->other_lookup_list('blender_comment',
+    'id');
+    $more = $this->lookup_more_available('blender_comment',
+    'id');
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
+  public function all_comments() {
+
+    $this->page = 'all-comments';
+
+    $articles = $this->other_lookup_list('blender_comment',
+    'id');
+    $more = $this->lookup_more_available('blender_comment',
+    'id');
 
     return $this->build_render_array($articles,$more);
 
@@ -320,6 +345,8 @@ class BlenderController extends ControllerBase {
 
     $articles = array();
     $type = 'blender_article';
+    $sort = 'article_id';
+    $order = 'DESC';
 
     if(strpos($page,'bookmarks') !== false)
     {
@@ -332,6 +359,19 @@ class BlenderController extends ControllerBase {
       $this->conditions['article_id'] = [$a_id,'<'];
       $type = 'blender_vote';
       $articles = $this->other_lookup_list($type);
+    }
+    else if(strpos($page,'comments') !== false)
+    {
+      //lookup most recent comment of LAST article displayed
+      $c_ids = $this->query_service->get('blender_comment')
+        ->condition('article_id',$a_id)
+        ->sort('id','DESC')
+        ->execute();
+
+      $this->conditions['id'] = [$c_id[0],'<'];
+      $type = 'blender_comment';
+      $sort = 'id';
+      $articles = $this->other_lookup_list($type,$sort);
     }
     else if(strpos($page,'recommendations') !== false)
     {
@@ -348,7 +388,7 @@ class BlenderController extends ControllerBase {
       $articles = $this->article_lookup_list();
     }
 
-    $more = $this->lookup_more_available($type);
+    $more = $this->lookup_more_available($type,$sort);
 
     $render = $this->build_render_array($articles,$more,true);
 
@@ -416,15 +456,14 @@ class BlenderController extends ControllerBase {
       $bm = $this->entityTypeManager()->getStorage('blender_bookmark')->create();
       $bm->set('user_id',$user->id());
       $bm->set('article_id',$a_id);
-      $bm->set('status',$is_bookmark);
       $bm->save();
     }
     else
     {
+      //bookmark exists. Delete it
       $bm = array_shift($bmlist);
-      $is_bookmark = !($bm->get('status')->value);
-      $bm->set('status',$is_bookmark);
-      $bm->save();
+      $bm->delete();
+      $is_bookmark = false;
     }
 
     $remove = false;

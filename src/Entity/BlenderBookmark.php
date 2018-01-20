@@ -22,7 +22,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *     "id" = "id",
  *     "user_id" = "user_id",
  *     "article_id" = "article_id",
- *     "status" = "status",
  *   },
  * )
  */
@@ -48,11 +47,6 @@ class BlenderBookmark extends ContentEntityBase implements ContentEntityInterfac
       ->setDescription(t('Article bookmarked.'))
       ->setSetting('target_type','blender_article');
 
-
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Bookmarked?'))
-      ->setDescription(t('Indicates whether article is bookmarked by user.'))
-      ->setSetting('default_value',true);
 
     return $fields;
   }
