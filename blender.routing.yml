@@ -60,6 +60,13 @@ blender.all-votes:
   requirements:
     _permission: 'access blender'
 
+blender.starred:
+  path: '/journals/starred'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::starred'
+  requirements:
+    _permission: 'access blender'
+
 blender.all:
   path: '/journals/all-articles'
   defaults:

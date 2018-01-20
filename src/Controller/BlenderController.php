@@ -326,6 +326,17 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function starred() {
+
+    $this->conditions['is_starred'] = [true];
+    $articles = $this->article_lookup_list();
+    $more = $this->lookup_more_available('blender_article');
+    $this->page = 'starred';
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
   public function more_articles(Request $request) {
 
     $a_id = $request->request->get('last_id');
@@ -385,6 +396,9 @@ class BlenderController extends ControllerBase {
     else
     {
       $this->conditions['id'] = [$a_id,'<'];
+      if(strpos($page,'starred') !== false)
+        $this->conditions['is_starred'] = [true];
+
       $articles = $this->article_lookup_list();
     }
 

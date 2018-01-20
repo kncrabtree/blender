@@ -73,10 +73,12 @@
       <span class="tooltiptext bottom">View all articles assigned to you.</span>
     </div>
   </a>
-  <div class="blender-navigation-item{% if page is same as('starred') %} selected{% endif %} tooltip">
-    <i class="material-icons md-dark icon clickable star-nav-icon{% if page is same as('starred') %} selected{% endif %}">star</i>
-    <span class="tooltiptext bottom">View all starred articles.</span>
-  </div>
+  <a href="{{ url('blender.starred') }}">
+    <div class="blender-navigation-item{% if page is same as('starred') %} selected{% endif %} tooltip">
+      <i class="material-icons md-dark icon clickable star-nav-icon{% if page is same as('starred') %} selected{% endif %}">star</i>
+      <span class="tooltiptext bottom">View all starred articles.</span>
+    </div>
+  </a>
   <a href="{{ url('blender.all-comments') }}">
     <div class="blender-navigation-item{% if page is same as('all-comments') %} selected{% endif %} tooltip">
       <i class="material-icons md-dark icon clickable comment-nav-icon{% if page is same as('comments') %} selected{% endif %}">question_answer</i>
