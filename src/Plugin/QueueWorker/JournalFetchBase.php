@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\user;
+use Drupal\Component\Datetime\Time;
 
 
 abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFactoryPluginInterface {
@@ -23,6 +24,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
   */
   protected $entity_manager;
   protected $query_service;
+  protected $time_service;
 
 
   /**
@@ -31,9 +33,10 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
    * @param \Drupal\Core\Entity\EntityStorageInterface $j_storage
    *   The node storage.
    */
-  public function __construct(EntityTypeManager $em, QueryFactory $qf) {
+  public function __construct(EntityTypeManager $em, QueryFactory $qf, Time $time) {
     $this->entity_manager = $em;
     $this->query_service = $qf;
+    $this->time_service = $time;
   }
 
   /**
@@ -42,7 +45,8 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity.query')
+      $container->get('entity.query'),
+      $container->get('datetime.time')
     );
   }
 
@@ -68,10 +72,11 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
 
     //1.) Generate date range to fetch (last update to yesterday; never today))
     $start = DrupalDateTime::createFromTimestamp($journal->last_update->value)->format('Y-m-d');
-    if((REQUEST_TIME - $journal->last_update->value) > 24*60*60*7)
-      $start = DrupalDateTime::createFromTimestamp(REQUEST_TIME-24*60*60*7)->format('Y-m-d');
+    $request_time = $this->time_service->getRequestTime();
+    if(($request_time - $journal->last_update->value) > 24*60*60*7)
+      $start = DrupalDateTime::createFromTimestamp($request_time-24*60*60*7)->format('Y-m-d');
 
-    $end = DrupalDateTime::createFromTimestamp(REQUEST_TIME-24*60*60)->format('Y-m-d');
+    $end = DrupalDateTime::createFromTimestamp($request_time-24*60*60)->format('Y-m-d');
 
 
     //2.) Get ISSN
@@ -249,7 +254,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
 
     \Drupal::logger('blender')->notice("Found ".$count." new articles in ".$journal->abbr->value);
     $journal->set('last_num_articles',$article_count);
-    $journal->set('last_update',REQUEST_TIME);
+    $journal->set('last_update',$request_time);
     $journal->save();
 
   }
