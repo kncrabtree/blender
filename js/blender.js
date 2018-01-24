@@ -60,32 +60,27 @@
             },
             dataType: 'json',
             success: function(response) {
-              if(response.remove)
-                $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
+              if(response.bookmark)
+              {
+                $('#bookmark-'+aid).find("span.icon-name").html("bookmark");
+                $('#bookmark-'+aid).find("span.tooltiptext").html("Remove bookmark");
+              }
               else
               {
-                if(response.bookmark)
-                {
-                  $('#bookmark-'+aid).find("span.icon-name").html("bookmark");
-                  $('#bookmark-'+aid).find("span.tooltiptext").html("Remove bookmark");
-                }
-                else
-                {
-                  $('#bookmark-'+aid).find("span.icon-name").html("bookmark_border");
-                  $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
-                }
-                $('#bookmark-'+aid).toggleClass('bookmarked');
-                if(response.new_inbox > 0)
-                  $('#inbox-new-count').addClass('visible');
-                else
-                  $('#inbox-new-count').removeClass('visible');
-                $('#inbox-new-count').html(response.new_inbox);
-                if(response.new_recommend > 0)
-                  $('#recommend-new-count').addClass('visible');
-                else
-                  $('#recommend-new-count').removeClass('visible');
-                $('#recommend-new-count').html(response.new_recommend);
+                $('#bookmark-'+aid).find("span.icon-name").html("bookmark_border");
+                $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
               }
+              $('#bookmark-'+aid).toggleClass('bookmarked');
+              if(response.new_inbox > 0)
+                $('#inbox-new-count').addClass('visible');
+              else
+                $('#inbox-new-count').removeClass('visible');
+              $('#inbox-new-count').html(response.new_inbox);
+              if(response.new_recommend > 0)
+                $('#recommend-new-count').addClass('visible');
+              else
+                $('#recommend-new-count').removeClass('visible');
+              $('#recommend-new-count').html(response.new_recommend);
             },
             error: function(a, b, c) {
               alert("Error: " + a + ", " + b + ", " + c);
@@ -118,23 +113,20 @@
             },
             dataType: 'json',
             success: function(response) {
-              if(response.remove)
-                $('#article-'+aid).slideUp(50, function(){ $(this).remove(); });
-              else
+
+              if(response.vote_added || response.vote_removed)
+                $('#vote-'+aid).toggleClass('voted');
+              if(response.vote_added)
               {
-                if(response.vote_added || response.vote_removed)
-                  $('#vote-'+aid).toggleClass('voted');
-                if(response.vote_added)
-                {
-                  $('#vote-'+aid).find("span.tooltiptext").html("Remove vote");
-                }
-                if(response.vote_removed)
-                {
-                  $('#vote-'+aid).find("span.tooltiptext").html("Add vote");
-                }
-                if(cls.includes("voted") && !response.vote_removed)
-                  alert("You cannot remove your vote from this article.");
+                $('#vote-'+aid).find("span.tooltiptext").html("Remove vote");
               }
+              if(response.vote_removed)
+              {
+                $('#vote-'+aid).find("span.tooltiptext").html("Add vote");
+              }
+              if(cls.includes("voted") && !response.vote_removed)
+                alert("You cannot remove your vote from this article.");
+
               if(response.new_inbox > 0)
                 $('#inbox-new-count').addClass('visible');
               else

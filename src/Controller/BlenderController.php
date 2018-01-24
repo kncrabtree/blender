@@ -130,12 +130,12 @@ class BlenderController extends ControllerBase {
 
       $fetch = ($duplicates > 0 ? $duplicates : $this->page_size);
 
-      //Debugging statements
-      $str = "Fetching ".$fetch." entries from ".$type;
-      if(isset($this->conditions[$sort]))
-        $str.=" with condition ".$sort.$this->conditions[$sort][1].$this->conditions[$sort][0];
-      $str.=" sorted by ".$sort." ".$order;
-      \Drupal::logger('blender')->notice($str);
+//       //Debugging statements
+//       $str = "Fetching ".$fetch." entries from ".$type;
+//       if(isset($this->conditions[$sort]))
+//         $str.=" with condition ".$sort.$this->conditions[$sort][1].$this->conditions[$sort][0];
+//       $str.=" sorted by ".$sort." ".$order;
+//       \Drupal::logger('blender')->notice($str);
 
       $ids = $query->sort($sort,$order)->pager($fetch)->execute();
 
@@ -160,9 +160,9 @@ class BlenderController extends ControllerBase {
           $duplicates++;
       }
 
-      //Debugging statements
-      $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
-      reset($article_ids);
+//       //Debugging statements
+//       $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
+//       reset($article_ids);
 
       \Drupal::logger('blender')->notice($str);
 
@@ -518,11 +518,12 @@ class BlenderController extends ControllerBase {
     if(strpos($request->request->get('origin'),'bookmarks') !== false)
       $remove = true;
 
+    $this->check_article_preserve($a_id);
+
     $return_data = $this->mark_read($a_id,$request->request->get('origin'));
 
     $return_data['article_id'] = $a_id;
     $return_data['bookmark'] = $is_bookmark;
-    $return_data['remove'] = $remove;
 
     return new JsonResponse($return_data);
 
@@ -569,6 +570,8 @@ class BlenderController extends ControllerBase {
 
     }
 
+    $this->check_article_preserve($a_id);
+
     $return_data['count'] = $this->get_vote_count($a_id);
 
     return new JsonResponse($return_data);
@@ -594,7 +597,6 @@ class BlenderController extends ControllerBase {
 
     $return_data = $this->mark_read($a_id,$request->request->get('origin'));
     $return_data['article_id'] = $a_id;
-    $return_data['remove'] = false;
 
     if(count($vl) == 0)
     {
@@ -610,11 +612,10 @@ class BlenderController extends ControllerBase {
       {
         $vote->delete();
         $return_data['vote_removed'] = true;
-        if(strpos($request->request->get('origin'),'user') !== false && strpos($request->request->get('origin'),'votes') !== false)
-          $return_data['remove'] = true;
       }
     }
 
+    $this->check_article_preserve($a_id);
 
     $return_data['count'] = $this->get_vote_count($a_id);
 
@@ -746,6 +747,8 @@ class BlenderController extends ControllerBase {
       $rec->save();
       $return_data['success'] = true;
     }
+
+    $this->check_article_preserve($a_id);
 
     return new JsonResponse($return_data);
 
@@ -902,6 +905,7 @@ class BlenderController extends ControllerBase {
     if($c->get('user_id')->target_id != $this->currentUser()->id())
       throw new NotFoundHttpException();
 
+    $this->check_article_preserve($c->get('article_id')->target_id);
 
     $c->delete();
     $return_data['success'] = true;
@@ -932,6 +936,10 @@ class BlenderController extends ControllerBase {
       'format' => 'Basic HTML',
     ]);
     $c->save();
+
+    $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+    $article->set('preserve',true);
+    $article->save();
 
     $return_data['success'] = true;
 
@@ -964,6 +972,31 @@ class BlenderController extends ControllerBase {
     return $this->query_service->get('blender_vote')
       ->condition('article_id',$a_id)
       ->count()->execute();
+  }
+
+  public function check_article_preserve($a_id) {
+
+    $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
+    if(!isset($article))
+      return;
+
+    //step 2: check to see if article has votes, comments, bookmarks, or recommendations
+    $tables = ['blender_bookmark', 'blender_vote', 'blender_comment', 'blender_recommendation'];
+
+    foreach( $tables as $t )
+    {
+      if($this->query_service->get($t)->condition('article_id',$a_id)->count()->execute() > 0)
+      {
+        $article->set('preserve',true);
+        $article->save();
+        return;
+      }
+    }
+
+    $article->set('preserve',false);
+    $article->save();
+
   }
 
 

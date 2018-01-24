@@ -44,10 +44,10 @@ function blender_cron() {
     return;
   }
 
-  $storage = \Drupal::entityManager()->getStorage('blender_journal');
+  $storage = \Drupal::entityTypeManager()->getStorage('blender_journal');
   $jids = \Drupal::entityQuery('blender_journal')
     ->condition('active', TRUE, '==')
-    ->condition('last_update',REQUEST_TIME-(24*60*60),'<')
+    ->condition('last_update',\Drupal::time()->getRequestTime()-(24*60*60),'<')
     ->execute();
 
   $journals = $storage->loadMultiple($jids);
@@ -59,18 +59,16 @@ function blender_cron() {
       \Drupal::logger('blender')->notice("Queued ".$j->abbr->value);
     }
   }
+
+//   //purge articles more than 180 days old that are not starred or preserved
+//   $a_ids = \Drupal::entityQuery('blender_article')
+//     ->condition('starred',false)
+//     ->condition('date_added',\Drupal::time()->getRequestTime()-(24*60*60*14),'<')
+//     ->condition('preserve',false)
+//     ->execute();
+
+
+
+
 }
-/*
-function blender_menu_links_discovered_alter(&$links) {
-  $user = \Drupal::currentUser();
 
-  \Drupal::logger('blender')->notice("Menu alter user: ".$user->id());
-
-  //get unread items in inbox
-  $unread_inbox = \Drupal::entityQuery('blender_article')
-    ->condition('user_id',$user->id())
-    ->condition('inbox',true)
-    ->count()->execute();
-
-  $links['blender.inbox']['title'].= ' ('.$unread_inbox.')';
-}*/
