@@ -60,13 +60,61 @@ function blender_cron() {
     }
   }
 
-//   //purge articles more than 180 days old that are not starred or preserved
-//   $a_ids = \Drupal::entityQuery('blender_article')
-//     ->condition('starred',false)
-//     ->condition('date_added',\Drupal::time()->getRequestTime()-(24*60*60*14),'<')
-//     ->condition('preserve',false)
-//     ->execute();
+  //purge articles more than 180 days old that are not starred or preserved
+  $a_ids = \Drupal::entityQuery('blender_article')
+    ->condition('is_starred',0)
+    ->condition('date_added',\Drupal::time()->getRequestTime()-(24*60*60*7),'<')
+    ->condition('preserve',0)
+    ->execute();
 
+
+//   $articles = \Drupal::entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+//   foreach($articles as $a)
+//     $a->delete();
+
+  \Drupal::logger('blender')->notice("Deleted ".count($a_ids)." old articles.");
+
+  //see if any articles have been starred within the last week
+  $ts_res = \Drupal::entityQuery('blender_article')
+    ->condition('is_starred',1)
+    ->condition('star_date',\Drupal::time()->getRequestTime()-(24*60*60*7),'>')
+    ->count()->execute();
+
+  //if no articles have been starred in the past week, it's time to look for new ones to star.
+  //query votes table; filter by article.is_starred=false and #votes > 1, aggregate on count, sort descending
+  if($ts_res == 0)
+  {
+    \Drupal::logger('blender')->notice("Looking for potential articles to star.");
+    $candidates = \Drupal::entityTypeManager()->getStorage('blender_vote')->getAggregateQuery()
+      ->aggregate('article_id','count')
+      ->condition('article_id.entity:blender_article.is_starred',0)
+      ->conditionAggregate('article_id','COUNT',1,'>')
+      ->groupBy('article_id')
+      ->sortAggregate('article_id','count','DESC')
+      ->range(0,2)->execute();
+
+
+    \Drupal::logger('blender')->notice("Found ".count($candidates)." articles to star.");
+
+//     foreach($candidates as $c)
+//     {
+//
+      //Debugging statements
+//       $str = "";
+//       foreach($c as $key=>$value)
+//         $str .= ' '.$key.': '.$value.', ';
+//       \Drupal::logger('blender')->notice($str);
+
+
+//       $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
+//       $a->set('is_starred',true);
+//       $a->set('star_date',\Drupal::time()->getRequestTime());
+//       $a->set('preserve',true);
+//       $a->save();
+//
+//       ///TODO: post selected article to Slack
+//     }
+  }
 
 
 

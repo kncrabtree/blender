@@ -57,24 +57,24 @@ class BlenderController extends ControllerBase {
     }
 
     //Debugging statements
-    $str = "Checking ".$type." for entries with conditions:";
-    if(isset($this->conditions))
-    {
-      foreach($this->conditions as $key => $value)
-      {
-        $str.=' '.$key;
-        if(isset($value[1]))
-          $str.=$value[1].$value[0];
-        else
-          $str.='=='.$value[0];
-      }
-    }
-    else
-      $str.= " none";
-    $str .= ".";
-    \Drupal::logger('blender')->notice($str);
-    $count = $numquery->count()->execute();
-    \Drupal::logger('blender')->notice("Found ".$count." articles.");
+//     $str = "Checking ".$type." for entries with conditions:";
+//     if(isset($this->conditions))
+//     {
+//       foreach($this->conditions as $key => $value)
+//       {
+//         $str.=' '.$key;
+//         if(isset($value[1]))
+//           $str.=$value[1].$value[0];
+//         else
+//           $str.='=='.$value[0];
+//       }
+//     }
+//     else
+//       $str.= " none";
+//     $str .= ".";
+//     \Drupal::logger('blender')->notice($str);
+//     $count = $numquery->count()->execute();
+//     \Drupal::logger('blender')->notice("Found ".$count." articles.");
 
 
     return  ($numquery->count()->execute() > 0);
@@ -163,8 +163,8 @@ class BlenderController extends ControllerBase {
 //       //Debugging statements
 //       $str = "Found ".count($list)." entries. First article: ".current($article_ids).", Last article: ".end($article_ids).". Duplicates: ".$duplicates.".";
 //       reset($article_ids);
+//       \Drupal::logger('blender')->notice($str);
 
-      \Drupal::logger('blender')->notice($str);
 
       //if several duplicates, get more articles
       if($duplicates < $this->page_size/10 || count($list)==0)
@@ -978,7 +978,7 @@ class BlenderController extends ControllerBase {
 
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
-    if(!isset($article))
+    if(!isset($article) || $article->get('is_starred')->value)
       return;
 
     //step 2: check to see if article has votes, comments, bookmarks, or recommendations
