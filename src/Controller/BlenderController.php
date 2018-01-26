@@ -12,12 +12,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception;
 use Drupal\Component\Datetime\Time;
+use Drupal\Core\Datetime\DrupalDateTime;
+use GuzzleHttp\Client;
 
 class BlenderController extends ControllerBase {
 
   protected $query_service;
 
   protected $time_service;
+
+  protected $http_client;
 
   protected $page_size = 20;
 
@@ -26,10 +30,11 @@ class BlenderController extends ControllerBase {
   protected $page;
 
 
-  public function __construct( QueryFactory $qf, Time $time)
+  public function __construct( QueryFactory $qf, Time $time, Client $client)
   {
     $this->query_service = $qf;
     $this->time_service = $time;
+    $this->http_client = $client;
   }
 
   /**
@@ -38,7 +43,8 @@ class BlenderController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.query'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('http_client')
     );
   }
 
@@ -876,6 +882,8 @@ class BlenderController extends ControllerBase {
 
     $return_data['success'] = true;
 
+    $article = $this->entityTypeManager()->getStorage('blender_article')->load($c->get('article_id')->target_id);
+
     if(!isset($c))
       $return_data['success'] = false;
     else
@@ -884,6 +892,24 @@ class BlenderController extends ControllerBase {
         'value' => $comment,
         'format' => 'Basic HTML',
       ]);
+
+      //edit comment on slack
+      $slack['channel'] = 'C8XGXGBQD';
+      $slack['text'] = ucwords($this->currentUser()->getDisplayName()).' commented on an article. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
+      $slack['as_user'] = true;
+      $slack['ts'] = $c->get('slack_ts')->value;
+      $slack['attachments'] = [
+        [
+          "title" => $article->get('title')->value,
+          "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
+          "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+        ],
+      ];
+
+      $reply = $this->post_to_slack('chat.update',$slack);
+      if(isset($reply['ok']) && $reply['ok'] == true)
+        $c->set('slack_ts',$reply['ts']);
+
       $c->set('edited_time',$this->time_service->getRequestTime());
       $c->save();
     }
@@ -906,6 +932,12 @@ class BlenderController extends ControllerBase {
       throw new NotFoundHttpException();
 
     $this->check_article_preserve($c->get('article_id')->target_id);
+
+    //delete comment on slack
+    $slack['channel'] = 'C8XGXGBQD';
+    $slack['as_user'] = true;
+    $slack['ts'] = $c->get('slack_ts')->value;
+    $this->post_to_slack('chat.delete',$slack);
 
     $c->delete();
     $return_data['success'] = true;
@@ -935,9 +967,27 @@ class BlenderController extends ControllerBase {
       'value' => $comment,
       'format' => 'Basic HTML',
     ]);
-    $c->save();
 
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
+    //send comment to slack; get TS ID for use with editing
+    $slack['channel'] = 'C8XGXGBQD';
+    $slack['text'] = ucwords($this->currentUser()->getDisplayName()).' commented on an article.';
+    $slack['attachments'] = [
+      [
+        "title" => $article->get('title')->value,
+        "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
+        "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+      ],
+    ];
+
+    $reply = $this->post_to_slack('chat.postMessage',$slack);
+    if(isset($reply['ok']) && $reply['ok'] == true)
+      $c->set('slack_ts',$reply['ts']);
+
+
+    $c->save();
+
     $article->set('preserve',true);
     $article->save();
 
@@ -972,6 +1022,29 @@ class BlenderController extends ControllerBase {
     return $this->query_service->get('blender_vote')
       ->condition('article_id',$a_id)
       ->count()->execute();
+  }
+
+  public function post_to_slack($method, $array) {
+
+    $url = 'https://slack.com/api/'.$method;
+
+    ///TODO: Move Authorization to configuration or something
+    $headers['Content-type'] = 'application/json';
+    $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+
+    $response = $this->http_client->request('POST',$url, [
+      'headers' => $headers,
+      'body' => json_encode($array)
+    ]);
+
+    if($response->getStatusCode() != 200)
+    {
+      \Drupal::logger('blender')->warning("Received error code ".$response->getStatusCode()," when posting to Slack (url = ".$url.").");
+      return array();
+    }
+
+    return json_decode($response->getBody(),true);
+
   }
 
   public function check_article_preserve($a_id) {

@@ -70,6 +70,11 @@ class BlenderComment extends ContentEntityBase implements JournalArticleInterfac
       ->setDescription(t('Time when comment was edited.'))
       ->setRequired(false);
 
+    $fields['slack_ts'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Slack TS'))
+      ->setDescription(t('Slack post timestamp ID for this comment.'))
+      ->setRequired(false);
+
     return $fields;
   }
 
@@ -80,6 +85,7 @@ class BlenderComment extends ContentEntityBase implements JournalArticleInterfac
     $out['timestamp'] = DrupalDateTime::createFromTimestamp($this->get('timestamp')->value)->format('Y-m-d g:i:s A');
     $out['edited'] = isset($this->get('edited_time')->value) ? DrupalDateTime::createFromTimestamp($this->get('edited_time')->value)->format('Y-m-d g:i:s A') : NULL;
     $out['text'] = $this->get('text')->get(0)->get('value')->getValue();
+    $out['slack_ts'] = $this->get('slack_ts')->value;
 
     return $out;
   }

@@ -77,21 +77,20 @@ function blender_cron() {
 
   \Drupal::logger('blender')->notice("Deleted ".count($a_ids)." old articles.");
 
-  $client = \Drupal::httpClient();
-  $url = 'https://slack.com/api/chat.postMessage';
-  $headers['Content-type'] = 'application/json';
-  $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
-
-  $slack['token'] = 'xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
-  $slack['channel'] = 'C8XGXGBQD';
-  $slack['text'] = 'Testing message post. There are '.count($a_ids).' articles pending deletion.';
-
-  $response = $client->request('POST',$url, [
-    'headers' => $headers,
-    'body' => json_encode($slack)
-  ]);
-
-  \Drupal::logger('blender')->notice("Slack Web API response: ".$response->getBody());
+//   $client = \Drupal::httpClient();
+//   $url = 'https://slack.com/api/chat.postMessage';
+//   $headers['Content-type'] = 'application/json';
+//   $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+//
+//   $slack['channel'] = 'C8XGXGBQD';
+//   $slack['text'] = 'Testing message post. There are '.count($a_ids).' articles pending deletion.';
+//
+//   $response = $client->request('POST',$url, [
+//     'headers' => $headers,
+//     'body' => json_encode($slack)
+//   ]);
+//
+//   \Drupal::logger('blender')->notice("Slack Web API response: ".$response->getBody());
 
 
   //see if any articles have been starred within the last week
