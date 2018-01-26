@@ -33,3 +33,21 @@ function blender_install() {
 //     $role->delete();
 
 }
+
+function blender_update_8001() {
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('Slack ID'))
+    ->setDescription(t('Slack ID for this user (e.g., U0XAXAA8L)'))
+    ->setRevisionable(TRUE)
+    ->setSettings( array (
+      'default_value' => '',
+      'max_length' => 9
+    ))
+    ->setDisplayOptions('view', array( 'type' => 'string', 'weight' => -6 ))
+    ->setDisplayOptions('form', array( 'type' => 'string_text_field', 'weight' => -6))
+    ->setDisplayConfigurable('form',TRUE)
+    ->setDisplayConfigurable('view',TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()
+  ->installFieldStorageDefinition('slack_id', 'user', 'user', $storage_definition);
+}

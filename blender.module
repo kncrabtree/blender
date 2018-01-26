@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Implements hook_theme().
  */
@@ -74,6 +77,23 @@ function blender_cron() {
 
   \Drupal::logger('blender')->notice("Deleted ".count($a_ids)." old articles.");
 
+  $client = \Drupal::httpClient();
+  $url = 'https://slack.com/api/chat.postMessage';
+  $headers['Content-type'] = 'application/json';
+  $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+
+  $slack['token'] = 'xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+  $slack['channel'] = 'C8XGXGBQD';
+  $slack['text'] = 'Testing message post. There are '.count($a_ids).' articles pending deletion.';
+
+  $response = $client->request('POST',$url, [
+    'headers' => $headers,
+    'body' => json_encode($slack)
+  ]);
+
+  \Drupal::logger('blender')->notice("Slack Web API response: ".$response->getBody());
+
+
   //see if any articles have been starred within the last week
   $ts_res = \Drupal::entityQuery('blender_article')
     ->condition('is_starred',1)
@@ -116,7 +136,31 @@ function blender_cron() {
 //     }
   }
 
+}
 
+/**
+* Implements hook_entity_base_field_info().
+*/
+function blender_entity_base_field_info(EntityTypeInterface $entity_type)
+{
+  if($entity_type->id() === 'user') {
+    $fields['slack_id'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Slack ID'))
+      ->setDescription(t('Slack ID for this user (e.g., U0XAXAA8L)'))
+      ->setRevisionable(TRUE)
+      ->setSettings( array (
+        'default_value' => '',
+        'max_length' => 9
+      ))
+      ->setDisplayOptions('view', array( 'type' => 'string', 'weight' => -6 ))
+      ->setDisplayOptions('form', array( 'type' => 'string_text_field', 'weight' => -6))
+      ->setDisplayConfigurable('form',TRUE)
+      ->setDisplayConfigurable('view',TRUE);
+
+    return $fields;
+  }
 
 }
+
+
 
