@@ -429,6 +429,7 @@
     attach: function (context, settings) {
       // Enable local plugins
       CKEDITOR.plugins.addExternal( 'texzilla', '/journals/drupal/modules/custom/blender/ckeditor-plugins/texzilla/src/' );
+      CKEDITOR.plugins.addExternal( 'emojione', '/journals/drupal/modules/custom/blender/ckeditor-plugins/emojione/' );
       $('.comment-add', context).once('addCommentBehavior').each(function () {
         var aid = $(this).parents('.article').attr('id').split('-')[1];
         $(this).click(function(event) {
@@ -484,7 +485,7 @@
               editor.val('');
             });
           }, {
-            extraPlugins: 'texzilla'
+            extraPlugins: 'texzilla,emojione'
           });
         });
       });
@@ -566,7 +567,7 @@
                   });
                 },
                 {
-                  extraPlugins: 'texzilla'
+                  extraPlugins: 'texzilla,emojione'
                 });
               });
             }
