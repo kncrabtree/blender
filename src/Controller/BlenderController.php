@@ -751,6 +751,42 @@ class BlenderController extends ControllerBase {
       $rec->set('sender_id',$this_user);
       $rec->set('new',true);
       $rec->save();
+
+      //get im channel and notify user on Slack
+      $receiver = $this->entityTypeManager()->getStorage('user')->load($target_user)->get('slack_id')->value;
+      $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
+      $slack['user'] = $receiver;
+
+      $reply = $this->post_to_slack('im.open',$slack,true);
+      if(isset($reply['ok']) && $reply['ok'] == true)
+      {
+        $channel = $reply['channel']['id'];
+        $slack2['channel'] = $channel;
+        $slack2['text'] = ucwords($this->currentUser()->getDisplayName()).' shared an article with you.';
+        $slack2['attachments'] = [
+          [
+            "title" => $article->get('title')->value,
+            "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
+            "text" => "Eventually, there will also be a link to the journal system here.",
+          ],
+        ];
+        $response2 = $this->post_to_slack('chat.postMessage',$slack2,true);
+        if(isset($response2['ok']) && $response2['ok'] == false)
+        {
+          \Drupal::logger('blender')->warning('Could not post message to user '.$receiver.'. Error: '.$response2['error']);
+        }
+      }
+      else
+      {
+        if(isset($reply['error']))
+          \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. Error: '.$reply['error']);
+        else
+        {
+          \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. No error message received. WTF?');
+        }
+      }
+
       $return_data['success'] = true;
     }
 
@@ -1024,13 +1060,16 @@ class BlenderController extends ControllerBase {
       ->count()->execute();
   }
 
-  public function post_to_slack($method, $array) {
+  public function post_to_slack($method, $array, $bot = false) {
 
     $url = 'https://slack.com/api/'.$method;
 
     ///TODO: Move Authorization to configuration or something
     $headers['Content-type'] = 'application/json';
-    $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+    if($bot)
+      $headers['Authorization'] = 'Bearer xoxb-305060915457-eKyGDUUz214GSvcvV9A5NNdu';
+    else
+      $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
 
     $response = $this->http_client->request('POST',$url, [
       'headers' => $headers,
