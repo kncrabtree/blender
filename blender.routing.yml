@@ -6,6 +6,13 @@ blender.inbox:
   requirements:
     _permission: 'access blender'
 
+blender.search:
+  path: '/journals/search'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::search'
+  requirements:
+    _permission: 'access blender'
+
 blender.user-archive:
   path: '/journals/user/articles'
   defaults:

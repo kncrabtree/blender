@@ -23,11 +23,25 @@
   text-align:center;
 }
 
+#search-container {
+  display: grid;
+  grid-auto-rows: auto;
+  max-width: 800px;
+  margin:auto;
+  position:relative;
+  top:50%;
+  transform: translate(0%,-50%);
+}
+
+.search-button-container {
+  display:grid;
+  grid-template-columns: auto 5em;
+}
+
 .button-container {
   display: grid;
   grid-template-columns: auto auto;
   padding: 1em 0 1em 0;
-
 }
 
 .button-container button {

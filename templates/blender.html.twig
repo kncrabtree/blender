@@ -33,6 +33,21 @@
 <div id="delete-bg" class="overlay">
 </div>
 
+<form action="{{ url('blender.search') }}">
+  <div id="search-bg" class="overlay">
+    <div id="search-container">
+      <h2>Search</h2>
+      <div class="search-button-container">
+        <input id="search-box" type="search" name="search-text" maxlength=255 />
+        <input type="submit" value="Search" />
+      </div>
+      <a id="search-advanced">Advanced</a>
+      <div id="search-advanced-container">
+      </div>
+    </div>
+  </div>
+</form>
+
 
 <div id="blender-navigation">
   <a href="{{ url('blender.inbox') }}">
@@ -97,6 +112,10 @@
       <span class="tooltiptext bottom">View all articles.</span>
     </div>
   </a>
+  <div class="blender-navigation-item{% if page is same as('search') %} selected{% endif %} tooltip" id="blender-search">
+    <i class="material-icons md-dark icon clickable search-nav-icon{% if page is same as('search') %} selected{% endif %}">search</i>
+    <span class="tooltiptext bottom">Search articles.</span>
+  </div>
 </div>
 
 {% if articles %}

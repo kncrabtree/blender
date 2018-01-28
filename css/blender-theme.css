@@ -18,6 +18,23 @@
   padding: 10px;
 }
 
+#search-container {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-family: Sans-serif;
+  padding: 10px;
+}
+
+#search-advanced {
+  font-size: 0.875em;
+  border:none;
+}
+
+#search-advanced:hover {
+  cursor:pointer;
+}
+
 #recommend-success {
   color: black;
   border: 1px solid rgba(20,150,30,0.87);
@@ -115,6 +132,14 @@
 
 .material-icons.md-dark.star-nav-icon.selected {
   color: rgba(255, 175, 30, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.search-nav-icon {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.material-icons.md-dark.search-nav-icon.selected {
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .article {

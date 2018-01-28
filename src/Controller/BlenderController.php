@@ -364,6 +364,43 @@ class BlenderController extends ControllerBase {
 
   }
 
+  public function search(Request $request) {
+
+    ///TODO: construct standardized search parameters; move implementation to separate function for compatibility with more-articles function.
+    $search_terms = $request->get('search-text');
+//     \Drupal::logger('blender')->notice('Search requested for '.$search_terms);
+
+    $terms = preg_split("/[\s,]+/",$search_terms,-1,PREG_SPLIT_NO_EMPTY);
+    $this->page = "search";
+    $articles = array();
+    $more = false;
+
+    if(count($terms)>0)
+    {
+//       \Drupal::logger('blender')->notice('Searching for '.count($terms).' terms.');
+      //set additional constraints here
+
+      $aq = $this->query_service->get('blender_article');
+      //here, check for or, and, or exact matching
+      $group = $aq->orConditionGroup();
+      foreach($terms as $term)
+      {
+        $group->condition('title',$term,'CONTAINS');
+        $group->condition('authors',$term,'CONTAINS');
+        $group->condition('abstract',$term,'CONTAINS');
+      }
+      $aq->condition($group);
+
+      $a_ids = $aq->sort('id','DESC')->pager($this->page_size)->execute();
+
+      $articles = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+
+    }
+
+    return $this->build_render_array($articles,$more);
+
+  }
+
   public function more_articles(Request $request) {
 
     $a_id = $request->request->get('last_id');

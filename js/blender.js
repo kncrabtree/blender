@@ -656,3 +656,24 @@
     }
   };
 })(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.blenderSearchBehavior = {
+    attach: function (context, settings) {
+      $('#blender-search', context).once('blenderSearchBehavior').each(function () {
+        var bg = $('#search-bg');
+        bg.click(function (event) {
+          if(!$.contains(bg.get(0),event.target))
+          {
+            //clean up input fields here
+            bg.removeClass('visible');
+          }
+        });
+        $(this).click(function (event) {
+          bg.addClass('visible');
+          $('#search-box').focus();
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);
