@@ -418,7 +418,7 @@ class BlenderController extends ControllerBase {
           $group->condition('title',$term,'CONTAINS');
           $group->condition('authors',$term,'CONTAINS');
           $group->condition('abstract',$term,'CONTAINS');
-          $c_group->condition('text',$term,'CONTAINS');
+          $c_group->condition('text.value',$term,'CONTAINS');
         }
         $aq->condition($group);
         $cq->condition($c_group);
@@ -428,7 +428,7 @@ class BlenderController extends ControllerBase {
         $aq->condition('title',$search['terms'],'CONTAINS');
         $aq->condition('authors',$search['terms'],'CONTAINS');
         $aq->condition('abstract',$search['terms'],'CONTAINS');
-        $cq->condition('text',$search['terms'],'CONTAINS');
+        $cq->condition('text.value',$search['terms'],'CONTAINS');
       }
 
       if($search['user'])
