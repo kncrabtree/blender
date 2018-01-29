@@ -366,34 +366,176 @@ class BlenderController extends ControllerBase {
 
   public function search(Request $request) {
 
-    ///TODO: construct standardized search parameters; move implementation to separate function for compatibility with more-articles function.
     $search_terms = $request->get('search-text');
-//     \Drupal::logger('blender')->notice('Search requested for '.$search_terms);
-
-    $terms = preg_split("/[\s,]+/",$search_terms,-1,PREG_SPLIT_NO_EMPTY);
     $this->page = "search";
+
+
+    $search['terms'] = $search_terms;
+    $search['type'] = 'or';
+    $search['user'] = false;
+    $search['star'] = false;
+//     $search['journal'] = NULL;
+//     $search['date_start'] = NULL;
+//     $search['date_end'] = NULL;
+//     $search['min_article_id'] = 0;
+//     $search['max_star_date'] = NULL;
+
+    return $this->process_search($search);
+  }
+
+  public function process_search($search) {
+
     $articles = array();
     $more = false;
 
+    $terms = preg_split("/[\s,]+/",$search['terms'],-1,PREG_SPLIT_NO_EMPTY);
+
     if(count($terms)>0)
     {
-//       \Drupal::logger('blender')->notice('Searching for '.count($terms).' terms.');
-      //set additional constraints here
-
       $aq = $this->query_service->get('blender_article');
-      //here, check for or, and, or exact matching
-      $group = $aq->orConditionGroup();
-      foreach($terms as $term)
+      $cq = $this->query_service->get('blender_comment');
+      //here, check for 'or', 'and', or 'exact' matching
+      if($search['type'] === 'or')
       {
-        $group->condition('title',$term,'CONTAINS');
-        $group->condition('authors',$term,'CONTAINS');
-        $group->condition('abstract',$term,'CONTAINS');
+        $group = $aq->orConditionGroup();
+        $c_group = $cq->orConditionGroup();
+        foreach($terms as $term)
+        {
+          $group->condition('title',$term,'CONTAINS');
+          $group->condition('authors',$term,'CONTAINS');
+          $group->condition('abstract',$term,'CONTAINS');
+          $c_group->condition('text.value',$term,'CONTAINS');
+        }
+        $aq->condition($group);
+        $cq->condition($c_group);
       }
-      $aq->condition($group);
+      else if($search['type'] === 'and')
+      {
+        $group = $aq->andConditionGroup();
+        $c_group = $cq->andConditionGroup();
+        foreach($terms as $term)
+        {
+          $group->condition('title',$term,'CONTAINS');
+          $group->condition('authors',$term,'CONTAINS');
+          $group->condition('abstract',$term,'CONTAINS');
+          $c_group->condition('text',$term,'CONTAINS');
+        }
+        $aq->condition($group);
+        $cq->condition($c_group);
+      }
+      else
+      {
+        $aq->condition('title',$search['terms'],'CONTAINS');
+        $aq->condition('authors',$search['terms'],'CONTAINS');
+        $aq->condition('abstract',$search['terms'],'CONTAINS');
+        $cq->condition('text',$search['terms'],'CONTAINS');
+      }
 
-      $a_ids = $aq->sort('id','DESC')->pager($this->page_size)->execute();
+      if($search['user'])
+      {
+        $aq->condition('user_id',$this->currentUser()->id());
+        $cq->condition('article_id.entity:blender_article.user_id',$this->currentUser()->id());
+      }
 
-      $articles = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+      if(isset($search['journal']))
+      {
+        $aq->condition('journal_id',$search['journal']);
+        $cq->condition('article_id.entity:blender_article.journal_id',$search['journal']);
+      }
+
+      if(isset($search['date_start']))
+      {
+        $aq->condition('date_added',$search['date_start'],'>');
+        $cq->condition('article_id.entity:blender_article.date_added',$search['date_start'],'>');
+      }
+
+      if(isset($search['date_end']))
+      {
+        $aq->condition('date_added',$search['date_end'],'<');
+        $cq->condition('article_id.entity:blender_article.date_added',$search['date_end'],'<');
+      }
+
+      if($search['star'])
+      {
+        if(isset($search['max_star_date']))
+        {
+          $aq->condition('star_date',$search['max_star_date'],'<');
+          $cq->condition('article_id.entity:blender_article.star_date',$search['max_star_date'],'<');
+        }
+        $aq->sort('star_date','DESC');
+        $cq->sort('article_id.entity:blender_article.star_date');
+      }
+      else
+      {
+        if(isset($search['min_article_id']))
+        {
+          $aq->condition('id',$search['min_article_id'],'<');
+          $cq->condition('article_id',$search['min_article_id'],'<');
+        }
+        $aq->sort('id','DESC');
+        $cq->sort('article_id','DESC');
+      }
+
+
+
+      $a_ids = $aq->execute();
+      $article_matches = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+
+      $c_ids = $cq->execute();
+      $comment_matches = $this->entityTypeManager()->getStorage('blender_comment')->loadMultiple($c_ids);
+      $i = 0;
+      $a_ids2 = array();
+      foreach($comment_matches as $c)
+      {
+        if(!in_array($c->get('article_id')->target_id,$a_ids) && !in_array($c->get('article_id')->target_id,$a_ids2))
+          $a_ids2[] = $c->get('article_id')->target_id;
+
+        $i++;
+        if($i > $this->page_size)
+          break;
+      }
+      $comment_articles = $this->entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids2);
+
+
+      //need to put all articles in order.
+      //limit to page_size
+      $articles = array();
+      $sort_c = ($search['star']) ? 'star_date' : 'id';
+      for($i=0; $i<$this->page_size; $i+=1)
+      {
+        //shift first elements off each array
+        $aa = array_shift($article_matches);
+        $ca = array_shift($comment_articles);
+
+        if(!isset($aa) && !isset($ca))
+          break;
+
+        if(!isset($aa))
+        {
+          $articles[] = $ca;
+          continue;
+        }
+
+        if(!isset($ca))
+        {
+          $articles[] = $aa;
+          continue;
+        }
+
+        if($aa->get($sort_c)->value > $ca->get($sort_c)->value)
+        {
+          $articles[] = $aa;
+          array_unshift($comment_articles,$ca);
+        }
+        else
+        {
+          $articles[] = $ca;
+          array_unshift($article_matches,$aa);
+        }
+      }
+
+      if(!empty($article_matches) || !empty($comment_articles))
+        $more = true;
 
     }
 
