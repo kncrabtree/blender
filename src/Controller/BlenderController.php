@@ -383,7 +383,7 @@ class BlenderController extends ControllerBase {
     return $this->process_search($search);
   }
 
-  public function process_search($search) {
+  public function process_search($search,$standalone = false) {
 
     $articles = array();
     $more = false;
@@ -539,7 +539,7 @@ class BlenderController extends ControllerBase {
 
     }
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$standalone);
 
   }
 
@@ -552,6 +552,35 @@ class BlenderController extends ControllerBase {
 
     //use the page to determine what conditions to use
     $page = $request->request->get('origin');
+
+    //searches use different logic than the rest
+    if(strpos($page,'search') !== false)
+    {
+      parse_str(substr($request->request->get('query'),1),$query);
+
+      $search['terms'] = $query['search-text'];
+      $search['type'] = 'or';
+      $search['user'] = false;
+      $search['star'] = false;
+//     $search['journal'] = NULL;
+//     $search['date_start'] = NULL;
+//     $search['date_end'] = NULL;
+      $search['min_article_id'] = $a_id;
+
+      if($search['star'])
+      {
+        $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+        $search['max_star_date'] = $article->get('star_date')->value;
+      }
+
+      $render = $this->process_search($search,true);
+      $return_data = array(
+        'html' => render($render),
+        'more' => $render['#more'],
+      );
+
+      return new JsonResponse($return_data);
+    }
 
     if(strpos($page,'inbox') !== false)
       $this->conditions['inbox'] = [true];

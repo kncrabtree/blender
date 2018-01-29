@@ -169,7 +169,8 @@
             type: 'POST',
             data: {
               'last_id' : last_id,
-              'origin' : window.location.pathname
+              'origin' : window.location.pathname,
+              'query' : window.location.search
             },
             dataType: 'json',
             success: function(response) {

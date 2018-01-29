@@ -124,7 +124,7 @@ function blender_cron() {
 //         $str .= ' '.$key.': '.$value.', ';
 //       \Drupal::logger('blender')->notice($str);
 
-
+        ///TODO: if selecting 2 articles, make timestamps 1 second different
 //       $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
 //       $a->set('is_starred',true);
 //       $a->set('star_date',\Drupal::time()->getRequestTime());
