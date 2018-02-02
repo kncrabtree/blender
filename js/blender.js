@@ -679,6 +679,7 @@
         adv.click(function advancedSearch() {
           if(adv.html() === 'Normal')
           {
+            adv_c.addClass('hidden');
             adv_c.html('');
             adv.html('Advanced');
           }
@@ -703,14 +704,28 @@
             var journalFilter = $('<div></div>').addClass('filter-block');
             journalFilter.append('<span>Journal: </span>');
             var jDiv = $('<div id="search-journal-autocomplete"></div>');
-            var journalInput = $('<input type="text" name="journal" id="journal-input" size="50"/>');
+            var journalInput = $('<input type="text" name="journal" id="journal-input" size="40"/>');
             jDiv.append(journalInput);
             journalFilter.append(jDiv);
 
             filterDiv.append(userFilter);
             filterDiv.append(starFilter);
             filterDiv.append(journalFilter);
+
+            var minDateDiv = $('<div style="clear:left"></div>').addClass('filter-block');
+            minDateDiv.append('<span>Added after: </span>');
+            var minDateInput = $('<input type="date" name="min-date" />').attr('placeholder','YYYY-MM-DD');
+            minDateDiv.append(minDateInput);
+
+            var maxDateDiv = $('<div></div>').addClass('filter-block');
+            maxDateDiv.append('<span>Added before: </span>');
+            var maxDateInput = $('<input type="date" name="max-date" />').attr('placeholder','YYYY-MM-DD');
+            maxDateDiv.append(maxDateInput);
+
+            filterDiv.append(minDateDiv).append(maxDateDiv);
+
             adv_c.append(filterDiv);
+            adv_c.removeClass('hidden');
 
             adv.html('Normal');
 
@@ -718,29 +733,35 @@
             $.ajax({
               url: Drupal.url('journals/get-journal-list'),
               success: function journalList(response) {
-                var journals = response.suggestions;
-                var j_id = -1;
-                $('#journal-input').autocomplete({
-                  lookup: journals,
-                  minchars: 1,
-                  appendTo: $('#search-journal-autocomplete'),
-                  onSelect: function(suggestion) {
-                    j_id = suggestion.data;
-                    journalInput.val(suggestion.value);
-                    $('#search-form').submit( function() {
-                      journalInput.val(j_id);
-                      return true;
-                    });
-                  }
-                });
+                if(response.suggestions.length > 0)
+                {
+                  var journals = response.suggestions;
+                  var j_id = -1;
+                  $('#journal-input').autocomplete({
+                    lookup: journals,
+                    minchars: 1,
+                    appendTo: $('#search-journal-autocomplete'),
+                    onSelect: function(suggestion) {
+                      j_id = suggestion.data;
+                      journalInput.val(suggestion.value);
+                      $('#search-form').submit( function() {
+                        journalInput.val(j_id);
+                        return true;
+                      });
+                    }
+                  });
+                }
+                else
+                {
+                  journalInput.val('');
+                  journalInput.prop('disabled',true);
+                }
               },
               error: function journalError() {
-                journalInput.attr('value','');
+                journalInput.val('');
                 journalInput.prop('disabled',true);
               }
             });
-
-
           }
         });
       });

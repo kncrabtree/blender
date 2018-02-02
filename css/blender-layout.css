@@ -26,16 +26,20 @@
 #search-container {
   display: grid;
   grid-auto-rows: auto;
-  max-width: 800px;
+  max-width: 650px;
+  max-height: 400px;
   margin:auto;
   position:relative;
   top:50%;
   transform: translate(0%,-50%);
+  overflow-y:auto;
 }
 
 #search-advanced-container {
-  display:grid;
-  grid-auto-rows: auto;
+  max-width:100%;
+  overflow-x: auto;
+  margin: 5px 0px 5px 0px;
+  padding: 5px;
 }
 
 #search-advanced-container h3 {

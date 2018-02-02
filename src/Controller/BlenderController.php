@@ -373,15 +373,31 @@ class BlenderController extends ControllerBase {
     $user = $request->get('user') === 'true' ? true : false;
     $star = $request->get('star') === 'true' ? true : false;
 
+    if(!empty($request->get('min-date')))
+    {
+      try
+      {
+        $search['date_start'] = DrupalDateTime::createFromFormat('Y-m-d',$request->get('min-date'))->format('U');
+      }
+      catch(Exception $e) {}
+    }
+
+    if(!empty($request->get('max-date')))
+    {
+      try
+      {
+        $search['date_end'] = DrupalDateTime::createFromFormat('Y-m-d',$request->get('max-date'))->format('U');
+      }
+      catch(Exception $e) {}
+    }
+
     $search['terms'] = $search_terms;
     $search['type'] = $type;
     $search['user'] = $user;
     $search['star'] = $star;
-    $search['journal'] = $request->get('journal');
-//     $search['date_start'] = NULL;
-//     $search['date_end'] = NULL;
-//     $search['min_article_id'] = 0;
-//     $search['max_star_date'] = NULL;
+    if(!empty($request->get('journal')))
+      $search['journal'] = $request->get('journal');
+
 
     return $this->process_search($search);
   }
@@ -571,9 +587,29 @@ class BlenderController extends ControllerBase {
       $search['type'] = isset($query['search-type']) ? $query['search-type'] : 'or';
       $search['user'] = isset($query['user']) && $query['user'] === 'true' ? true : false;
       $search['star'] = isset($query['star']) && $query['star'] === 'true' ? true : false;
-      $search['journal'] = $query['journal'];
-//     $search['date_start'] = NULL;
-//     $search['date_end'] = NULL;
+
+      if(!empty($query['journal']))
+        $search['journal'] = $query['journal'];
+
+      if(!empty($query['min-date']))
+      {
+        try
+        {
+          $search['date_start'] = DrupalDateTime::createFromFormat('Y-m-d',$query['min-date'])->format('U');
+        }
+        catch(Exception $e) {}
+      }
+
+      if(!empty($query['max-date']))
+      {
+        try
+        {
+          $search['date_end'] = DrupalDateTime::createFromFormat('Y-m-d',$query['max-date'])->format('U');
+        }
+        catch(Exception $e) {}
+      }
+
+
       $search['min_article_id'] = $a_id;
 
       if($search['star'])
