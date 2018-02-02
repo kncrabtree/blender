@@ -142,7 +142,6 @@ class Journal extends ContentEntityBase implements ContentEntityInterface {
     $fields['active'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active?'))
       ->setDescription(t('If active, the feed will be checked daily.'))
-      ->setRequired(TRUE)
       ->setSettings(array(
         'default_value' => TRUE,
       ))

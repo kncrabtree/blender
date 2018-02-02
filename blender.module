@@ -49,7 +49,7 @@ function blender_cron() {
 
   $storage = \Drupal::entityTypeManager()->getStorage('blender_journal');
   $jids = \Drupal::entityQuery('blender_journal')
-    ->condition('active', TRUE, '==')
+    ->condition('active', TRUE)
     ->condition('last_update',\Drupal::time()->getRequestTime()-(24*60*60),'<')
     ->execute();
 
