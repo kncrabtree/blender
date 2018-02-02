@@ -674,6 +674,75 @@
           bg.addClass('visible');
           $('#search-box').focus();
         });
+        var adv = $('#search-advanced')
+        var adv_c = $('#search-advanced-container')
+        adv.click(function advancedSearch() {
+          if(adv.html() === 'Normal')
+          {
+            adv_c.html('');
+            adv.html('Advanced');
+          }
+          else
+          {
+            //build advanced search options
+            var radioDiv = $('<div></div>').addClass('radio-container');
+            var radioLabel = $('<span></span>').addClass('radio-label').html('Match: ');
+            var orButton = $('<span><input type="radio" name="search-type" value="or" checked />Or</span>');
+            var andButton = $('<span><input type="radio" name="search-type" value="and" />And</span>');
+            var exactButton = $('<span><input type="radio" name="search-type" value="exact" />Exact</span>');
+
+            radioDiv.append(radioLabel).append(orButton).append(andButton).append(exactButton);
+
+            adv_c.append(radioDiv);
+
+            adv_c.append($('<h3>Filters</h3>'));
+
+            var filterDiv = $('<div></div>');
+            var userFilter = $('<div class="filter-block"><input type="checkbox" name="user" value="true" />My articles</div>');
+            var starFilter = $('<div class="filter-block"><input type="checkbox" name="star" value="true" />Starred articles</div>');
+            var journalFilter = $('<div></div>').addClass('filter-block');
+            journalFilter.append('<span>Journal: </span>');
+            var jDiv = $('<div id="search-journal-autocomplete"></div>');
+            var journalInput = $('<input type="text" name="journal" id="journal-input" size="50"/>');
+            jDiv.append(journalInput);
+            journalFilter.append(jDiv);
+
+            filterDiv.append(userFilter);
+            filterDiv.append(starFilter);
+            filterDiv.append(journalFilter);
+            adv_c.append(filterDiv);
+
+            adv.html('Normal');
+
+            //get list of journals for autocomplete
+            $.ajax({
+              url: Drupal.url('journals/get-journal-list'),
+              success: function journalList(response) {
+                var journals = response.suggestions;
+                var j_id = -1;
+                $('#journal-input').autocomplete({
+                  lookup: journals,
+                  minchars: 1,
+                  appendTo: $('#search-journal-autocomplete'),
+                  onSelect: function(suggestion) {
+                    j_id = suggestion.data;
+                    journalInput.val(suggestion.value);
+                    $('#search-form').submit( function() {
+                      journalInput.val(j_id);
+                      return true;
+                    });
+                  }
+                });
+              },
+              error: function journalError() {
+                journalInput.attr('value','');
+                journalInput.prop('disabled',true);
+              }
+            });
+
+
+          }
+        });
       });
     }
   };

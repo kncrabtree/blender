@@ -35,6 +35,10 @@
   cursor:pointer;
 }
 
+#search-advanced-container h3 {
+  font-weight: bold;
+}
+
 #recommend-success {
   color: black;
   border: 1px solid rgba(20,150,30,0.87);

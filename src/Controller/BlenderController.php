@@ -369,12 +369,15 @@ class BlenderController extends ControllerBase {
     $search_terms = $request->get('search-text');
     $this->page = "search";
 
+    $type = $request->get('search-type') !== NULL ? $request->get('search-type') : 'or';
+    $user = $request->get('user') === 'true' ? true : false;
+    $star = $request->get('star') === 'true' ? true : false;
 
     $search['terms'] = $search_terms;
-    $search['type'] = 'or';
-    $search['user'] = false;
-    $search['star'] = false;
-//     $search['journal'] = NULL;
+    $search['type'] = $type;
+    $search['user'] = $user;
+    $search['star'] = $star;
+    $search['journal'] = $request->get('journal');
 //     $search['date_start'] = NULL;
 //     $search['date_end'] = NULL;
 //     $search['min_article_id'] = 0;
@@ -415,9 +418,11 @@ class BlenderController extends ControllerBase {
         $c_group = $cq->andConditionGroup();
         foreach($terms as $term)
         {
-          $group->condition('title',$term,'CONTAINS');
-          $group->condition('authors',$term,'CONTAINS');
-          $group->condition('abstract',$term,'CONTAINS');
+          $subgroup = $aq->orConditionGroup();
+          $subgroup->condition('title',$term,'CONTAINS');
+          $subgroup->condition('authors',$term,'CONTAINS');
+          $subgroup->condition('abstract',$term,'CONTAINS');
+          $group->condition($subgroup);
           $c_group->condition('text.value',$term,'CONTAINS');
         }
         $aq->condition($group);
@@ -425,9 +430,11 @@ class BlenderController extends ControllerBase {
       }
       else
       {
-        $aq->condition('title',$search['terms'],'CONTAINS');
-        $aq->condition('authors',$search['terms'],'CONTAINS');
-        $aq->condition('abstract',$search['terms'],'CONTAINS');
+        $group = $aq->orConditionGroup();
+        $group->condition('title',$search['terms'],'CONTAINS');
+        $group->condition('authors',$search['terms'],'CONTAINS');
+        $group->condition('abstract',$search['terms'],'CONTAINS');
+        $aq->condition($group);
         $cq->condition('text.value',$search['terms'],'CONTAINS');
       }
 
@@ -457,6 +464,8 @@ class BlenderController extends ControllerBase {
 
       if($search['star'])
       {
+        $aq->condition('is_starred',true);
+        $cq->condition('article_id.entity:blender_article.is_starred',true);
         if(isset($search['max_star_date']))
         {
           $aq->condition('star_date',$search['max_star_date'],'<');
@@ -559,10 +568,10 @@ class BlenderController extends ControllerBase {
       parse_str(substr($request->request->get('query'),1),$query);
 
       $search['terms'] = $query['search-text'];
-      $search['type'] = 'or';
-      $search['user'] = false;
-      $search['star'] = false;
-//     $search['journal'] = NULL;
+      $search['type'] = isset($query['search-type']) ? $query['search-type'] : 'or';
+      $search['user'] = isset($query['user']) && $query['user'] === 'true' ? true : false;
+      $search['star'] = isset($query['star']) && $query['star'] === 'true' ? true : false;
+      $search['journal'] = $query['journal'];
 //     $search['date_start'] = NULL;
 //     $search['date_end'] = NULL;
       $search['min_article_id'] = $a_id;
@@ -1239,6 +1248,25 @@ class BlenderController extends ControllerBase {
 
     return new JsonResponse($return_data);
 
+  }
+
+  public function get_journal_list() {
+    $q = $this->query_service->get('blender_journal');
+    $ids = $q->sort('title','ASC')->execute();
+
+    $j_list = $this->entityTypeManager()->getStorage('blender_journal')->loadMultiple($ids);
+    $return_data['query'] = 'Unit';
+
+    foreach($j_list as $j)
+    {
+      $str = $j->get('abbr')->value.': '.$j->get('title')->value;
+      $return_data['suggestions'][] = [
+        'value' => $str,
+        'data' => $j->get('id')->value,
+      ];
+    }
+
+    return new JsonResponse($return_data);
   }
 
   public function get_new_inbox() {

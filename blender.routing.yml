@@ -173,6 +173,13 @@ blender.more-articles:
   requirements:
     _permission: 'access blender'
 
+blender.get-journal-list:
+  path: '/journals/get-journal-list'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::get_journal_list'
+  requirements:
+    _permission: 'access blender'
+
 blender.mark-read-if-owner:
   path: '/journals/mark-read-if-owner'
   defaults:

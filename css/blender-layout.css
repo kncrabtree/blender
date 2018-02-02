@@ -33,6 +33,46 @@
   transform: translate(0%,-50%);
 }
 
+#search-advanced-container {
+  display:grid;
+  grid-auto-rows: auto;
+}
+
+#search-advanced-container h3 {
+  margin:0;
+}
+
+#search-advanced-container .radio-container {
+  display:block;
+  padding:5px;
+}
+
+#search-advanced-container .radio-label {
+  margin-right:-20px;
+}
+
+#search-advanced-container .radio-container input {
+  vertical-align:middle;
+  margin-right:0.5em;
+  margin-left:30px;
+}
+
+#search-advanced-container .filter-block {
+  display:inline-block;
+  padding:5px;
+  margin-right:30px;
+}
+
+#search-advanced-container .filter-block input {
+  vertical-align:middle;
+  margin-right:0.5em;
+}
+
+#search-journal-autocomplete {
+  position:relative;
+  display:inline-block
+}
+
 .search-button-container {
   display:grid;
   grid-template-columns: auto 5em;
