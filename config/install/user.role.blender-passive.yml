@@ -6,22 +6,6 @@ dependencies:
   enforced:
     module:
       - blender
-id: blender_active_user
-label: 'Blender Active User'
-description: 'Active users are regularly assigned articles.'
-weight: 0
-is_admin: false
-permissions:
-  - access blender
-
-langcode: en
-status: true
-dependencies:
-  module:
-    - blender
-  enforced:
-    module:
-      - blender
 id: blender_passive_user
 label: 'Blender Passive User'
 description: 'Passive users can comment, share, and vote, but are not assigned articles.'
