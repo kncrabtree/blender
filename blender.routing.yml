@@ -1,3 +1,11 @@
+blender.home:
+  path: '/journals'
+  defaults:
+    _controller: '\Drupal\blender\Controller\BlenderController::home'
+    #_title: 'Inbox'
+  requirements:
+    _permission: 'access blender'
+
 blender.inbox:
   path: '/journals/user/inbox'
   defaults:

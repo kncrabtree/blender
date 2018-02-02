@@ -243,6 +243,27 @@ class BlenderController extends ControllerBase {
     return $render;
   }
 
+  public function home() {
+    //if the user is active, send to inbox.
+    //for a passive user, send to recommendations if they have any
+    //new ones, and to all commented otherwise
+    $user = $this->entityTypeManager()->getStorage('user')->load($this->currentUser()->id());
+
+    if($user->hasRole('blender_active_user'))
+      return $this->inbox();
+
+    $new_recs = $this->query_service->get('blender_recommendation')
+      ->condition('user_id',$this->currentUser()->id())
+      ->condition('new',true)
+      ->count()->execute();
+
+    if($new_recs > 0)
+      return $this->user_recommendations();
+
+    return $this->all_comments();
+
+  }
+
   public function inbox() {
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
