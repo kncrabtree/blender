@@ -251,7 +251,7 @@ class BlenderController extends ControllerBase {
     $user = $this->entityTypeManager()->getStorage('user')->load($this->currentUser()->id());
 
     if($user->hasRole('blender_active_user'))
-      return new RedirectResponse(\Drupal::url('blender.inbox'));
+      return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.inbox')->toString());
 
     $new_recs = $this->query_service->get('blender_recommendation')
       ->condition('user_id',$this->currentUser()->id())
@@ -259,9 +259,9 @@ class BlenderController extends ControllerBase {
       ->count()->execute();
 
     if($new_recs > 0)
-      return new RedirectResponse(\Drupal::url('blender.user-recommendations'));
+      return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-recommendations')->toString());
 
-    return new RedirectResponse(\Drupal::url('blender.all-comments'));
+    return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all-comments')->toString());
 
   }
 
@@ -985,7 +985,7 @@ class BlenderController extends ControllerBase {
       if(!in_array($u->id(),$ineligible))
       {
         $return_data['suggestions'][] = [
-          'value' => ucwords($u->getDisplayName()),
+          'value' => $u->getDisplayName(),
           'data' => $u->id(),
         ];
       }
@@ -1031,34 +1031,48 @@ class BlenderController extends ControllerBase {
       $receiver = $this->entityTypeManager()->getStorage('user')->load($target_user)->get('slack_id')->value;
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
-      $slack['user'] = $receiver;
+      if(isset($receiver))
+      {
+        $slack['user'] = $receiver;
 
-      $reply = $this->post_to_slack('im.open',$slack,true);
-      if(isset($reply['ok']) && $reply['ok'] == true)
-      {
-        $channel = $reply['channel']['id'];
-        $slack2['channel'] = $channel;
-        $slack2['text'] = ucwords($this->currentUser()->getDisplayName()).' shared an article with you.';
-        $slack2['attachments'] = [
-          [
-            "title" => $article->get('title')->value,
-            "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
-            "text" => "Eventually, there will also be a link to the journal system here.",
-          ],
-        ];
-        $response2 = $this->post_to_slack('chat.postMessage',$slack2,true);
-        if(isset($response2['ok']) && $response2['ok'] == false)
+        $reply = $this->post_to_slack('im.open',$slack,true);
+        if(isset($reply['ok']) && $reply['ok'] == true)
         {
-          \Drupal::logger('blender')->warning('Could not post message to user '.$receiver.'. Error: '.$response2['error']);
+          $channel = $reply['channel']['id'];
+          $slack2['channel'] = $channel;
+          $slack2['text'] = $this->currentUser()->getDisplayName().' shared an article from '.$article->get('journal_id')->entity->get('abbr')->value.' with you.';
+          $slack2['attachments'] = [
+            [
+              "title" => $article->get('title')->value,
+              "color" => "good",
+              "actions" => [
+    	        [
+       	          "type" => "button",
+	          "text" => "View Abstract",
+	          "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+	        ],
+	        [
+       	          "type" => "button",
+   	          "text" => "Open in Blender",
+	          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(), 
+	        ],
+              ],
+            ],
+          ];
+          $response2 = $this->post_to_slack('chat.postMessage',$slack2,true);
+          if(isset($response2['ok']) && $response2['ok'] == false)
+          {
+            \Drupal::logger('blender')->warning('Could not post message to user '.$receiver.'. Error: '.$response2['error']);
+          }
         }
-      }
-      else
-      {
-        if(isset($reply['error']))
-          \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. Error: '.$reply['error']);
         else
         {
-          \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. No error message received. WTF?');
+          if(isset($reply['error']))
+            \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. Error: '.$reply['error']);
+          else
+          {
+            \Drupal::logger('blender')->warning('Could not open IM with user '.$receiver.'. No error message received. WTF?');
+          }
         }
       }
 
@@ -1206,16 +1220,29 @@ class BlenderController extends ControllerBase {
 
       //edit comment on slack
       $slack['channel'] = 'C8XGXGBQD';
-      $slack['text'] = ucwords($this->currentUser()->getDisplayName()).' commented on an article. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
+      $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
       $slack['as_user'] = true;
       $slack['ts'] = $c->get('slack_ts')->value;
       $slack['attachments'] = [
         [
           "title" => $article->get('title')->value,
-          "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
           "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+          "color" => "warning",
+          "actions" => [
+	    [
+       	      "type" => "button",
+	      "text" => "View Abstract",
+	      "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+  	    ],
+	    [
+       	      "type" => "button",
+	      "text" => "Open in Blender",
+	      "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(), 
+  	    ],
+          ],
         ],
       ];
+      
 
       $reply = $this->post_to_slack('chat.update',$slack);
       if(isset($reply['ok']) && $reply['ok'] == true)
@@ -1283,12 +1310,24 @@ class BlenderController extends ControllerBase {
 
     //send comment to slack; get TS ID for use with editing
     $slack['channel'] = 'C8XGXGBQD';
-    $slack['text'] = ucwords($this->currentUser()->getDisplayName()).' commented on an article.';
+    $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
     $slack['attachments'] = [
       [
         "title" => $article->get('title')->value,
-        "title_link" => 'http://dx.doi.org/'.$article->get('doi')->value,
         "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+        "color" => "good",
+        "actions" => [
+	  [
+       	    "type" => "button",
+	    "text" => "View Abstract",
+	    "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+	  ],
+	  [
+       	    "type" => "button",
+	    "text" => "Open in Blender",
+	    "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(), 
+	  ],
+        ],
       ],
     ];
 

@@ -13,7 +13,7 @@
 
 {% if articles %}
 {% for a in articles %}
-  <div class="article{% if not (a.is_owner or a.is_recommendation) %} other{% endif %}{% if articles|length == 1 %} expanded{% endif %}{% if (a.is_owner or a.is_recommendation) and a.new %} new{% endif %}" id="article-{{ a.id }}">
+  <div class="article{% if not (a.is_owner or a.is_recommendation) %} other{% endif %}{% if (a.is_owner or a.is_recommendation) and a.new %} new{% endif %}" id="article-{{ a.id }}">
     <div class="article-display">
 
 
@@ -58,9 +58,9 @@
         <span class="article-metadata">{{ a.authors }}. <a href="http://dx.doi.org/{{ a.doi }}" target="_BLANK">{{ a.journal }} ({{ a.year }}){% if a.volume %}  <span class = "article-volume">{{ a.volume }}</span>{% endif %}{% if a.pages %}, {{ a.pages }}{% endif %}.</a>
         <br />
         {% if a.is_recommendation %}
-          Recommended by {{ a.rec_sender|title }} on {{ a.rec_timestamp }}.
+          Recommended by {{ a.rec_sender }} on {{ a.rec_timestamp }}.
         {% else %}
-          Assigned to {{ a.owner|title }} on {{ a.date_added }}.
+          Assigned to {{ a.owner }} on {{ a.date_added }}.
         {% endif %}
         {% if a.is_starred %} Starred on {{ a.star_date }}.{% endif %}</span>
       </div>
@@ -103,7 +103,7 @@
     </div>
 
 
-    <div class="article-comment-box {% if articles|length == 1 %} visible{% endif %}">
+    <div class="article-comment-box">
       <div class="comments-wrapper" id="comment_display-{{ a.id }}"></div>
       <div class="comment-add" id="add_comment-{{ a.id }}">
           <i class="material-icons md-dark icon clickable">add_circle</i>
