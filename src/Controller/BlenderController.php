@@ -846,7 +846,7 @@ class BlenderController extends ControllerBase {
       $slack['attachments'] = [
         [
           "title" => $article->get('title')->value,
-          "text" => "Total votes: ".$return_data['count'],
+          "text" => "Total votes: ".$vc,
           "color" => "#0000FF",
           "actions" => [
             [
@@ -926,7 +926,7 @@ class BlenderController extends ControllerBase {
         {
           $slack['channel'] = 'C8XGXGBQD';
           $slack['as_user'] = true;
-          $slack['ts'] = $c->get('slack_ts')->value;
+          $slack['ts'] = $vote->get('slack_ts')->value;
           $this->post_to_slack('chat.delete',$slack);
         }
         $vote->delete();
