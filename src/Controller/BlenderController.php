@@ -1084,16 +1084,16 @@ class BlenderController extends ControllerBase {
               "title" => $article->get('title')->value,
               "color" => "good",
               "actions" => [
-    	        [
+                [
        	          "type" => "button",
-	          "text" => "View Abstract",
-	          "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-	        ],
-	        [
+                  "text" => "View Abstract",
+                  "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+                ],
+                [
        	          "type" => "button",
-   	          "text" => "Open in Blender",
-	          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
-	        ],
+                  "text" => "Open in Blender",
+                  "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+                ],
               ],
             ],
           ];

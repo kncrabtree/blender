@@ -119,11 +119,63 @@ function blender_cron() {
         $a->set('star_date',$ts+$offset);
         $a->set('preserve',true);
         $a->save();
-  
+
+        $slack['attachments'][] = [
+          "title" => $a->get('title')->value,
+          "color" => "#FFAF1D",
+          "fields" => [
+            [
+              "title" => "Assigned to",
+              "value" => $a->get('user_id')->entity->getDisplayName(),
+              "short" => true,
+            ],
+            [
+              "title" => "Total Votes",
+              "value" => $c['article_id_count'],
+              "short" => true,
+            ],
+          ],
+          "actions" => [
+            [
+              "type" => "button",
+              "text" => "View Abstract",
+              "url" => 'http://dx.doi.org/'.$a->get('doi')->value,
+            ],
+            [
+              "type" => "button",
+              "text" => "Open in Blender",
+              "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a->get('id')->value, ],[ 'absolute' => true, ])->toString(),
+            ],
+          ],
+        ];
+
         $offset++;
       }
+
       //post to slack
-      
+      $slack['channel'] = 'C8XGXGBQD';
+      $txt = 'The following article';
+      if($count($candidates) > 1)
+        $txt.= 's have ';
+      else
+        $txt.= ' has ';
+      $txt.='been selected for discussion at the next group meeting.';
+      $slack['text'] = $txt;
+
+      $url = 'https://slack.com/api/chat.postMessage';
+      $headers['Content-type'] = 'application/json';
+      $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+
+      $response = $this->http_client->request('POST',$url, [
+        'headers' => $headers,
+        'body' => json_encode($slack)
+      ]);
+
+      if($response->getStatusCode() != 200)
+      {
+        \Drupal::logger('blender')->warning("Received error code ".$response->getStatusCode()," when posting starred articles to Slack (url = ".$url.").");
+      }
+
     }
   }
 
