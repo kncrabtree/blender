@@ -9,6 +9,7 @@ use Drupal\user;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception;
 use Drupal\Component\Datetime\Time;
@@ -250,7 +251,7 @@ class BlenderController extends ControllerBase {
     $user = $this->entityTypeManager()->getStorage('user')->load($this->currentUser()->id());
 
     if($user->hasRole('blender_active_user'))
-      return $this->inbox();
+      return new RedirectResponse(\Drupal::url('blender.inbox'));
 
     $new_recs = $this->query_service->get('blender_recommendation')
       ->condition('user_id',$this->currentUser()->id())
@@ -258,9 +259,9 @@ class BlenderController extends ControllerBase {
       ->count()->execute();
 
     if($new_recs > 0)
-      return $this->user_recommendations();
+      return new RedirectResponse(\Drupal::url('blender.user-recommendations'));
 
-    return $this->all_comments();
+    return new RedirectResponse(\Drupal::url('blender.all-comments'));
 
   }
 
