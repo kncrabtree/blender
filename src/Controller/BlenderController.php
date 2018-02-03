@@ -829,13 +829,43 @@ class BlenderController extends ControllerBase {
     $return_data = $this->mark_read($a_id,$request->request->get('origin'));
 
     $return_data['article_id'] = $a_id;
+    $vc = $this->get_vote_count($a_id);
 
     if(count($vl) == 0)
     {
       //add vote to system
+      $vc++;
       $vote = $vs->create();
       $vote->set('user_id',$user->id());
       $vote->set('article_id',$a_id);
+      $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
+
+      //post to Slack
+      $slack['channel'] = 'C8XGXGBQD';
+      $slack['text'] = $this->currentUser()->getDisplayName().' voted for an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
+      $slack['attachments'] = [
+        [
+          "title" => $article->get('title')->value,
+          "text" => "Total votes: ".$return_data['count'],
+          "color" => "#0000FF",
+          "actions" => [
+            [
+              "type" => "button",
+              "text" => "View Abstract",
+              "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+            ],
+            [
+              "type" => "button",
+              "text" => "Open in Blender",
+              "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+            ],
+          ],
+        ],
+      ];
+
+      $reply = $this->post_to_slack('chat.postMessage',$slack);
+      if(isset($reply['ok']) && $reply['ok'] == true)
+        $vote->set('slack_ts',$reply['ts']);
       $vote->save();
       $return_data['vote_added'] = true;
     }
@@ -853,7 +883,7 @@ class BlenderController extends ControllerBase {
 
     $this->check_article_preserve($a_id);
 
-    $return_data['count'] = $this->get_vote_count($a_id);
+    $return_data['count'] = $vc;
 
     return new JsonResponse($return_data);
 
@@ -891,6 +921,14 @@ class BlenderController extends ControllerBase {
         $return_data['vote_removed'] = false;
       else
       {
+        //remove from Slack if it's there
+        if(isset($vote->get('slack_ts')->value))
+        {
+          $slack['channel'] = 'C8XGXGBQD';
+          $slack['as_user'] = true;
+          $slack['ts'] = $c->get('slack_ts')->value;
+          $this->post_to_slack('chat.delete',$slack);
+        }
         $vote->delete();
         $return_data['vote_removed'] = true;
       }
@@ -1054,7 +1092,7 @@ class BlenderController extends ControllerBase {
 	        [
        	          "type" => "button",
    	          "text" => "Open in Blender",
-	          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(), 
+	          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
 	        ],
               ],
             ],
@@ -1237,12 +1275,12 @@ class BlenderController extends ControllerBase {
 	    [
        	      "type" => "button",
 	      "text" => "Open in Blender",
-	      "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(), 
+	      "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
   	    ],
           ],
         ],
       ];
-      
+
 
       $reply = $this->post_to_slack('chat.update',$slack);
       if(isset($reply['ok']) && $reply['ok'] == true)
@@ -1272,10 +1310,13 @@ class BlenderController extends ControllerBase {
     $this->check_article_preserve($c->get('article_id')->target_id);
 
     //delete comment on slack
-    $slack['channel'] = 'C8XGXGBQD';
-    $slack['as_user'] = true;
-    $slack['ts'] = $c->get('slack_ts')->value;
-    $this->post_to_slack('chat.delete',$slack);
+    if(isset($c->get('slack_ts')->value))
+    {
+      $slack['channel'] = 'C8XGXGBQD';
+      $slack['as_user'] = true;
+      $slack['ts'] = $c->get('slack_ts')->value;
+      $this->post_to_slack('chat.delete',$slack);
+    }
 
     $c->delete();
     $return_data['success'] = true;
@@ -1325,7 +1366,7 @@ class BlenderController extends ControllerBase {
 	  [
        	    "type" => "button",
 	    "text" => "Open in Blender",
-	    "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(), 
+	    "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
 	  ],
         ],
       ],

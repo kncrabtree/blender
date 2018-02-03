@@ -47,6 +47,11 @@ class BlenderVote extends ContentEntityBase implements ContentEntityInterface {
       ->setDescription(t('Article voted on.'))
       ->setSetting('target_type','blender_article');
 
+    $fields['slack_ts'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Slack TS'))
+      ->setDescription(t('Slack post timestamp ID for this vote.'))
+      ->setRequired(false);
+
     return $fields;
   }
 
