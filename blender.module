@@ -66,31 +66,16 @@ function blender_cron() {
   //purge articles more than 180 days old that are not starred or preserved
   $a_ids = \Drupal::entityQuery('blender_article')
     ->condition('is_starred',0)
-    ->condition('date_added',\Drupal::time()->getRequestTime()-(24*60*60*7),'<')
+    ->condition('date_added',\Drupal::time()->getRequestTime()-(24*60*60*180),'<')
     ->condition('preserve',0)
     ->execute();
 
 
-//   $articles = \Drupal::entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
-//   foreach($articles as $a)
-//     $a->delete();
+  $articles = \Drupal::entityTypeManager()->getStorage('blender_article')->loadMultiple($a_ids);
+  foreach($articles as $a)
+    $a->delete();
 
   \Drupal::logger('blender')->notice("Deleted ".count($a_ids)." old articles.");
-
-//   $client = \Drupal::httpClient();
-//   $url = 'https://slack.com/api/chat.postMessage';
-//   $headers['Content-type'] = 'application/json';
-//   $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
-//
-//   $slack['channel'] = 'C8XGXGBQD';
-//   $slack['text'] = 'Testing message post. There are '.count($a_ids).' articles pending deletion.';
-//
-//   $response = $client->request('POST',$url, [
-//     'headers' => $headers,
-//     'body' => json_encode($slack)
-//   ]);
-//
-//   \Drupal::logger('blender')->notice("Slack Web API response: ".$response->getBody());
 
 
   //see if any articles have been starred within the last week
@@ -115,24 +100,31 @@ function blender_cron() {
 
     \Drupal::logger('blender')->notice("Found ".count($candidates)." articles to star.");
 
-//     foreach($candidates as $c)
-//     {
-//
-      //Debugging statements
-//       $str = "";
-//       foreach($c as $key=>$value)
-//         $str .= ' '.$key.': '.$value.', ';
-//       \Drupal::logger('blender')->notice($str);
+    if($count($candidates) > 0)
+    {
+      $offset = 0;
+      $timestamp = \Drupal::time()->getRequestTime();
+      foreach($candidates as $c)
+      {
+
+        //Debugging statements
+//         $str = "";
+//         foreach($c as $key=>$value)
+//           $str .= ' '.$key.': '.$value.', ';
+//         \Drupal::logger('blender')->notice($str);
 
         ///TODO: if selecting 2 articles, make timestamps 1 second different
-//       $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
-//       $a->set('is_starred',true);
-//       $a->set('star_date',\Drupal::time()->getRequestTime());
-//       $a->set('preserve',true);
-//       $a->save();
-//
-//       ///TODO: post selected article to Slack
-//     }
+        $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
+        $a->set('is_starred',true);
+        $a->set('star_date',$ts+$offset);
+        $a->set('preserve',true);
+        $a->save();
+  
+        $offset++;
+      }
+      //post to slack
+      
+    }
   }
 
 }
