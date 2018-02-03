@@ -1,4 +1,4 @@
-.badge {
+.blender-badge {
   display:inline-block;
   position: absolute;
   visibility: hidden;
@@ -12,40 +12,42 @@
   text-align:center;
   min-width:10px;
   margin:2px;
+  max-height:10pt;
+  line-height: 8pt;
 }
 
-.badge.visible {
+.blender-badge.visible {
   visibility: visible;
 }
 
-.badge.bottom {
+.blender-badge.bottom {
   bottom:0;
 }
 
-.badge.top {
+.blender-badge.top {
   top:0;
 }
 
-.badge.left {
+.blender-badge.left {
   left:0;
 }
 
-.badge.right {
+.blender-badge.right {
   right:0;
 }
 
-.badge.bottom-icon {
+.blender-badge.bottom-icon {
   bottom:-6px;
 }
 
-.badge.top-icon {
+.blender-badge.top-icon {
   top:6px;
 }
 
-.badge.left-icon {
+.blender-badge.left-icon {
   left:-6px;
 }
 
-.badge.right-icon {
+.blender-badge.right-icon {
   right:6px;
 }

@@ -20,30 +20,30 @@
       <div class="article-icons left">
         {% if a.is_owner %}
           <i class="material-icons md-dark clickable icon done-icon{% if not a.inbox %} archive{% endif %}" id="done-{{ a.id }}">
-            <div class="tooltip">
+            <div class="blender-tooltip">
               done
-              <span class="tooltiptext top right" id="donetooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
+              <span class="blender-tooltiptext top right" id="done-tooltip-{{ a.id }}">{% if a.inbox %}Mark as done{% else %}Move to inbox{% endif %}</span>
             </div>
           </i>
         {% else %}
           <i class="icon"></i>
         {% endif %}
         <i class="material-icons md-dark clickable icon bookmark-icon{% if a.bookmark %} bookmarked{% endif %}" id="bookmark-{{ a.id }}">
-          <div class="tooltip">
-            <span class="icon-name">
+          <div class="blender-tooltip">
+            <span class="blender-icon-name">
             {% if a.bookmark %}
               bookmark
             {% else %}
               bookmark_border
             {% endif %}
             </span>
-            <span class="tooltiptext bottom right" id="bookmarktooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
+            <span class="blender-tooltiptext bottom right" id="bookmark-tooltip-{{ a.id }}">{% if a.bookmark %}Remove bookmark{% else %}Add bookmark{% endif %}</span>
           </div>
         </i>
         <i class="material-icons md-dark clickable icon comment-icon" id="commenticon-{{ a.id }}">
-          <div class="tooltip">
+          <div class="blender-tooltip">
             comment
-            <div class="badge{% if a.num_comments > 0 %} visible{% endif %} bottom-icon left-icon" id="comment_count-{{ a.id }}">{{ a.num_comments }}</div>
+            <div class="blender-badge{% if a.num_comments > 0 %} visible{% endif %} bottom-icon left-icon" id="comment_count-{{ a.id }}">{{ a.num_comments }}</div>
           </div>
         </i>
 
@@ -73,9 +73,9 @@
           <i class="icon"></i>
         {% endif %}
         <i class="material-icons md-dark clickable icon options-icon">
-          <div class="tooltip">
+          <div class="blender-tooltip">
             menu
-            <span class="tooltiptext bottom left">More actions</span>
+            <span class="blender-tooltiptext bottom left">More actions</span>
           </div>
           <div class="article-actions-container">
             <div class="article-actions-menu" id="menu-{{ a.id }}" tabindex="1">
@@ -93,10 +93,10 @@
           </div>
         </i>
         <i class="material-icons md-dark icon{% if not a.is_starred %} clickable vote-icon{% else %} vote-icon-disabled{% endif %}{% if a.voted %} voted{% endif %}" id="vote-{{ a.id }}">
-          <div class="tooltip">
+          <div class="blender-tooltip">
             plus_one
-            <span class="tooltiptext bottom left" id="votetooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
-            <div class="badge left-icon bottom-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
+            <span class="blender-tooltiptext bottom left" id="vote-tooltip-{{ a.id }}">{% if a.voted %}Remove vote{% else %}Add vote{% endif %}</span>
+            <div class="blender-badge left-icon bottom-icon{% if a.num_votes>0 %} visible{% endif %}" id="vote_count-{{ a.id }}">{{ a.num_votes }}</div>
           </div>
         </i>
       </div>

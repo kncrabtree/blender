@@ -1,8 +1,8 @@
-.tooltip {
+.blender-tooltip {
     position: relative;
 }
 
-.tooltiptext {
+.blender-tooltiptext {
     visibility: hidden;
     min-width: 100px;
     max-width: 300px;
@@ -20,23 +20,23 @@
     font-weight: normal;
 }
 
-.tooltiptext.left {
+.blender-tooltiptext.left {
   right: 100%;
 }
 
-.tooltiptext.right {
+.blender-tooltiptext.right {
   left: 100%;
 }
 
-.tooltiptext.top {
+.blender-tooltiptext.top {
   bottom: 100%;
 }
 
-.tooltiptext.bottom {
+.blender-tooltiptext.bottom {
   top: 100%;
 }
 
-.tooltip:hover .tooltiptext {
+.blender-tooltip:hover .blender-tooltiptext {
     visibility: visible;
     opacity: 1;
 }

@@ -62,12 +62,12 @@
             success: function(response) {
               if(response.bookmark)
               {
-                $('#bookmark-'+aid).find("span.icon-name").html("bookmark");
+                $('#bookmark-'+aid).find("span.blender-icon-name").html("bookmark");
                 $('#bookmark-'+aid).find("span.tooltiptext").html("Remove bookmark");
               }
               else
               {
-                $('#bookmark-'+aid).find("span.icon-name").html("bookmark_border");
+                $('#bookmark-'+aid).find("span.blender-icon-name").html("bookmark_border");
                 $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
               }
               $('#bookmark-'+aid).toggleClass('bookmarked');
@@ -429,8 +429,8 @@
   Drupal.behaviors.addCommentBehavior = {
     attach: function (context, settings) {
       // Enable local plugins
-      CKEDITOR.plugins.addExternal( 'texzilla', '/journals/drupal/modules/custom/blender/ckeditor-plugins/texzilla/src/' );
-      CKEDITOR.plugins.addExternal( 'emojione', '/journals/drupal/modules/custom/blender/ckeditor-plugins/emojione/' );
+      CKEDITOR.plugins.addExternal( 'texzilla', '/modules/custom/blender/ckeditor-plugins/texzilla/src/' );
+      CKEDITOR.plugins.addExternal( 'emojione', '/modules/custom/blender/ckeditor-plugins/emojione/' );
       $('.comment-add', context).once('addCommentBehavior').each(function () {
         var aid = $(this).parents('.article').attr('id').split('-')[1];
         $(this).click(function(event) {
