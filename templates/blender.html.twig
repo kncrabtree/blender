@@ -54,67 +54,67 @@
     <div class="blender-navigation-item{% if page is same as('inbox') %} selected{% endif %} blender-tooltip">
         <i class="material-icons md-dark icon clickable inbox-nav-icon{% if page is same as('inbox') %} selected{% endif %}">markunread</i>
         <div class="blender-badge{% if inbox_new > 0 %} visible{% endif %} bottom right" id="inbox-new-count">{{ inbox_new }}</div>
-        <span class="blender-tooltiptext bottom">View articles in inbox.</span>
+        <span class="blender-tooltiptext top">View articles in inbox.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-recommendations') }}">
     <div class="blender-navigation-item{% if page is same as('user-recommendations') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable rec-nav-icon{% if page is same as('user-recommendations') %} selected{% endif %}">share</i>
       <div class="blender-badge{% if recommend_new > 0 %} visible{% endif %} bottom right" id="recommend-new-count">{{ recommend_new }}</div>
-      <span class="blender-tooltiptext bottom">View articles shared with you.</span>
+      <span class="blender-tooltiptext top">View articles shared with you.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-bookmarks') }}">
     <div class="blender-navigation-item{% if page is same as('bookmarks') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable bookmark-nav-icon{% if page is same as('bookmarks') %} selected{% endif %}">bookmark</i>
-      <span class="blender-tooltiptext bottom">View bookmarked articles.</span>
+      <span class="blender-tooltiptext top">View bookmarked articles.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-comments') }}">
     <div class="blender-navigation-item{% if page is same as('user-comments') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable comment-nav-icon{% if page is same as('user-comments') %} selected{% endif %}">comment</i>
-      <span class="blender-tooltiptext bottom">View articles you have commented on.</span>
+      <span class="blender-tooltiptext top">View articles you have commented on.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-votes') }}">
     <div class="blender-navigation-item{% if page is same as('user-votes') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable vote-nav-icon{% if page is same as('user-votes') %} selected{% endif %}">plus_one</i>
-      <span class="blender-tooltiptext bottom">View articles you have voted for.</span>
+      <span class="blender-tooltiptext top">View articles you have voted for.</span>
     </div>
   </a>
   <a href="{{ url('blender.user-archive') }}">
     <div class="blender-navigation-item{% if page is same as('user-archive') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable archive-nav-icon{% if page is same as('user-archive') %} selected{% endif %}">done</i>
-      <span class="blender-tooltiptext bottom">View all articles assigned to you.</span>
+      <span class="blender-tooltiptext top">View all articles assigned to you.</span>
     </div>
   </a>
   <a href="{{ url('blender.starred') }}">
     <div class="blender-navigation-item{% if page is same as('starred') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable star-nav-icon{% if page is same as('starred') %} selected{% endif %}">star</i>
-      <span class="blender-tooltiptext bottom">View all starred articles.</span>
+      <span class="blender-tooltiptext top">View all starred articles.</span>
     </div>
   </a>
   <a href="{{ url('blender.all-comments') }}">
     <div class="blender-navigation-item{% if page is same as('all-comments') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable comment-nav-icon{% if page is same as('comments') %} selected{% endif %}">question_answer</i>
-      <span class="blender-tooltiptext bottom">View all commented articles.</span>
+      <span class="blender-tooltiptext top">View all commented articles.</span>
     </div>
   </a>
   <a href="{{ url('blender.all-votes') }}">
     <div class="blender-navigation-item{% if page is same as('votes') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable vote-nav-icon{% if page is same as('votes') %} selected{% endif %}">group_add</i>
-      <span class="blender-tooltiptext bottom">View all articles with votes.</span>
+      <span class="blender-tooltiptext top">View all articles with votes.</span>
     </div>
   </a>
   <a href="{{ url('blender.all') }}">
     <div class="blender-navigation-item{% if page is same as('archive') %} selected{% endif %} blender-tooltip">
       <i class="material-icons md-dark icon clickable archive-nav-icon{% if page is same as('archive') %} selected{% endif %}">archive</i>
-      <span class="blender-tooltiptext bottom">View all articles.</span>
+      <span class="blender-tooltiptext top">View all articles.</span>
     </div>
   </a>
   <div class="blender-navigation-item{% if page is same as('search') %} selected{% endif %} blender-tooltip" id="blender-search">
     <i class="material-icons md-dark icon clickable search-nav-icon{% if page is same as('search') %} selected{% endif %}">search</i>
-    <span class="blender-tooltiptext bottom">Search articles.</span>
+    <span class="blender-tooltiptext top">Search articles.</span>
   </div>
 </div>
 

@@ -847,7 +847,7 @@ class BlenderController extends ControllerBase {
         [
           "title" => $article->get('title')->value,
           "text" => "Total votes: ".$vc,
-          "color" => "#0000FF",
+          "color" => "#ce0610",
           "actions" => [
             [
               "type" => "button",
@@ -1265,7 +1265,7 @@ class BlenderController extends ControllerBase {
         [
           "title" => $article->get('title')->value,
           "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
-          "color" => "warning",
+          "color" => "#a000c4",
           "actions" => [
 	    [
        	      "type" => "button",

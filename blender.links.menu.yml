@@ -1,41 +1,47 @@
 entity.blender_journal.collection:
   title: 'View All Journals'
   route_name: entity.blender_journal.collection
-  description: 'List information about all journals in the system.'
+  description: 'List information about all journals in the blender.'
   weight: 100
 
-blender.inbox:
-  title: 'Inbox'
-  route_name: blender.inbox
-  description: 'View assigned articles'
-  weight: 10
+blender.home:
+  title: 'Blender'
+  route_name: blender.home
+  description: 'Access journal blender'
+  weight: -10
 
-blender.user_bookmarks:
-  title: 'My Bookmarks'
-  route_name: blender.user-bookmarks
-  description: 'View your bookmarked articles.'
-  weight: 11
+#blender.inbox:
+#  title: 'Inbox'
+#  route_name: blender.inbox
+#  description: 'View assigned articles'
+#  weight: 10
 
-blender.user_votes:
-  title: 'My Votes'
-  route_name: blender.user-votes
-  description: 'View articles you have voted for.'
-  weight: 12
-
-blender.user_all:
-  title: 'My Articles'
-  route_name: blender.user-archive
-  description: 'View all of your articles in the system.'
-  weight: 13
-
-blender.all_votes:
-  title: 'All Votes'
-  route_name: blender.all-votes
-  description: 'View all articles that have votes.'
-  weight: 20
-
-blender.all:
-  title: 'All Articles'
-  route_name: blender.all
-  description: 'View all articles in the system.'
-  weight: 21
+#blender.user_bookmarks:
+#  title: 'My Bookmarks'
+#  route_name: blender.user-bookmarks
+#  description: 'View your bookmarked articles.'
+#  weight: 11
+#
+#blender.user_votes:
+#  title: 'My Votes'
+#  route_name: blender.user-votes
+#  description: 'View articles you have voted for.'
+#  weight: 12
+#
+#blender.user_all:
+#  title: 'My Articles'
+#  route_name: blender.user-archive
+#  description: 'View all of your articles in the system.'
+#  weight: 13
+#
+#blender.all_votes:
+#  title: 'All Votes'
+#  route_name: blender.all-votes
+#  description: 'View all articles that have votes.'
+#  weight: 20
+#
+#blender.all:
+#  title: 'All Articles'
+#  route_name: blender.all
+#  description: 'View all articles in the system.'
+#  weight: 21

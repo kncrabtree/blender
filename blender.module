@@ -100,7 +100,7 @@ function blender_cron() {
 
     \Drupal::logger('blender')->notice("Found ".count($candidates)." articles to star.");
 
-    if($count($candidates) > 0)
+    if(count($candidates) > 0)
     {
       $offset = 0;
       $timestamp = \Drupal::time()->getRequestTime();
@@ -116,7 +116,7 @@ function blender_cron() {
         ///TODO: if selecting 2 articles, make timestamps 1 second different
         $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
         $a->set('is_starred',true);
-        $a->set('star_date',$ts+$offset);
+        $a->set('star_date',$timestamp+$offset);
         $a->set('preserve',true);
         $a->save();
 
@@ -127,6 +127,11 @@ function blender_cron() {
             [
               "title" => "Assigned to",
               "value" => $a->get('user_id')->entity->getDisplayName(),
+              "short" => true,
+            ],
+            [
+              "title" => "Journal",
+              "value" => $a->get('journal_id')->entity->get('abbr')->value,
               "short" => true,
             ],
             [
@@ -155,7 +160,7 @@ function blender_cron() {
       //post to slack
       $slack['channel'] = 'C8XGXGBQD';
       $txt = 'The following article';
-      if($count($candidates) > 1)
+      if(count($candidates) > 1)
         $txt.= 's have ';
       else
         $txt.= ' has ';
@@ -166,7 +171,7 @@ function blender_cron() {
       $headers['Content-type'] = 'application/json';
       $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
 
-      $response = $this->http_client->request('POST',$url, [
+      $response = \Drupal::httpClient()->request('POST',$url, [
         'headers' => $headers,
         'body' => json_encode($slack)
       ]);

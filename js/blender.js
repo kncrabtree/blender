@@ -21,7 +21,7 @@
               {
                 $('#article-'+aid).removeClass('new');
                 if(cls.includes("archive"))
-                  $('#donetooltip-'+aid).html("Mark as done");
+                  $('#done-tooltip-'+aid).html("Mark as done");
                 else
                   $('#donetooltip-'+aid).html("Move to inbox");
                 $('#done-'+aid).toggleClass('archive');
@@ -63,12 +63,12 @@
               if(response.bookmark)
               {
                 $('#bookmark-'+aid).find("span.blender-icon-name").html("bookmark");
-                $('#bookmark-'+aid).find("span.tooltiptext").html("Remove bookmark");
+                $('#bookmark-'+aid).find("span.blender-tooltiptext").html("Remove bookmark");
               }
               else
               {
                 $('#bookmark-'+aid).find("span.blender-icon-name").html("bookmark_border");
-                $('#bookmark-'+aid).find("span.tooltiptext").html("Add bookmark");
+                $('#bookmark-'+aid).find("span.blender-tooltiptext").html("Add bookmark");
               }
               $('#bookmark-'+aid).toggleClass('bookmarked');
               if(response.new_inbox > 0)
@@ -118,11 +118,11 @@
                 $('#vote-'+aid).toggleClass('voted');
               if(response.vote_added)
               {
-                $('#vote-'+aid).find("span.tooltiptext").html("Remove vote");
+                $('#vote-'+aid).find("span.blender-tooltiptext").html("Remove vote");
               }
               if(response.vote_removed)
               {
-                $('#vote-'+aid).find("span.tooltiptext").html("Add vote");
+                $('#vote-'+aid).find("span.blender-tooltiptext").html("Add vote");
               }
               if(cls.includes("voted") && !response.vote_removed)
                 alert("You cannot remove your vote from this article.");
