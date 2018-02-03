@@ -81,12 +81,12 @@
             <div class="article-actions-menu" id="menu-{{ a.id }}" tabindex="1">
               {% if a.is_owner or a.is_recommendation %}
                 <div class="article-actions-menu-item unread-action">
-                  <i class="material-icons md-dark icon unread-icon">markunread</i>
+                  <i class="material-icons md-dark icon clickable unread-icon">markunread</i>
                   <span class="article-actions-menu-item-desc">Keep unread</span>
                 </div>
               {% endif %}
               <div class="article-actions-menu-item share-action">
-                <i class="material-icons md-dark icon share-icon">share</i>
+                <i class="material-icons md-dark icon clickable share-icon">share</i>
                 <span class="article-actions-menu-item-desc">Recommend article</span>
               </div>
             </div>

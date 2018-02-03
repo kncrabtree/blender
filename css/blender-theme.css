@@ -227,6 +227,10 @@
   background: rgba(0,0,0,0.13);
 }
 
+.article-actions-menu-item:hover .material-icons.md-dark.icon {
+  color: rgba(0,0,0,0.87);
+}
+
 .article-actions-menu-item-desc {
   font-size: 12pt;
   font-family: Sans-serif;
