@@ -37,7 +37,8 @@ class JournalForm extends ContentEntityForm {
 
     $this->entity->set('last_num_articles',0);
     $this->entity->set('queued_time',0);
-    $this->entity->set('last_update',REQUEST_TIME);
+    if(!isset($this->entity->get('last_update')->value))
+      $this->entity->set('last_update',0);
     $entity = $this->entity;
 
 
