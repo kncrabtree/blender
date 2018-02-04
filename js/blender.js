@@ -486,6 +486,7 @@
               editor.val('');
             });
           }, {
+            customConfig: '/modules/custom/blender/js/ckeditor-config.js',
             extraPlugins: 'texzilla,emojione'
           });
         });
@@ -568,6 +569,7 @@
                   });
                 },
                 {
+                  customConfig: '/modules/custom/blender/js/ckeditor-config.js',
                   extraPlugins: 'texzilla,emojione'
                 });
               });
