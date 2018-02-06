@@ -34,3 +34,10 @@ ckeditor:
     https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js: { type: external }
     https://cdn.ckeditor.com/4.8.0/standard/adapters/jquery.js: { type: external }
 
+mathjax:
+  remote: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML
+  license:
+    name: GPL 3.0
+    url: http://www.gnu.org/licenses/gpl.html
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML: { type: external }

@@ -237,6 +237,7 @@ class BlenderController extends ControllerBase {
           'blender/blender',
           'blender/google.icons',
           'blender/ckeditor',
+          'blender/mathjax',
         ),
       );
     }

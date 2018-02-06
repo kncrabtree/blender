@@ -247,7 +247,11 @@
                 else
                   $('#comment_count-'+aid).addClass('visible');
                 Drupal.attachBehaviors();
+                $('.math-tex').each( function (el) {
+                  MathJax.Hub.Queue(["Typeset",MathJax.Hub,el[0]]);
+                });
                 comment.slideDown(100, function(){ $(this).toggleClass('visible'); });
+
               }
             });
           }
@@ -429,7 +433,7 @@
   Drupal.behaviors.addCommentBehavior = {
     attach: function (context, settings) {
       // Enable local plugins
-      CKEDITOR.plugins.addExternal( 'texzilla', '/modules/custom/blender/ckeditor-plugins/texzilla/src/' );
+      CKEDITOR.plugins.addExternal( 'mathjax', '/modules/custom/blender/ckeditor-plugins/mathjax/' );
       CKEDITOR.plugins.addExternal( 'emojione', '/modules/custom/blender/ckeditor-plugins/emojione/' );
       $('.comment-add', context).once('addCommentBehavior').each(function () {
         var aid = $(this).parents('.article').attr('id').split('-')[1];
@@ -473,6 +477,9 @@
                         else
                           $('#comment_count-'+aid).addClass('visible');
                         Drupal.attachBehaviors();
+                        $('.math-tex').each( function (el) {
+                          MathJax.Hub.Queue(["Typeset",MathJax.Hub,el[0]]);
+                        });
                       }
                     });
                   }
@@ -487,7 +494,8 @@
             });
           }, {
             customConfig: '/modules/custom/blender/js/ckeditor-config.js',
-            extraPlugins: 'texzilla,emojione'
+            extraPlugins: 'mathjax,emojione',
+            mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML'
           });
         });
       });
@@ -562,6 +570,9 @@
                             else
                               $('#comment_count-'+aid).addClass('visible');
                             Drupal.attachBehaviors();
+                            $('.math-tex').each( function (el) {
+                              MathJax.Hub.Queue(["Typeset",MathJax.Hub,el[0]]);
+                            });
                           }
                         });
                       }
@@ -570,7 +581,8 @@
                 },
                 {
                   customConfig: '/modules/custom/blender/js/ckeditor-config.js',
-                  extraPlugins: 'texzilla,emojione'
+                  extraPlugins: 'mathjax,emojione',
+                  mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML'
                 });
               });
             }
@@ -633,6 +645,9 @@
                     else
                       $('#comment_count-'+aid).addClass('visible');
                     Drupal.attachBehaviors();
+                    $('.math-tex').each( function (el) {
+                      MathJax.Hub.Queue(["Typeset",MathJax.Hub,el[0]]);
+                    });
                   }
                 });
               }
