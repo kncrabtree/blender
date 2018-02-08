@@ -199,6 +199,8 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
             $author_count = 0;
             foreach($a['author'] as $author)
             {
+              if(!isset($author['given']) || !isset($author['family']))
+		continue;
               $author_count++;
               $author_name = $author['given'].' '.$author['family'];
               if($author_string === "")
