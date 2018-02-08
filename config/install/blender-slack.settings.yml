@@ -1,0 +1,5 @@
+blender-slack:
+  enabled: false
+  workspace-token: ''
+  bot-token: ''
+  channel: ''

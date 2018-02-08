@@ -10,6 +10,19 @@ blender.home:
   description: 'Access journal blender'
   weight: -10
 
+blender.admin_config_blender:
+  title: 'Blender'
+  description: 'Blender settings'
+  route_name: blender.settings
+  parent: 'system.admin_config'
+
+blenderslack.form:
+  title: 'Configure Slack'
+  route_name: blenderslack.form
+  description: 'Configure Slack integration settings.'
+  parent: blender.admin_config_blender
+  menu_name: blender
+
 #blender.inbox:
 #  title: 'Inbox'
 #  route_name: blender.inbox

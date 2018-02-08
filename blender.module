@@ -158,27 +158,31 @@ function blender_cron() {
       }
 
       //post to slack
-      $slack['channel'] = 'C8XGXGBQD';
-      $txt = 'The following article';
-      if(count($candidates) > 1)
-        $txt.= 's have ';
-      else
-        $txt.= ' has ';
-      $txt.='been selected for discussion at the next group meeting.';
-      $slack['text'] = $txt;
-
-      $url = 'https://slack.com/api/chat.postMessage';
-      $headers['Content-type'] = 'application/json';
-      $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
-
-      $response = \Drupal::httpClient()->request('POST',$url, [
-        'headers' => $headers,
-        'body' => json_encode($slack)
-      ]);
-
-      if($response->getStatusCode() != 200)
+      $config = \Drupal::config('blender-slack');
+      if($config->get('enabled'))
       {
-        \Drupal::logger('blender')->warning("Received error code ".$response->getStatusCode()," when posting starred articles to Slack (url = ".$url.").");
+        $slack['channel'] = $config->get('channel');
+        $txt = 'The following article';
+        if(count($candidates) > 1)
+          $txt.= 's have ';
+        else
+          $txt.= ' has ';
+        $txt.='been selected for discussion at the next group meeting.';
+        $slack['text'] = $txt;
+
+        $url = 'https://slack.com/api/chat.postMessage';
+        $headers['Content-type'] = 'application/json';
+        $headers['Authorization'] = 'Bearer '.$config->get('workspace-token');
+
+        $response = \Drupal::httpClient()->request('POST',$url, [
+          'headers' => $headers,
+          'body' => json_encode($slack)
+        ]);
+
+        if($response->getStatusCode() != 200)
+        {
+          \Drupal::logger('blender')->warning("Received error code ".$response->getStatusCode()," when posting starred articles to Slack (url = ".$url.").");
+        }
       }
 
     }

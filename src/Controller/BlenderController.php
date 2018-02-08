@@ -842,31 +842,34 @@ class BlenderController extends ControllerBase {
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
       //post to Slack
-      $slack['channel'] = 'C8XGXGBQD';
-      $slack['text'] = $this->currentUser()->getDisplayName().' voted for an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
-      $slack['attachments'] = [
-        [
-          "title" => $article->get('title')->value,
-          "text" => "Total votes: ".$vc,
-          "color" => "#ce0610",
-          "actions" => [
-            [
-              "type" => "button",
-              "text" => "View Abstract",
-              "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-            ],
-            [
-              "type" => "button",
-              "text" => "Open in Blender",
-              "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+      if($this->config('blender-slack')->get('enabled'))
+      {
+        $slack['channel'] = $this->config('blender-slack')->get('channel');
+        $slack['text'] = $this->currentUser()->getDisplayName().' voted for an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
+        $slack['attachments'] = [
+          [
+            "title" => $article->get('title')->value,
+            "text" => "Total votes: ".$vc,
+            "color" => "#ce0610",
+            "actions" => [
+              [
+                "type" => "button",
+                "text" => "View Abstract",
+                "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+              ],
+              [
+                "type" => "button",
+                "text" => "Open in Blender",
+                "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+              ],
             ],
           ],
-        ],
-      ];
+        ];
 
-      $reply = $this->post_to_slack('chat.postMessage',$slack);
-      if(isset($reply['ok']) && $reply['ok'] == true)
-        $vote->set('slack_ts',$reply['ts']);
+        $reply = $this->post_to_slack('chat.postMessage',$slack);
+        if(isset($reply['ok']) && $reply['ok'] == true)
+          $vote->set('slack_ts',$reply['ts']);
+      }
       $vote->save();
       $return_data['vote_added'] = true;
     }
@@ -923,12 +926,15 @@ class BlenderController extends ControllerBase {
       else
       {
         //remove from Slack if it's there
-        if(isset($vote->get('slack_ts')->value))
+        if($this->config('blender-slack')->get('enabled'))
         {
-          $slack['channel'] = 'C8XGXGBQD';
-          $slack['as_user'] = true;
-          $slack['ts'] = $vote->get('slack_ts')->value;
-          $this->post_to_slack('chat.delete',$slack);
+          if(isset($vote->get('slack_ts')->value))
+          {
+            $slack['channel'] = $this->config('blender.slack')->get(channel);
+            $slack['as_user'] = true;
+            $slack['ts'] = $vote->get('slack_ts')->value;
+            $this->post_to_slack('chat.delete',$slack);
+          }
         }
         $vote->delete();
         $return_data['vote_removed'] = true;
@@ -1070,7 +1076,7 @@ class BlenderController extends ControllerBase {
       $receiver = $this->entityTypeManager()->getStorage('user')->load($target_user)->get('slack_id')->value;
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
-      if(isset($receiver))
+      if(isset($receiver) && $this->config('blender-slack')->get('enabled'))
       {
         $slack['user'] = $receiver;
 
@@ -1258,34 +1264,37 @@ class BlenderController extends ControllerBase {
       ]);
 
       //edit comment on slack
-      $slack['channel'] = 'C8XGXGBQD';
-      $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
-      $slack['as_user'] = true;
-      $slack['ts'] = $c->get('slack_ts')->value;
-      $slack['attachments'] = [
+      if($this->config('blender-slack')->get('enabled'))
+      {
+        $slack['channel'] = $this->config('blender-slack')->get('channel');
+        $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
+        $slack['as_user'] = true;
+        $slack['ts'] = $c->get('slack_ts')->value;
+        $slack['attachments'] = [
+          [
+            "title" => $article->get('title')->value,
+            "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+            "color" => "#a000c4",
+            "actions" => [
         [
-          "title" => $article->get('title')->value,
-          "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
-          "color" => "#a000c4",
-          "actions" => [
-	    [
-       	      "type" => "button",
-	      "text" => "View Abstract",
-	      "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-  	    ],
-	    [
-       	      "type" => "button",
-	      "text" => "Open in Blender",
-	      "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
-  	    ],
+                "type" => "button",
+          "text" => "View Abstract",
+          "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
           ],
-        ],
-      ];
+        [
+                "type" => "button",
+          "text" => "Open in Blender",
+          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
+          ],
+            ],
+          ],
+        ];
 
 
-      $reply = $this->post_to_slack('chat.update',$slack);
-      if(isset($reply['ok']) && $reply['ok'] == true)
-        $c->set('slack_ts',$reply['ts']);
+        $reply = $this->post_to_slack('chat.update',$slack);
+        if(isset($reply['ok']) && $reply['ok'] == true)
+          $c->set('slack_ts',$reply['ts']);
+      }
 
       $c->set('edited_time',$this->time_service->getRequestTime());
       $c->save();
@@ -1311,9 +1320,9 @@ class BlenderController extends ControllerBase {
     $this->check_article_preserve($c->get('article_id')->target_id);
 
     //delete comment on slack
-    if(isset($c->get('slack_ts')->value))
+    if(isset($c->get('slack_ts')->value) && $this->config('blender-slack')->get('enabled'))
     {
-      $slack['channel'] = 'C8XGXGBQD';
+      $slack['channel'] = $this->config('blender-slack')->get('channel');
       $slack['as_user'] = true;
       $slack['ts'] = $c->get('slack_ts')->value;
       $this->post_to_slack('chat.delete',$slack);
@@ -1351,32 +1360,34 @@ class BlenderController extends ControllerBase {
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
     //send comment to slack; get TS ID for use with editing
-    $slack['channel'] = 'C8XGXGBQD';
-    $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
-    $slack['attachments'] = [
+    if($this->config('blender-slack')->get('enabled'))
+    {
+      $slack['channel'] = $this->config('blender-slack')->get('channel');
+      $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
+      $slack['attachments'] = [
+        [
+          "title" => $article->get('title')->value,
+          "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+          "color" => "good",
+          "actions" => [
       [
-        "title" => $article->get('title')->value,
-        "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
-        "color" => "good",
-        "actions" => [
-	  [
-       	    "type" => "button",
-	    "text" => "View Abstract",
-	    "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-	  ],
-	  [
-       	    "type" => "button",
-	    "text" => "Open in Blender",
-	    "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
-	  ],
-        ],
+              "type" => "button",
+        "text" => "View Abstract",
+        "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
       ],
-    ];
+      [
+              "type" => "button",
+        "text" => "Open in Blender",
+        "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+      ],
+          ],
+        ],
+      ];
 
-    $reply = $this->post_to_slack('chat.postMessage',$slack);
-    if(isset($reply['ok']) && $reply['ok'] == true)
-      $c->set('slack_ts',$reply['ts']);
-
+      $reply = $this->post_to_slack('chat.postMessage',$slack);
+      if(isset($reply['ok']) && $reply['ok'] == true)
+        $c->set('slack_ts',$reply['ts']);
+    }
 
     $c->save();
 
@@ -1437,14 +1448,17 @@ class BlenderController extends ControllerBase {
 
   public function post_to_slack($method, $array, $bot = false) {
 
+    if(!$this->config('blender-slack')->get('enabled'))
+      return;
+
     $url = 'https://slack.com/api/'.$method;
 
-    ///TODO: Move Authorization to configuration or something
+
     $headers['Content-type'] = 'application/json';
     if($bot)
-      $headers['Authorization'] = 'Bearer xoxb-305060915457-eKyGDUUz214GSvcvV9A5NNdu';
+      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack')->get('bot-token');
     else
-      $headers['Authorization'] = 'Bearer xoxp-31374271478-31371350292-303582881365-7c51d6e8db44cc483631da9df2e3c37e';
+      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack')->get('workspace-token');
 
     $response = $this->http_client->request('POST',$url, [
       'headers' => $headers,

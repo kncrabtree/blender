@@ -239,3 +239,16 @@ blender.blender_article.canonical:
     parameters:
       blender_article:
         type: entity:blender_article
+
+blender.settings:
+  path: 'admin/config/blender'
+  requirements:
+    _permission: 'administer blender'
+
+blenderslack.form:
+  path: '/admin/config/blender/slack'
+  defaults:
+    _form: 'Drupal\blender\Form\BlenderSlackForm'
+    _title: 'Configure Slack Integration'
+  requirements:
+   _permission: 'administer blender'
