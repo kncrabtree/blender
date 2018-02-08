@@ -842,9 +842,10 @@ class BlenderController extends ControllerBase {
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
       //post to Slack
-      if($this->config('blender-slack')->get('enabled'))
+      if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
       {
-        $slack['channel'] = $this->config('blender-slack')->get('channel');
+        //\Drupal::logger('blender')->notice('Trying to post to Slack.');
+        $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
         $slack['text'] = $this->currentUser()->getDisplayName().' voted for an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
         $slack['attachments'] = [
           [
@@ -869,6 +870,10 @@ class BlenderController extends ControllerBase {
         $reply = $this->post_to_slack('chat.postMessage',$slack);
         if(isset($reply['ok']) && $reply['ok'] == true)
           $vote->set('slack_ts',$reply['ts']);
+        else
+        {
+          \Drupal::logger('blender')->warning('Could not post to Slack. Error: '.$reply['error']);
+        }
       }
       $vote->save();
       $return_data['vote_added'] = true;
@@ -926,11 +931,11 @@ class BlenderController extends ControllerBase {
       else
       {
         //remove from Slack if it's there
-        if($this->config('blender-slack')->get('enabled'))
+        if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
         {
           if(isset($vote->get('slack_ts')->value))
           {
-            $slack['channel'] = $this->config('blender.slack')->get(channel);
+            $slack['channel'] = $this->config('blender-slack')->get('blender-slack.channel');
             $slack['as_user'] = true;
             $slack['ts'] = $vote->get('slack_ts')->value;
             $this->post_to_slack('chat.delete',$slack);
@@ -1076,7 +1081,7 @@ class BlenderController extends ControllerBase {
       $receiver = $this->entityTypeManager()->getStorage('user')->load($target_user)->get('slack_id')->value;
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
-      if(isset($receiver) && $this->config('blender-slack')->get('enabled'))
+      if(isset($receiver) && $this->config('blender-slack.settings')->get('blender-slack.enabled'))
       {
         $slack['user'] = $receiver;
 
@@ -1264,9 +1269,9 @@ class BlenderController extends ControllerBase {
       ]);
 
       //edit comment on slack
-      if($this->config('blender-slack')->get('enabled'))
+      if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
       {
-        $slack['channel'] = $this->config('blender-slack')->get('channel');
+        $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
         $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
         $slack['as_user'] = true;
         $slack['ts'] = $c->get('slack_ts')->value;
@@ -1320,9 +1325,9 @@ class BlenderController extends ControllerBase {
     $this->check_article_preserve($c->get('article_id')->target_id);
 
     //delete comment on slack
-    if(isset($c->get('slack_ts')->value) && $this->config('blender-slack')->get('enabled'))
+    if(isset($c->get('slack_ts')->value) && $this->config('blender-slack.settings')->get('blender-slack.enabled'))
     {
-      $slack['channel'] = $this->config('blender-slack')->get('channel');
+      $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
       $slack['as_user'] = true;
       $slack['ts'] = $c->get('slack_ts')->value;
       $this->post_to_slack('chat.delete',$slack);
@@ -1360,9 +1365,9 @@ class BlenderController extends ControllerBase {
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
     //send comment to slack; get TS ID for use with editing
-    if($this->config('blender-slack')->get('enabled'))
+    if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
     {
-      $slack['channel'] = $this->config('blender-slack')->get('channel');
+      $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
       $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
       $slack['attachments'] = [
         [
@@ -1448,7 +1453,7 @@ class BlenderController extends ControllerBase {
 
   public function post_to_slack($method, $array, $bot = false) {
 
-    if(!$this->config('blender-slack')->get('enabled'))
+    if(!$this->config('blender-slack.settings')->get('blender-slack.enabled'))
       return;
 
     $url = 'https://slack.com/api/'.$method;
@@ -1456,9 +1461,9 @@ class BlenderController extends ControllerBase {
 
     $headers['Content-type'] = 'application/json';
     if($bot)
-      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack')->get('bot-token');
+      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack.settings')->get('blender-slack.bot-token');
     else
-      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack')->get('workspace-token');
+      $headers['Authorization'] = 'Bearer '.$this->config('blender-slack.settings')->get('blender-slack.workspace-token');
 
     $response = $this->http_client->request('POST',$url, [
       'headers' => $headers,

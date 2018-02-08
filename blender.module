@@ -158,10 +158,10 @@ function blender_cron() {
       }
 
       //post to slack
-      $config = \Drupal::config('blender-slack');
-      if($config->get('enabled'))
+      $config = \Drupal::config('blender-slack.settings');
+      if($config->get('blender-slack.enabled'))
       {
-        $slack['channel'] = $config->get('channel');
+        $slack['channel'] = $config->get('blender-slack.channel');
         $txt = 'The following article';
         if(count($candidates) > 1)
           $txt.= 's have ';
@@ -172,7 +172,7 @@ function blender_cron() {
 
         $url = 'https://slack.com/api/chat.postMessage';
         $headers['Content-type'] = 'application/json';
-        $headers['Authorization'] = 'Bearer '.$config->get('workspace-token');
+        $headers['Authorization'] = 'Bearer '.$config->get('blender-slack.workspace-token');
 
         $response = \Drupal::httpClient()->request('POST',$url, [
           'headers' => $headers,
