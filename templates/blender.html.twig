@@ -57,7 +57,7 @@
       <select name="journal_id">
         <option value="0">All</option>
         {% for j in journals %}
-          <option value="{{ j.id }}">{{ j.abbr }}: {{ j.title }}</option>
+          <option value="{{ j.id }}"{% if j.id == journalfilter %} selected{% endif %}>{{ j.abbr }}: {{ j.title }}</option>
         {% endfor %}
       </select>
       <input type="submit" value="Filter" />
