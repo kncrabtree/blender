@@ -785,3 +785,23 @@
     }
   };
 })(jQuery, Drupal);
+
+(function ($, Drupal) {
+  Drupal.behaviors.journalFilterBehavior = {
+    attach: function (context, settings) {
+      $('#blender-filter', context).once('journalFilterBehavior').each(function () {
+        var bg = $('#journal-filter-bg');
+        bg.click(function (event) {
+          if(!$.contains(bg.get(0),event.target))
+          {
+            //clean up input fields here
+            bg.removeClass('visible');
+          }
+        });
+        $(this).click(function (event) {
+          bg.addClass('visible');
+        });
+      });
+    }
+  };
+})(jQuery, Drupal);

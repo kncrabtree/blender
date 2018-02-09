@@ -11,6 +11,8 @@ function blender_theme($existing, $type, $theme, $path) {
     'blender' => array(
       'variables' => array(
         'articles' => NULL,
+        'journals' => NULL,
+        'journalfilter' => 0,
         'more' => NULL,
         'page' => 'inbox',
         'inbox_new' => 0,

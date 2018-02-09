@@ -190,7 +190,7 @@ class BlenderController extends ControllerBase {
     return $articles;
   }
 
-  protected function build_render_array($articles, $more, $standalone = false) {
+  protected function build_render_array($articles, $more, $jid = 0, $standalone = false) {
 
     $a_array = array();
     foreach($articles as $a)
@@ -216,6 +216,21 @@ class BlenderController extends ControllerBase {
       $a_array[] = $a_d;
     }
 
+    $q = $this->query_service->get('blender_journal');
+    $jids = $q->sort('abbr','ASC')->execute();
+
+    $j_list = $this->entityTypeManager()->getStorage('blender_journal')->loadMultiple($jids);
+
+    $journals = array();
+    foreach($j_list as $j)
+    {
+      $journals[] = [
+        'id' => $j->get('id')->value,
+        'abbr' => $j->get('abbr')->value,
+        'title' => $j->get('title')->value,
+      ];
+    }
+
     $render = array(
       '#articles' => $a_array,
       '#more' => $more,
@@ -229,6 +244,8 @@ class BlenderController extends ControllerBase {
     else
     {
       $render['#theme'] = 'blender';
+      $render['#journals'] = $journals;
+      $render['#journalfilter'] = isset($jid) ? $jid : 0;
       $render['#page'] = $this->page;
       $render['#inbox_new'] = $this->get_new_inbox();
       $render['#recommend_new'] = $this->get_new_recommend();
@@ -266,7 +283,16 @@ class BlenderController extends ControllerBase {
 
   }
 
-  public function inbox() {
+  public function inbox(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.inbox')->toString());
+      else
+        $this->conditions['journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->conditions['inbox'] = [true];
@@ -275,10 +301,19 @@ class BlenderController extends ControllerBase {
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
   }
 
-  public function all_user_articles() {
+  public function all_user_articles(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-archive')->toString());
+      else
+        $this->conditions['journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'user-archive';
@@ -286,7 +321,7 @@ class BlenderController extends ControllerBase {
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
   }
 
   public function article(JournalArticleInterface $blender_article)
@@ -294,16 +329,34 @@ class BlenderController extends ControllerBase {
     return $this->build_render_array([$blender_article],false);
   }
 
-  public function all_articles() {
+  public function all_articles(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all')->toString());
+      else
+        $this->conditions['journal_id'] = $jid;
+    }
 
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
     $this->page = 'archive';
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
   }
 
-  public function user_bookmarks() {
+  public function user_bookmarks(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-bookmarks')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'bookmarks';
@@ -311,11 +364,20 @@ class BlenderController extends ControllerBase {
     $articles = $this->other_lookup_list('blender_bookmark');
     $more = $this->lookup_more_available('blender_bookmark');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function user_comments() {
+  public function user_comments(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-comments')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'user-comments';
@@ -325,11 +387,20 @@ class BlenderController extends ControllerBase {
     $more = $this->lookup_more_available('blender_comment',
     'id');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function all_comments() {
+  public function all_comments(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all-comments')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $this->page = 'all-comments';
 
@@ -338,11 +409,20 @@ class BlenderController extends ControllerBase {
     $more = $this->lookup_more_available('blender_comment',
     'id');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function user_votes() {
+  public function user_votes(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-votes')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'user-votes';
@@ -350,11 +430,20 @@ class BlenderController extends ControllerBase {
     $articles = $this->other_lookup_list('blender_vote');
     $more = $this->lookup_more_available('blender_vote');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function user_recommendations() {
+  public function user_recommendations(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-recommendations')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
     $this->page = 'user-recommendations';
@@ -362,28 +451,46 @@ class BlenderController extends ControllerBase {
     $articles = $this->other_lookup_list('blender_recommendation','id','DESC');
     $more = $this->lookup_more_available('blender_recommendation');
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function all_votes() {
+  public function all_votes(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all-votes')->toString());
+      else
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+    }
 
     $articles = $this->other_lookup_list('blender_vote');
     $more = $this->lookup_more_available('blender_vote');
     $this->page = 'votes';
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
-  public function starred() {
+  public function starred(Request $request) {
+
+    $jid = $request->get('journal_id');
+    if($jid !== NULL)
+    {
+      if($jid == 0)
+        return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.starred')->toString());
+      else
+        $this->conditions['journal_id'] = $jid;
+    }
 
     $this->conditions['is_starred'] = [true];
     $articles = $this->article_lookup_list();
     $more = $this->lookup_more_available('blender_article');
     $this->page = 'starred';
 
-    return $this->build_render_array($articles,$more);
+    return $this->build_render_array($articles,$more,$jid);
 
   }
 
@@ -587,7 +694,7 @@ class BlenderController extends ControllerBase {
 
     }
 
-    return $this->build_render_array($articles,$more,$standalone);
+    return $this->build_render_array($articles,$more,0,$standalone);
 
   }
 
@@ -720,7 +827,7 @@ class BlenderController extends ControllerBase {
 
     $more = $this->lookup_more_available($type);
 
-    $render = $this->build_render_array($articles,$more,true);
+    $render = $this->build_render_array($articles,$more,0,true);
 
     $return_data = array(
       'html' => render($render),
@@ -1407,7 +1514,7 @@ class BlenderController extends ControllerBase {
 
   public function get_journal_list() {
     $q = $this->query_service->get('blender_journal');
-    $ids = $q->sort('title','ASC')->execute();
+    $ids = $q->sort('abbr','ASC')->execute();
 
     $j_list = $this->entityTypeManager()->getStorage('blender_journal')->loadMultiple($ids);
     $return_data['query'] = 'Unit';

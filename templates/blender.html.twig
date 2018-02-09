@@ -5,6 +5,8 @@
  *
  * Available variables:
  *   - articles
+ *   - journals
+ *   - journalfilter
  *   - more
  *   - page
  *   - inbox_new
@@ -44,6 +46,21 @@
       <div id="search-advanced-container" class="hidden">
       </div>
       <a id="search-advanced">Advanced</a>
+    </div>
+  </div>
+</form>
+
+<form id="journal-filter-form">
+  <div id="journal-filter-bg" class="overlay">
+    <div id="journal-filter-container">
+      <h2> Filter by Journal </h2>
+      <select name="journal_id">
+        <option value="0">All</option>
+        {% for j in journals %}
+          <option value="{{ j.id }}">{{ j.abbr }}: {{ j.title }}</option>
+        {% endfor %}
+      </select>
+      <input type="submit" value="Filter" />
     </div>
   </div>
 </form>
@@ -133,12 +150,19 @@
     <span class="blender-tooltiptext bottom">View all articles.</span>
   </div>
   <div class="blender-tooltip">
+    <div class="blender-navigation-item{% if journalfilter > 0 %} selected{% endif %}{% if page is same as('search') %} disabled{% endif %}" id="blender-filter{% if page is same as('search') %}-disabled{% endif %}">
+      <i class="material-icons md-dark icon {% if page is not same as('search') %}clickable {% endif %}filter-nav-icon{% if page is same as('search') %}-disabled{% endif %}{% if journalfilter > 0 %} selected{% endif %}">filter_list</i>
+    </div>
+    <span class="blender-tooltiptext bottom">{% if page is not same as('search') %}Filter by journal.{% else %}Use advanced search to filter by journal.{% endif %}</span>
+  </div>
+  <div class="blender-tooltip">
     <div class="blender-navigation-item{% if page is same as('search') %} selected{% endif %}" id="blender-search">
       <i class="material-icons md-dark icon clickable search-nav-icon{% if page is same as('search') %} selected{% endif %}">search</i>
     </div>
     <span class="blender-tooltiptext bottom">Search articles.</span>
   </div>
 </div>
+
 
 {% if articles %}
   <div id="articles-table">

@@ -23,6 +23,17 @@
   text-align:center;
 }
 
+
+#journal-filter-container {
+  display:block;
+  max-width: 350px;
+  max-height: 400px;
+  margin:auto;
+  position:relative;
+  top:50%;
+  transform: translate(0%,-50%);
+}
+
 #search-container {
   display: grid;
   grid-auto-rows: auto;

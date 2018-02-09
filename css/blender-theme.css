@@ -18,6 +18,14 @@
   padding: 10px;
 }
 
+#journal-filter-container {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-family: Sans-serif;
+  padding: 10px;
+}
+
 #search-container {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.13);
@@ -91,6 +99,11 @@
   background: white;
 }
 
+.blender-navigation-item.disabled:hover {
+  cursor: default;
+  background: rgba(0,0,0,0.06);
+}
+
 .blender-navigation-item:hover .material-icons.md-dark.inbox-nav-icon {
   color: rgba(255,0,0,0.87);
 }
@@ -145,6 +158,19 @@
 
 .material-icons.md-dark.star-nav-icon.selected {
   color: rgba(255, 175, 30, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.filter-nav-icon {
+  color: rgba(145, 0, 175, 0.87);
+}
+
+.blender-navigation-item:hover .material-icons.md-dark.filter-nav-icon-disabled {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+
+.material-icons.md-dark.filter-nav-icon.selected {
+  color: rgba(145, 0, 175, 0.87);
 }
 
 .blender-navigation-item:hover .material-icons.md-dark.search-nav-icon {
