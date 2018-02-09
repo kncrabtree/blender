@@ -291,7 +291,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.inbox')->toString());
       else
-        $this->conditions['journal_id'] = $jid;
+        $this->conditions['journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -312,7 +312,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-archive')->toString());
       else
-        $this->conditions['journal_id'] = $jid;
+        $this->conditions['journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -337,7 +337,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all')->toString());
       else
-        $this->conditions['journal_id'] = $jid;
+        $this->conditions['journal_id'] = [$jid];
     }
 
     $articles = $this->article_lookup_list();
@@ -355,7 +355,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-bookmarks')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -376,7 +376,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-comments')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -399,7 +399,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all-comments')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $this->page = 'all-comments';
@@ -421,7 +421,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-votes')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -442,7 +442,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.user-recommendations')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $this->conditions['user_id'] = [$this->currentUser()->id()];
@@ -463,7 +463,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.all-votes')->toString());
       else
-        $this->conditions['article_id.entity:blender_article.journal_id'] = $jid;
+        $this->conditions['article_id.entity:blender_article.journal_id'] = [$jid];
     }
 
     $articles = $this->other_lookup_list('blender_vote');
@@ -482,7 +482,7 @@ class BlenderController extends ControllerBase {
       if($jid == 0)
         return new RedirectResponse(\Drupal\Core\Url::fromRoute('blender.starred')->toString());
       else
-        $this->conditions['journal_id'] = $jid;
+        $this->conditions['journal_id'] = [$jid];
     }
 
     $this->conditions['is_starred'] = [true];
