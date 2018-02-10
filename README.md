@@ -2,6 +2,8 @@
 
 The Journal Blender is a Drupal 8 module that allows a group of people to share the burden of keeping up with new articles posted in scientific journals. Using a list of journal ISSN numbers, the system automatically polls the CrossRef system for new articles from those sources and assigns them randomly to the participants. Users can comment, vote for, and share articles with one another. Each week, the two articles with the most votes are "starred" so that they can be flagged for group discussion. Optional Slack integration allows notifications from the system to be posted to a Slack workspace.
 
+![Screenshot](https://github.com/kncrabtree/blender/blob/master/doc/images/screenshot.png)
+
 ## Requirements
 
 * Drupal 8.x
