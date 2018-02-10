@@ -11,7 +11,7 @@ The Journal Blender is a Drupal 8 module that allows a group of people to share 
 
 ## Installation
 
-1. Unpack into the modules folder of the drupal site, and ensure permissions are correctly set.
+1. Unpack into modules/custom/blender, and ensure permissions are correctly set.
 2. Enable the module in the Adminstration>Extend menu.
 3. The module adds the "Blender Active User" and "Blender Passive User" Roles. An "active" user will be regularly assigned articles, while a passive user will not. Passive users may still comment, vote, and send/receive article recommendations. Assign roles as desired to users through Drupal's People menu.
 4. In addition, there are additional permissions "access blender" and "administer blender" that can be added to other existing roles. Users with the "administer blender" permission (adminstrators only by default) can add, edit, and disable journals in the system, and can configure Slack settings.
