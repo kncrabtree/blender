@@ -708,11 +708,11 @@ class BlenderController extends ControllerBase {
     //use the page to determine what conditions to use
     $page = $request->request->get('origin');
 
+    parse_str(substr($request->request->get('query'),1),$query);
+
     //searches use different logic than the rest
     if(strpos($page,'search') !== false)
     {
-      parse_str(substr($request->request->get('query'),1),$query);
-
       $search['terms'] = $query['search-text'];
       $search['type'] = isset($query['search-type']) ? $query['search-type'] : 'or';
       $search['user'] = isset($query['user']) && $query['user'] === 'true' ? true : false;
@@ -773,12 +773,18 @@ class BlenderController extends ControllerBase {
     {
       $this->conditions['article_id'] = [$a_id,'<'];
       $type = 'blender_bookmark';
+      if(isset($query['journal_id']))
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $query['journal_id'];
+
       $articles = $this->other_lookup_list($type);
     }
     else if(strpos($page,'votes') !== false)
     {
       $this->conditions['article_id'] = [$a_id,'<'];
       $type = 'blender_vote';
+      if(isset($query['journal_id']))
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $query['journal_id'];
+
       $articles = $this->other_lookup_list($type);
     }
     else if(strpos($page,'comments') !== false)
@@ -793,6 +799,9 @@ class BlenderController extends ControllerBase {
       $this->conditions['id'] = [$val,'<'];
       $type = 'blender_comment';
       $sort = 'id';
+      if(isset($query['journal_id']))
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $query['journal_id'];
+
       $articles = $this->other_lookup_list($type,$sort);
     }
     else if(strpos($page,'recommendations') !== false)
@@ -807,6 +816,9 @@ class BlenderController extends ControllerBase {
       $this->conditions['id'] = [$r_id,'<'];
       $type = 'blender_recommendation';
       $sort = 'id';
+      if(isset($query['journal_id']))
+        $this->conditions['article_id.entity:blender_article.journal_id'] = $query['journal_id'];
+
 
       $articles = $this->other_lookup_list($type,$sort);
     }
@@ -817,10 +829,16 @@ class BlenderController extends ControllerBase {
       $this->conditions['is_starred'] = [true];
       $this->conditions['star_date'] = [$a->get('star_date')->value,'<'];
       $sort = 'star_date';
+      if(isset($query['journal_id']))
+        $this->conditions['journal_id'] = $query['journal_id'];
+
     }
     else
     {
       $this->conditions['id'] = [$a_id,'<'];
+      if(isset($query['journal_id']))
+        $this->conditions['journal_id'] = $query['journal_id'];
+
 
       $articles = $this->article_lookup_list();
     }
