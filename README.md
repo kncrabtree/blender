@@ -2,6 +2,8 @@
 
 The Journal Blender is a Drupal 8 module that allows a group of people to share the burden of keeping up with new articles posted in scientific journals. Using a list of journal ISSN numbers, the system automatically polls the CrossRef system for new articles from those sources and assigns them randomly to the participants. Users can comment, vote for, and share articles with one another. Each week, the two articles with the most votes are "starred" so that they can be flagged for group discussion. Optional Slack integration allows notifications from the system to be posted to a Slack workspace.
 
+![Screenshot](https://github.com/kncrabtree/blender/blob/master/doc/images/screenshot.png)
+
 ## Requirements
 
 * Drupal 8.x
@@ -9,7 +11,7 @@ The Journal Blender is a Drupal 8 module that allows a group of people to share 
 
 ## Installation
 
-1. Unpack into the modules folder of the drupal site, and ensure permissions are correctly set.
+1. Unpack into modules/custom/blender, and ensure permissions are correctly set.
 2. Enable the module in the Adminstration>Extend menu.
 3. The module adds the "Blender Active User" and "Blender Passive User" Roles. An "active" user will be regularly assigned articles, while a passive user will not. Passive users may still comment, vote, and send/receive article recommendations. Assign roles as desired to users through Drupal's People menu.
 4. In addition, there are additional permissions "access blender" and "administer blender" that can be added to other existing roles. Users with the "administer blender" permission (adminstrators only by default) can add, edit, and disable journals in the system, and can configure Slack settings.
