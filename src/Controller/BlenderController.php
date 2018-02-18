@@ -967,7 +967,7 @@ class BlenderController extends ControllerBase {
       $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
       //post to Slack
-      if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
+      if($this->config('blender-slack.settings')->get('blender-slack.enabled') && !$this->config('blender-slack.settings')->get('blender-slack.aggregate'))
       {
         //\Drupal::logger('blender')->notice('Trying to post to Slack.');
         $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
@@ -1056,6 +1056,7 @@ class BlenderController extends ControllerBase {
       else
       {
         //remove from Slack if it's there
+        //does not work with aggregation
         if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
         {
           if(isset($vote->get('slack_ts')->value))
@@ -1393,37 +1394,41 @@ class BlenderController extends ControllerBase {
         'format' => 'Basic HTML',
       ]);
 
-      //edit comment on slack
+      //edit comment on slack. Does not work with aggregation
       if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
       {
-        $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
-        $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
-        $slack['as_user'] = true;
-        $slack['ts'] = $c->get('slack_ts')->value;
-        $slack['attachments'] = [
-          [
-            "title" => $article->get('title')->value,
-            "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
-            "color" => "#a000c4",
-            "actions" => [
-        [
-                "type" => "button",
-          "text" => "View Abstract",
-          "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-          ],
-        [
-                "type" => "button",
-          "text" => "Open in Blender",
-          "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
-          ],
+        if($c->get('slack_ts')->value !== NULL)
+        {
+          $slack['ts'] = $c->get('slack_ts')->value;
+          $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
+          $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'. (Edited: '.DrupalDateTime::createFromTimestamp($this->time_service->getRequestTime())->format('Y-m-d g:i:s A').')';
+          $slack['as_user'] = true;
+          $slack['attachments'] = [
+            [
+              "title" => $article->get('title')->value,
+              "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
+              "color" => "#a000c4",
+              "actions" => [
+                [
+                  "type" => "button",
+                  "text" => "View Abstract",
+                  "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+                ],
+                [
+                  "type" => "button",
+                  "text" => "Open in Blender",
+                  "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
+                ],
+              ],
             ],
-          ],
-        ];
+          ];
 
 
-        $reply = $this->post_to_slack('chat.update',$slack);
-        if(isset($reply['ok']) && $reply['ok'] == true)
-          $c->set('slack_ts',$reply['ts']);
+          $reply = $this->post_to_slack('chat.update',$slack);
+          if(isset($reply['ok']) && $reply['ok'] == true)
+            $c->set('slack_ts',$reply['ts']);
+
+        }
       }
 
       $c->set('edited_time',$this->time_service->getRequestTime());
@@ -1449,7 +1454,7 @@ class BlenderController extends ControllerBase {
 
     $this->check_article_preserve($c->get('article_id')->target_id);
 
-    //delete comment on slack
+    //delete comment on slack. Does not work with aggregation
     if(isset($c->get('slack_ts')->value) && $this->config('blender-slack.settings')->get('blender-slack.enabled'))
     {
       $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
@@ -1490,7 +1495,7 @@ class BlenderController extends ControllerBase {
     $article = $this->entityTypeManager()->getStorage('blender_article')->load($a_id);
 
     //send comment to slack; get TS ID for use with editing
-    if($this->config('blender-slack.settings')->get('blender-slack.enabled'))
+    if($this->config('blender-slack.settings')->get('blender-slack.enabled') && !$this->config('blender-slack.settings')->get('blender-slack.aggregate'))
     {
       $slack['channel'] = $this->config('blender-slack.settings')->get('blender-slack.channel');
       $slack['text'] = $this->currentUser()->getDisplayName().' commented on an article in '.$article->get('journal_id')->entity->get('abbr')->value.'.';
@@ -1500,16 +1505,16 @@ class BlenderController extends ControllerBase {
           "text" => html_entity_decode(strip_tags($comment), ENT_QUOTES|ENT_HTML5),
           "color" => "good",
           "actions" => [
-      [
+            [
               "type" => "button",
-        "text" => "View Abstract",
-        "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
-      ],
-      [
+              "text" => "View Abstract",
+              "url" => 'http://dx.doi.org/'.$article->get('doi')->value,
+            ],
+            [
               "type" => "button",
-        "text" => "Open in Blender",
-        "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
-      ],
+              "text" => "Open in Blender",
+              "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $a_id, ],[ 'absolute' => true, ])->toString(),
+            ],
           ],
         ],
       ];

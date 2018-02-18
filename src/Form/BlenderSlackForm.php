@@ -52,6 +52,13 @@ class BlenderSlackForm extends ConfigFormBase {
       '#description' => $this->t('Bot token. This allows the app to send direct messages to inform users of new article recommendations.'),
     );
 
+    $form['aggregate'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Aggregate?'),
+      '#default_value' => $config->get('blender-slack.aggregate'),
+      '#description' => $this->t('If checked, new comments and votes will only be posted to Slack when cron runs, not immediately.'),
+    );
+
 
 
     return $form;
@@ -73,6 +80,7 @@ class BlenderSlackForm extends ConfigFormBase {
     $config->set('blender-slack.workspace-token', $form_state->getValue('workspace-token'));
     $config->set('blender-slack.channel', $form_state->getValue('channel'));
     $config->set('blender-slack.bot-token', $form_state->getValue('bot-token'));
+    $config->set('blender-slack.aggregate', $form_state->getValue('aggregate'));
     $config->save();
     return parent::submitForm($form, $form_state);
   }

@@ -3,3 +3,4 @@ blender-slack:
   workspace-token: ''
   bot-token: ''
   channel: ''
+  aggregate: false

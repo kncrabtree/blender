@@ -79,6 +79,163 @@ function blender_cron() {
 
   \Drupal::logger('blender')->notice("Deleted ".count($a_ids)." old articles.");
 
+  //if slack aggregation is enabled; seek comments and votes made since last cron run
+  $config = \Drupal::config('blender-slack.settings');
+  if($config->get('blender-slack.enabled') && $config->get('blender-slack.aggregate'))
+  {
+
+    $last_cron = \Drupal::state()->get('system.cron_last');
+
+    $attachments = [];
+
+    //first, comments
+    $list = \Drupal::entityTypeManager()->getStorage('blender_comment')->getAggregateQuery()
+      ->condition('timestamp',$last_cron,'>=')
+      ->aggregate('article_id','count')
+      ->groupBy('article_id')->execute();
+
+    foreach($list as $a)
+    {
+      $c_ids = \Drupal::entityQuery('blender_comment')
+        ->condition('article_id',$a['article_id'])
+        ->condition('timestamp',$last_cron,'>=')
+        ->sort('timestamp','ASC')->execute();
+
+      $comments = \Drupal::entityTypeManager()->getStorage('blender_comment')->loadMultiple($c_ids);
+
+      $this_article = \Drupal::entityTypeManager()->getStorage('blender_article')->load($a['article_id']);
+
+      $commenters = [];
+      $comment_text = '';
+
+      foreach($comments as $c)
+      {
+        $name = $c->get('user_id')->entity->getDisplayName();
+        if(!in_array($name,$commenters,true))
+          $commenters[] = $name;
+
+        $comment_text .= '*'.$name.':* '.html_entity_decode(strip_tags($c->get('text')->value), ENT_QUOTES|ENT_HTML5);
+      }
+
+      $pt_string = array_shift($commenters);
+      while(count($commenters) > 0)
+      {
+        if(count($commenters) > 1)
+          $pt_string.= ', '.array_shift($commenters);
+        else
+          $pt_string.= ' and '.array_shift($commenters);
+      }
+      $pt_string.= ' commented on an article in '.$this_article->get('journal_id')->entity->get('abbr')->value.'.';
+
+      $attachments[] =
+      [
+        'pretext' => $pt_string,
+        'title' => $this_article->get('title')->value,
+        'text' => $comment_text,
+        'color' => 'good',
+        "actions" => [
+          [
+            "type" => "button",
+            "text" => "View Abstract",
+            "url" => 'http://dx.doi.org/'.$this_article->get('doi')->value,
+          ],
+          [
+            "type" => "button",
+            "text" => "Open in Blender",
+            "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $this_article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
+          ],
+        ],
+      ];
+    }
+
+    //now, votes
+    $list = \Drupal::entityTypeManager()->getStorage('blender_vote')->getAggregateQuery()
+      ->condition('timestamp',$last_cron,'>=')
+      ->aggregate('article_id','count')
+      ->groupBy('article_id')->execute();
+
+    foreach($list as $a)
+    {
+      $v_ids = \Drupal::entityQuery('blender_vote')
+        ->condition('article_id',$a['article_id'])
+        ->condition('timestamp',$last_cron,'>=')
+        ->sort('timestamp','ASC')->execute();
+
+      $votes = \Drupal::entityTypeManager()->getStorage('blender_vote')->loadMultiple($v_ids);
+
+      $this_article = \Drupal::entityTypeManager()->getStorage('blender_article')->load($a['article_id']);
+
+      $voters = [];
+      foreach($votes as $v)
+      {
+        $name = $v->get('user_id')->entity->getDisplayName();
+        if(!in_array($name,$voters))
+          $voters[] = $name;
+      }
+
+      $pt_string = array_shift($voters);
+      while(count($voters)>0)
+      {
+        if(count($voters) > 1)
+          $pt_string.= ', '.array_shift($voters);
+        else
+          $pt_string.= ' and '.array_shift($voters);
+      }
+      $pt_string.= ' voted for an article in '.$this_article->get('journal_id')->entity->get('abbr')->value.'.';
+
+      $vc = \Drupal::entityQuery('blender_vote')
+        ->condition('article_id',$this_article->get('id')->value)
+        ->count()->execute();
+
+      $attachments[] =
+      [
+        'pretext' => $pt_string,
+        'title' => $this_article->get('title')->value,
+        'text' => "Total votes: ".$vc,
+        'color' => '#ce0610',
+        "actions" => [
+          [
+            "type" => "button",
+            "text" => "View Abstract",
+            "url" => 'http://dx.doi.org/'.$this_article->get('doi')->value,
+          ],
+          [
+            "type" => "button",
+            "text" => "Open in Blender",
+            "url" => \Drupal\Core\Url::fromRoute('blender.blender_article.canonical',[ 'blender_article' => $this_article->get('id')->value, ],[ 'absolute' => true, ])->toString(),
+          ],
+        ],
+
+      ];
+    }
+
+    //post to Slack, but keep number of attachments per post to 20
+    $slack['channel'] = $config->get('blender-slack.channel');
+    $offset = 0;
+    $chunk_size = 20;
+    $url = 'https://slack.com/api/chat.postMessage';
+    $headers['Content-type'] = 'application/json';
+    $headers['Authorization'] = 'Bearer '.$config->get('blender-slack.workspace-token');
+
+    while($offset < count($attachments))
+    {
+      $att = array_slice($attachments,$offset,$chunk_size);
+      $offset += $chunk_size;
+
+      $slack['attachments'] = $att;
+      $response = \Drupal::httpClient()->request('POST',$url, [
+        'headers' => $headers,
+        'body' => json_encode($slack)
+      ]);
+
+      if($response->getStatusCode() != 200)
+      {
+        \Drupal::logger('blender')->warning("Received error code ".$response->getStatusCode()," when posting comments and votes to Slack (url = ".$url.").");
+        break;
+      }
+    }
+  }
+
 
   //see if any articles have been starred within the last week
   $ts_res = \Drupal::entityQuery('blender_article')
@@ -115,7 +272,6 @@ function blender_cron() {
 //           $str .= ' '.$key.': '.$value.', ';
 //         \Drupal::logger('blender')->notice($str);
 
-        ///TODO: if selecting 2 articles, make timestamps 1 second different
         $a = \Drupal::entityTypeManager()->getStorage('blender_article')->load($c['article_id']);
         $a->set('is_starred',true);
         $a->set('star_date',$timestamp+$offset);
@@ -160,7 +316,6 @@ function blender_cron() {
       }
 
       //post to slack
-      $config = \Drupal::config('blender-slack.settings');
       if($config->get('blender-slack.enabled'))
       {
         $slack['channel'] = $config->get('blender-slack.channel');

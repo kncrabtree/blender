@@ -210,7 +210,7 @@ abstract class JournalFetchBase extends QueueWorkerBase implements ContainerFact
 
               if($author_count >= 10)
               {
-                $author_string .= ', et al.';
+                $author_string .= ', et al';
                 break;
               }
             }
