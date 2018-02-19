@@ -8,7 +8,7 @@ namespace Drupal\blender\Plugin\QueueWorker;
  * @QueueWorker(
  *   id = "journal_fetcher",
  *   title = @Translation("Journal Fetcher"),
- *   cron = {"time" = 120}
+ *   cron = {"time" = 20}
  * )
  */
 class JournalFetchWorker extends JournalFetchBase {}
