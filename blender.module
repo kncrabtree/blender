@@ -261,6 +261,7 @@ function blender_cron() {
 
     if(count($candidates) > 0)
     {
+      $slack = [];
       $offset = 0;
       $timestamp = \Drupal::time()->getRequestTime();
       foreach($candidates as $c)
