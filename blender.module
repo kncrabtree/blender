@@ -46,22 +46,24 @@ function blender_cron() {
   if($queue->numberOfItems() > 0)
   {
     \Drupal::logger('blender')->notice("Not queuing more journals; queue not empty.");
-    return;
   }
+  else
+  {
 
-  $storage = \Drupal::entityTypeManager()->getStorage('blender_journal');
-  $jids = \Drupal::entityQuery('blender_journal')
-    ->condition('active', TRUE)
-    ->condition('last_update',\Drupal::time()->getRequestTime()-(24*60*60),'<')
-    ->execute();
+    $storage = \Drupal::entityTypeManager()->getStorage('blender_journal');
+    $jids = \Drupal::entityQuery('blender_journal')
+      ->condition('active', TRUE)
+      ->condition('last_update',\Drupal::time()->getRequestTime()-(24*60*60),'<')
+      ->execute();
 
-  $journals = $storage->loadMultiple($jids);
+    $journals = $storage->loadMultiple($jids);
 
 
-  foreach( $journals as $j ) {
-    if($queue->createItem($j))
-    {
-      \Drupal::logger('blender')->notice("Queued ".$j->abbr->value);
+    foreach( $journals as $j ) {
+      if($queue->createItem($j))
+      {
+        \Drupal::logger('blender')->notice("Queued ".$j->abbr->value);
+      }
     }
   }
 
